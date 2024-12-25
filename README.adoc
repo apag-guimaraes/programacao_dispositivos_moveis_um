@@ -30,7 +30,7 @@ IMPORTANT: Atenção, este material está sendo atualizado regularmente.
 
 2. link:aula_dois/[Linear Layout / View, Activity / Intent]
 
-3. link:aula_tres/[Exemplo prático: App Lanchonete]
+3. link:aula_tres/[Exemplo prático: App Lanchonete, IMC e Calculadora]
 
 4. link:aula_quatro/[List View: simples e personalizado]
 
