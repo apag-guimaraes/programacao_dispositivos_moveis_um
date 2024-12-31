@@ -16,6 +16,58 @@ Exemplos práticos
 - Inicialmente deve-se verificar no arquivo themes.xml se a seguinte tag:  <style name="Base.Theme.ExemploMenu"
         parent="Theme.Material3.DayNight.NoActionBar"> está configurada como NOACTIONBAR, pois assim você poderá adicionar sua própria barra de ferramentas.
 
+- colors.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Cores para o Tema Claro  -->
+    <color name="primary_light">#6200EE</color>
+    <color name="secondary_light">#03DAC6</color>
+    <color name="background_light">#FFFFFF</color>
+    <!-- Cores para o Tema Escuro  -->
+    <color name="primary_dark">#BB86FC</color>
+    <color name="secondary_dark">#03DAC6</color>
+    <color name="background_dark">#121212</color>
+</resources>
+
+- themes.xml (tema claro)
+[source,xml]
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.ExemploMenu"
+        parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Customize your light theme here. -->
+        <item name="colorPrimary">@color/primary_light</item>
+        <item name="colorSecondary">@color/secondary_light</item>
+        <item name="android:background">@color/background_light</item>
+    </style>
+    <style name="Theme.ExemploMenu"
+        parent="Base.Theme.ExemploMenu" />
+</resources>
+
+- themes.xml (tema escuro)
+[source,xml]
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.ExemploMenu"
+        parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Customize your dark theme here. -->
+        <item name="colorPrimary">@color/primary_dark</item>
+        <item name="colorSecondary">@color/secondary_dark</item>
+        <item name="android:background">@color/background_dark</item>
+    </style>
+</resources>
+
+- strings.xml
+[source,xml]
+<resources>
+    <string name="app_name">ExemploMenu</string>
+    <string name="java">JAVA</string>
+    <string name="php">PHP</string>
+    <string name="c">C</string>
+    <string name="android">Android</string>
+</resources>
+
 - activity_main.xml
 [source,xml]
 <?xml version="1.0" encoding="utf-8"?>
