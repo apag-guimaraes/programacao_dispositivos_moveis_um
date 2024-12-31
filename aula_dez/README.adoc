@@ -1,15 +1,3 @@
-//caminho padrão para imagens
-:imagesdir: image
-:figure-caption: Figura
-:doctype: book
-
-//gera apresentacao
-//pode se baixar os arquivos e add no diretório
-:revealjsdir: https://cdnjs.cloudflare.com/ajax/libs/reveal.js/3.8.0
-
-//GERAR ARQUIVOS
-//make slides
-//make ebook
 
 = Fragments
 
@@ -53,80 +41,104 @@ Referência: GOOGLE DEVELOPERS. Ciclo de Vida dos Fragmentos. Disponível em:<ht
 
 Exemplos práticos (estático):
 
+- colors.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="red">#CE3D3D</color>
+    <color name="green">#4CAF50</color>
+</resources>
+
 - activity_main.xml
 [source,xml]
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-   xmlns:app="http://schemas.android.com/apk/res-auto"
-   xmlns:tools="http://schemas.android.com/tools"
-   android:layout_width="match_parent"
-   android:layout_height="match_parent"
-   android:orientation="vertical"
-   tools:context=".MainActivity">
-   <fragment   //neste local será adicionado um Fragment
-       android:layout_width="match_parent"
-       android:layout_height="0dp"
-       android:layout_weight="1"
-       android:name="com.example.appfragment1.Tela1"   //nome da classe que implementa um Fragment
-       android:id="@+id/tela1"/>
-   <fragment   //neste local será adicionado um Fragment
-       android:layout_width="match_parent"
-       android:layout_height="0dp"
-       android:layout_weight="1"
-       android:name="com.example.appfragment1.Tela2"  //nome da classe que implementa um Fragment
-       android:id="@+id/tela2"/>
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+    <fragment
+    android:layout_width="match_parent"
+    android:layout_height="0dp"
+    android:layout_weight="1"
+    android:name="com.example.fragment_01.Tela1"
+    android:id="@+id/tela1"/>
+    <fragment
+    android:layout_width="match_parent"
+    android:layout_height="0dp"
+    android:layout_weight="1"
+    android:name="com.example.fragment_01.Tela2"
+    android:id="@+id/tela2"/>
 </LinearLayout>
 
 - MainActivity.java
 [source,java]
-import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
+import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 public class MainActivity extends AppCompatActivity {
-   @Override
-   protected void onCreate(Bundle savedInstanceState) {
-       super.onCreate(savedInstanceState);
-       setContentView(R.layout.activity_main);
-   }
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+       // EdgeToEdge.enable(this);
+        setContentView(R.layout.activity_main);
+
+    }
 }
 
 - tela1.xml
 [source,xml]
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-   android:orientation="vertical"
-   android:background="@color/colorPrimary"
-   android:layout_width="match_parent"
-   android:layout_height="match_parent">
-<EditText
-   android:layout_width="match_parent"
-   android:layout_height="wrap_content"
-   android:id="@+id/editTextNome"
-   android:hint="Digite seu nome"/>
-   <Button
-       android:layout_width="match_parent"
-       android:layout_height="wrap_content"
-       android:id="@+id/buttonNome"
-       android:text="CLICK"/>
-   <TextView
-       android:layout_width="match_parent"
-       android:layout_height="wrap_content"
-       android:id="@+id/textViewNome"/>
+    android:orientation="vertical"
+    android:background="@color/green"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/editTextNome"
+        android:hint="Digite seu nome"/>
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/buttonNome"
+        android:text="CLICK"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/textViewNome"/>
 </LinearLayout>
 
 - Tela1.java
 [source,java]
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 public class Tela1 extends Fragment {
-   private EditText editText;
-   private Button button;
-   private TextView textView;
-//ViewGroup container permite vincular ao layout pai
-//a visualização não será anexada imediatamente ao pai, o sistema fará esse vinculo depois
-   //return super.onCreateView(inflater, container, savedInstanceState);
- @Override
+    private EditText editText;
+    private Button button;
+    private TextView textView;
+    @Override
     public View onCreateView(LayoutInflater inflater,
                              ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_a,container, false);
+        View view = inflater.inflate(R.layout.tela1,container,
+                false);
         return view;
     }
     @Override
@@ -148,36 +160,46 @@ public class Tela1 extends Fragment {
 [source,xml]
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-   android:orientation="vertical"
-   android:layout_width="match_parent"
-   android:background="@color/colorPrimaryDark"
-   android:layout_height="match_parent">
-   <EditText
-       android:layout_width="match_parent"
-       android:layout_height="wrap_content"
-       android:id="@+id/editTextCurso"
-       android:hint="Digite o curso"/>
-   <Button
-       android:layout_width="match_parent"
-       android:layout_height="wrap_content"
-       android:id="@+id/buttonCurso"
-       android:text="CLICK"/>
-   <TextView
-       android:layout_width="match_parent"
-       android:layout_height="wrap_content"
-       android:id="@+id/textViewCurso"/>
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:background="@color/red"
+    android:layout_height="match_parent">
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/editTextCurso"
+        android:hint="Digite o curso"/>
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/buttonCurso"
+        android:text="CLICK"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/textViewCurso"/>
 </LinearLayout>
 
 - Tela2.java
 [source,java]
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 public class Tela2 extends Fragment {
-   private EditText editText;
-   private Button button;
-   private TextView textView;
- @Override
+    private EditText editText;
+    private Button button;
+    private TextView textView;
+    @Override
     public View onCreateView(LayoutInflater inflater,
-                              ViewGroup container,  Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_b,container,false);
+                             ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.tela2, container, false);
         return view;
     }//method
     @Override
@@ -194,114 +216,147 @@ public class Tela2 extends Fragment {
         });
     }
 }
-
+    
 Exemplos práticos (dinâmico):
+
+- colors.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="green">#4CAF50</color>
+    <color name="orange">#FF9800</color>
+    <color name="blue">#00BCD4</color>
+    <color name="red">#E91E63</color>
+</resources>
 
 - activity_main.xml
 [source,xml]
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-   xmlns:app="http://schemas.android.com/apk/res-auto"
-   xmlns:tools="http://schemas.android.com/tools"
-   android:layout_width="match_parent"
-   android:layout_height="match_parent"
-   android:orientation="vertical"
-   tools:context=".MainActivity">
-   <LinearLayout
-       android:layout_width="match_parent"
-       android:layout_height="wrap_content"
-       android:orientation="horizontal">
-       <Button
-           android:layout_width="0dp"
-           android:layout_weight="1"
-           android:text="Tela1"
-           android:onClick="trocar"
-           android:id="@+id/buttonTela1"
-           android:layout_height="wrap_content"/>
-       <Button
-           android:layout_width="0dp"
-           android:layout_weight="1"
-           android:text="Tela2"
-           android:onClick="trocar"
-           android:id="@+id/buttonTela2"
-           android:layout_height="wrap_content"/>
-   </LinearLayout>
-   <FrameLayout  //local onde será inserido o Fragment
-       android:layout_width="match_parent"
-       android:layout_height="match_parent"
-       android:background="@color/colorPrimary"
-       android:id="@+id/telaPrincipal" />
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/orange"
+    tools:context=".MainActivity">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <Button
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:text="Tela1"
+            android:onClick="trocar"
+            android:id="@+id/buttonTela1"
+            android:layout_height="wrap_content"/>
+        <Button
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:text="Tela2"
+            android:onClick="trocar"
+            android:id="@+id/buttonTela2"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+    <FrameLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/red"
+    android:id="@+id/telaPrincipal" />
 </LinearLayout>
 
 - MainActivity.java
 [source,java]
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 public class MainActivity extends AppCompatActivity {
-   private Button buttonTela1,buttonTela2;
-   private FragmentManager fm;
-  @Override
-protected void onCreate(Bundle savedInstanceState) {
-   super.onCreate(savedInstanceState);
-   setContentView(R.layout.activity_main);
-   buttonTela1 = findViewById(R.id.buttonTela1);  //fazer as conversões
-   buttonTela2 = findViewById(R.id.buttonTela2);
-   fm = getSupportFragmentManager();   //obter uma referência do gerenciador
-}
-  public void trocar(View view){
-   if(view.getId() == R.id.buttonTela1){
-       FragmentTransaction ft = fm.beginTransaction();  //obter uma referência de FragmentTransaction, este serve para adicionar, remover e excluir o fragmento
-       ft.add(R.id.telaPrincipal, new Tela1());  //adicionar a tela 1 no FrameLayout da tela principal
-       ft.commit();  //confirmar a adição
-   }
-   if(view.getId() == R.id.buttonTela2){
-       FragmentTransaction ft = fm.beginTransaction();
-       ft.add(R.id.telaPrincipal, new Tela2());
-       ft.commit();
-   }
-}//
+    private Button buttonTela1,buttonTela2;
+    private FragmentManager fm;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        buttonTela1 = findViewById(R.id.buttonTela1);  
+        buttonTela2 = findViewById(R.id.buttonTela2);
+        fm = getSupportFragmentManager();   
+    }
+    public void trocar(View view){
+        if(view.getId() == R.id.buttonTela1){
+            FragmentTransaction ft = fm.beginTransaction();  
+            ft.replace(R.id.telaPrincipal, new Tela1());  
+            ft.commit();  //confirmar
+        }
+        if(view.getId() == R.id.buttonTela2){
+            FragmentTransaction ft = fm.beginTransaction();
+            ft.replace(R.id.telaPrincipal, new Tela2());
+            ft.commit();
+        }
+    }//
 }
 
 - tela1.xml
 [source,xml]
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
-   xmlns:android="http://schemas.android.com/apk/res/android"
-   android:layout_width="match_parent"
-   android:background="@color/colorPrimary"
-   android:orientation="vertical"
-   android:layout_height="match_parent">
-   <EditText
-       android:layout_width="match_parent"
-       android:layout_height="wrap_content"
-       android:id="@+id/editTextNome"
-       android:hint="Digite seu nome"/>
-   <Button
-       android:layout_width="match_parent"
-       android:layout_height="wrap_content"
-       android:id="@+id/buttonNome"
-       android:text="CLICK"/>
-   <TextView
-       android:layout_width="match_parent"
-       android:layout_height="wrap_content"
-       android:id="@+id/textViewNome" />
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:background="@color/green"
+    android:orientation="vertical"
+    android:layout_height="match_parent">
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/editTextNome"
+        android:hint="Digite seu nome"/>
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/buttonNome"
+        android:text="CLICK"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/textViewNome" />
 </LinearLayout>
 
 - Tela1.java
 [source,java]
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 public class Tela1 extends Fragment {
-   private EditText editText;
-   private Button button;
-   private TextView textView;
-@Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,  Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_b,container, false);        
+    private EditText editText;
+    private Button button;
+    private TextView textView;
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.tela1,container, false);
         return view;
     }//method
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         //super.onViewCreated(view, savedInstanceState);
-        editText = view.findViewById(R.id.editTextCurso);
-        button = view.findViewById(R.id.buttonCurso);
-        textView = view.findViewById(R.id.textViewCurso);
+        editText = view.findViewById(R.id.editTextNome);
+        button = view.findViewById(R.id.buttonNome);
+        textView = view.findViewById(R.id.textViewNome);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -315,36 +370,47 @@ public class Tela1 extends Fragment {
 [source,xml]
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
-   xmlns:android="http://schemas.android.com/apk/res/android"
-   android:layout_width="match_parent"
-   android:background="@color/colorPrimary"
-   android:orientation="vertical"
-   android:layout_height="match_parent">
-   <EditText
-       android:layout_width="match_parent"
-       android:layout_height="wrap_content"
-       android:id="@+id/editTextCurso"
-       android:hint="Digite o curso"/>
-   <Button
-       android:layout_width="match_parent"
-       android:layout_height="wrap_content"
-       android:id="@+id/buttonCurso"
-       android:text="CLICK"/>
-   <TextView
-       android:layout_width="match_parent"
-       android:layout_height="wrap_content"
-       android:id="@+id/textViewCurso" />
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:background="@color/blue"
+    android:orientation="vertical"
+    android:layout_height="match_parent">
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/editTextCurso"
+        android:hint="Digite o curso"/>
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/buttonCurso"
+        android:text="CLICK"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/textViewCurso" />
 </LinearLayout>
 
 - Tela2.java
 [source,java]
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 public class Tela2 extends Fragment {
-   private EditText editText;
-   private Button button;
-   private TextView textView
-@Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,  Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_b,container,false);
+    private EditText editText;
+    private Button button;
+    private TextView textView;
+    @Override
+    public View onCreateView(LayoutInflater inflater,
+                             ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.tela2,container,false);
         return view;
     }//method
     @Override
@@ -379,7 +445,7 @@ protected void onCreate(Bundle savedInstanceState) {
    super.onCreate(savedInstanceState);
    setContentView(R.layout.activity_main);
    getSupportFragmentManager().beginTransaction()
-           .setReorderingAllowed(true) //pede para o sistema reordenar as operações de transições dos fragmentos
+           .setReorderingAllowed(true) 
            .add(R.id.tela, FragmentActivity.class,null)
            .commit();
 }
