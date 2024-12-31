@@ -250,7 +250,7 @@ public class CActivity extends AppCompatActivity {
     tools:context=".CActivity">
 </androidx.constraintlayout.widget.ConstraintLayout>
 
-
+OBS: Depois faça o teste com o emulador configurado com o tema escuro.
 
 
 
