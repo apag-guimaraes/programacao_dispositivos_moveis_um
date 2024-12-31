@@ -1,5 +1,3 @@
-:figure-caption: Figura
-:doctype: book
 
 = Fragments
 
@@ -36,8 +34,6 @@ Métodos do ciclo de vida:
 - onDestroy(): chamado para encerrar o fragmento;
 
 - onDetach(): o fragmento é desassociado da activity.
-
-image::cicloDeVidaFragment.png[500,500]
 
 Referência: GOOGLE DEVELOPERS. Ciclo de Vida dos Fragmentos. Disponível em:<https://developer.android.com/guide/fragments/lifecycle?hl=pt-br>. Acessado em: 26 ago. 2024.
 
