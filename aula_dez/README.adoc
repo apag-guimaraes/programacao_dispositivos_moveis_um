@@ -1,3 +1,5 @@
+:figure-caption: Figura
+:doctype: book
 
 = Fragments
 
