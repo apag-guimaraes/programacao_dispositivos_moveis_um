@@ -140,7 +140,7 @@ Exemplos práticos (Botões Personalizados)
     <color name="colorHintText">#888888</color>
 </resources>
 
-- button_custom.xml
+- button_custom.xml (coloque no diretório drawable)
 [source,xml]
 <?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
