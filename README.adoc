@@ -34,7 +34,7 @@ IMPORTANT: Atenção, este material está sendo atualizado regularmente.
 
 4. link:aula_quatro/[List View: simples e personalizado]
 
-5. link:aula_cinco/[Barra de ações e Menu]
+5. link:aula_cinco/[Barra de ações/ferramentas e Menu]
 
 6. link:aula_seis/[Caixas de diálogo]
 
