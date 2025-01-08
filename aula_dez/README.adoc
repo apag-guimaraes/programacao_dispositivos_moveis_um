@@ -704,7 +704,7 @@ public class ListaFragment extends Fragment {
     }
 }
 
-Exemplos práticos:
+Exemplos práticos (Passando valor da activity para o fragmento):
 
 - activity_main.xml
 [source,xml]
@@ -785,7 +785,7 @@ public class ExampleFragment extends Fragment {
     }
 }
 
-- Exemplos práticos (lista com 4 itens e cada item é mostrado usando fragmentos):
+Exemplos práticos (lista com 4 itens e cada item é mostrado usando fragmentos):
 
 - strings.xml
 [source,xml]
