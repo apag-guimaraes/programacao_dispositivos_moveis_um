@@ -7,146 +7,162 @@ Disponível em: https://developer.android.com/training/data-storage?hl=pt-br. Ac
 
 Exemplos práticos (Armazenamento interno):
 
+- ManipulaArquivo.java
+[source,java]
+import android.content.Context;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+public class ManipulaArquivo {
+    private Context context;
+    public ManipulaArquivo(Context context) {
+        this.context = context;
+    }
+    public void salvarArquivo(String nome, String conteudo) throws IOException {
+        try (FileOutputStream fos = context.openFileOutput(nome, Context.MODE_PRIVATE)) {
+            fos.write(conteudo.getBytes());
+        }
+    }
+    public String lerArquivo(String nome) throws IOException {
+        StringBuilder sb = new StringBuilder();
+        try (FileInputStream fis = context.openFileInput(nome)) {
+            int letra;
+            while ((letra = fis.read()) != -1) {
+                sb.append((char) letra);
+            }
+        }
+        return sb.toString();
+    }
+    public void deleteFile(String nome) {
+        context.deleteFile(nome);
+    }
+}
+
 - activity_main.xml
 [source,xml]
-<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-   xmlns:app="http://schemas.android.com/apk/res-auto"
-   xmlns:tools="http://schemas.android.com/tools"
-   android:layout_width="match_parent"
-   android:layout_height="match_parent"
-   android:layout_margin="10dp"
-   android:orientation="vertical"
-   tools:context=".MainActivity">
-   <EditText
-       android:layout_width="match_parent"
-       android:layout_height="wrap_content"
-       android:id="@+id/editTextTexto"
-       android:hint="Digite um texto"
-       />
-   <LinearLayout
-       android:layout_width="match_parent"
-       android:layout_height="wrap_content"
-       android:orientation="horizontal">
-       <Button
-           android:layout_width="0dp"
-           android:layout_height="wrap_content"
-           android:text="S"
-           android:id="@+id/buttonS"
-           android:onClick="clicar"
-           android:layout_weight="1"/>
-       <Button
-           android:layout_width="0dp"
-           android:layout_height="wrap_content"
-           android:text="E"
-           android:id="@+id/buttonE"
-           android:onClick="clicar"
-           android:layout_weight="1"/>
-   </LinearLayout>
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+    <EditText
+        android:id="@+id/editTextTexto"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Digite algo"
+        android:inputType="text" />
+    <Button
+        android:id="@+id/buttonS"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="clicar"
+        android:text="Salvar" />
+    <Button
+        android:id="@+id/buttonE"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="clicar"
+        android:text="Excluir" />
 </LinearLayout>
 
-- MainActivity.java
+- MainAcitivty.java
 [source,java]
+import android.os.Bundle;
+import androidx.appcompat.app.AppCompatActivity;
+import android.content.Intent;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
+import java.io.IOException;
 public class MainActivity extends AppCompatActivity {
-   private EditText editTextNome;
-   private Button buttonS, buttonE;
-  @Override
-protected void onCreate(Bundle savedInstanceState) {
-   super.onCreate(savedInstanceState);
-   setContentView(R.layout.activity_main);
-   editTextNome = findViewById(R.id.editTextTexto);
-   buttonS = findViewById(R.id.buttonS);
-   buttonE = findViewById(R.id.buttonE);
-   Intent  i = getIntent();  
-   editTextNome.setText(i.getStringExtra("texto"));  //obter os dados quando a segunda activity passar os dados para esta.
-}//onCreate
-  public void clicar(View v){
-   FileOutputStream fos = null;
-   if(v.getId() == R.id.buttonS){
-       String conteudo = editTextNome.getText().toString();   //obter o dado digitado no campo de entrada
-       try {
-           fos = openFileOutput("meuArq.txt",
-                   Context.MODE_PRIVATE);  //se o arquivo existir, este será aberto. 
-//Caso não exista, este será criado. O arquivo é exclusivo do aplicativo.
-           fos.write(conteudo.getBytes());  //escreve no arquivo
-           fos.close();  //sempre que o arquivo for aberto, este deverá ser fechado.
-           Toast.makeText(getApplicationContext(),"Salvo",
-                   Toast.LENGTH_SHORT).show();
-           editTextNome.setText("");
-           Intent i = new Intent(getApplicationContext(),Activity2.class); 
-           startActivity(i);   //abrir a segunda tela
-       } catch (FileNotFoundException e) {
-           e.printStackTrace();
-           Log.e("erro1","arquivo não encontrado");
-       } catch (IOException e) {
-           e.printStackTrace();
-           Log.e("erro2","não foi possível escrever");
-       }
-   }//if
-   if(v.getId() == R.id.buttonE){
-          getApplicationContext().deleteFile("meuArq.txt");  //deletar o arquivo
-          editTextNome.setText("");
-          Toast.makeText(getApplicationContext(),"arquivo excluído",Toast.LENGTH_SHORT).show();
-   }//if
- }//clicar
-}//class
+    private EditText editTextNome;
+    private Button buttonS, buttonE;
+    private ManipulaArquivo arquivo;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        editTextNome = findViewById(R.id.editTextTexto);
+        buttonS = findViewById(R.id.buttonS);
+        buttonE = findViewById(R.id.buttonE);
+        arquivo = new ManipulaArquivo(this);
+        Intent intent = getIntent();
+        if (intent != null && intent.hasExtra("texto")) {
+            editTextNome.setText(intent.getStringExtra("texto"));
+        }
+    }
+    public void clicar(View v) {
+        try {
+            if (v.getId() == R.id.buttonS) {
+                String conteudo = editTextNome.getText().toString();
+                arquivo.salvarArquivo("meuArq.txt", conteudo); 
+                Toast.makeText(this, "Salvo", Toast.LENGTH_SHORT).show();
+                editTextNome.setText("");
+                startActivity(new Intent(this, SegundaActivity.class)); 
+            } else if (v.getId() == R.id.buttonE) {
+                arquivo.deleteFile("meuArq.txt"); 
+                editTextNome.setText("");
+                Toast.makeText(this, "Arquivo excluído", Toast.LENGTH_SHORT).show();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Erro ao salvar/excluir", Toast.LENGTH_SHORT).show();
+        }
+    }
+}
 
 - activity_segunda.xml
 [source,xml]
-<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-   xmlns:app="http://schemas.android.com/apk/res-auto"
-   xmlns:tools="http://schemas.android.com/tools"
-   android:layout_width="match_parent"
-   android:layout_height="match_parent"
-   android:layout_margin="10dp"
-   android:orientation="vertical"
-   tools:context=".Activity2">
-   <TextView
-       android:layout_width="wrap_content"
-       android:layout_height="match_parent"
-       android:text="textViewTexto"
-       android:onClick="abrirTela"
-       android:id="@+id/textViewTexto"/>
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+    <TextView
+        android:id="@+id/textViewTexto"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Texto da primeira tela"
+        android:textSize="18sp" />
+    <Button
+        android:id="@+id/buttonBack"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="abrirTela"
+        android:text="Voltar" />
 </LinearLayout>
 
 - SegundaActivity.java
 [source,java]
+import android.os.Bundle;
+import androidx.appcompat.app.AppCompatActivity;
+import android.content.Intent;
+import android.view.View;
+import android.widget.TextView;
+import java.io.IOException;
 public class SegundaActivity extends AppCompatActivity {
-   private TextView textViewTexto;
-   @Override
-protected void onCreate(Bundle savedInstanceState) {
-   super.onCreate(savedInstanceState);
-   setContentView(R.layout.activity_segunda);
-   textViewTexto = findViewById(R.id.textViewTexto);
-   String texto = getInfo();
-   textViewTexto.setText(texto);
-}//onCreate
-  private String getInfo() {
-   StringBuffer sb = null;
-   try {
-       FileInputStream fis = openFileInput("meuArq.txt");  //solicita a abertura do arquivo no modo de leitura. O arquivo precisa existir.
-       sb = new StringBuffer();   
-       int retorno = 0;
-       char texto = 0;
-       while((retorno = fis.read())!=-1){  //o método read() devolve o caractere presente no arquivo, 
-//dessa forma é colocado em um laço de repetição. Os caracteres serão devolvidos até encontrar o valor -1 (significando o fim o arquivo)
-           texto = (char)retorno;
-           sb.append(texto);  //adicionar o caractere no StringBuffer
-       }//while
-       fis.close();   //encerra o arquivo
-   } catch (FileNotFoundException e) {
-       e.printStackTrace();
-   } catch (IOException e) {
-       e.printStackTrace();
-   }
-   return sb.toString();
-}//getInfo
-  public void abrirTela(View view) {
-   Intent i = new Intent(getApplicationContext(), MainActivity.class);
-   i.putExtra("texto",textViewTexto.getText().toString());
-   startActivity(i);
-  }
+    private TextView textViewTexto;
+    private ManipulaArquivo arquivo;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_segunda);
+        textViewTexto = findViewById(R.id.textViewTexto);
+        arquivo = new ManipulaArquivo(this);
+        try {
+            String texto = arquivo.lerArquivo("meuArq.txt"); 
+            textViewTexto.setText(texto);
+        } catch (IOException e) {
+            e.printStackTrace();
+            textViewTexto.setText("Erro ao carregar conteúdo");
+        }
+    }
+    public void abrirTela(View view) {
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.putExtra("texto", textViewTexto.getText().toString());
+        startActivity(intent); 
+    }
 }
 
 Exemplos práticos (Armazenamento externo no SDCARD):
