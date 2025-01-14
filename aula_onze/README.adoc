@@ -273,7 +273,6 @@ public class MainActivity extends AppCompatActivity {
                Toast.makeText(getApplicationContext(), "Erro ao excluir", Toast.LENGTH_SHORT).show();
            }
        }
-
     }
 }
 
