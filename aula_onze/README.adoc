@@ -33,7 +33,7 @@ public class ManipulaArquivo {
         }
         return sb.toString();
     }
-    public void deleteFile(String nome) {
+    public void deletarArquivo(String nome) {
         context.deleteFile(nome);
     }
 }
@@ -101,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
                 editTextNome.setText("");
                 startActivity(new Intent(this, SegundaActivity.class)); 
             } else if (v.getId() == R.id.buttonE) {
-                arquivo.deleteFile("meuArq.txt"); 
+                arquivo.deletarArquivo("meuArq.txt"); 
                 editTextNome.setText("");
                 Toast.makeText(this, "Arquivo excluído", Toast.LENGTH_SHORT).show();
             }
@@ -167,323 +167,329 @@ public class SegundaActivity extends AppCompatActivity {
 
 Exemplos práticos (Armazenamento externo no SDCARD):
 
-- activity_main.xml
-[source,xml]
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-   xmlns:app="http://schemas.android.com/apk/res-auto"
-   xmlns:tools="http://schemas.android.com/tools"
-   android:layout_width="match_parent"
-   android:layout_height="match_parent"
-   android:orientation="vertical"
-   tools:context=".MainActivity">
-   <EditText
-       android:layout_width="wrap_content"
-       android:layout_height="wrap_content"
-       android:id="@+id/editTextNome"
-       android:hint="Digite seu nome"
-        />
-   <LinearLayout
-       android:layout_width="match_parent"
-       android:layout_height="wrap_content"
-       android:orientation="horizontal"
-       android:layout_margin="10dp">
-       <Button
-           android:layout_width="0dp"
-           android:layout_height="wrap_content"
-           android:layout_weight="1"
-           android:onClick="clicar"
-           android:id="@+id/buttonS"
-           android:text="SALVAR"/>
-       <Button
-           android:layout_width="0dp"
-           android:layout_height="wrap_content"
-           android:layout_weight="1"
-           android:onClick="clicar"
-           android:id="@+id/buttonE"
-           android:text="EXCLUIR"/>
-   </LinearLayout>
-</LinearLayout>
-
-- MainActivity.java
+- ManipulaArquivo.java
 [source,java]
-public class MainActivity extends AppCompatActivity {
- private EditText editTextNome;
- private Button buttonS, buttonE;
-  @Override
-protected void onCreate(Bundle savedInstanceState) {
-   super.onCreate(savedInstanceState);
-   setContentView(R.layout.activity_main);
-   editTextNome = findViewById(R.id.editTextNome);
-   buttonE = findViewById(R.id.buttonE);
-   buttonS = findViewById(R.id.buttonS);
-   Intent i = getIntent();
-   editTextNome.setText(i.getStringExtra("msg"));   //obter os dados quando a segunda activity passar os dados para esta.
-}//onCreate
-  public void clicar(View view) {
-   switch (view.getId()){
-       case R.id.buttonS:
-           String dado = editTextNome.getText().toString();
-           String state = Environment.getExternalStorageState();
-           if(Environment.MEDIA_MOUNTED.equals(state)){
-               File file =  new File("/sdcard/"+"meuArq.txt");  //criar o arquivo no cartão do dispositivo
-               FileOutputStream fos = null;
-               try {
-                   fos = new FileOutputStream(file);  //obter uma referência de arquivo no modo de escrita
-                   OutputStreamWriter osw = new OutputStreamWriter(fos);  //é necessário esta referência para 
-//ter acesso ao método de escrita
-                   osw.write(dado);  //escreve no arquivo
-                   osw.close();   //fecha o arquivo
-                   fos.close();  //fecha o arquivo
-                   Toast.makeText(getApplicationContext(),"Salvo",Toast.LENGTH_SHORT).show();
-                   Intent intent = new Intent(getApplicationContext(), Activity2.class);
-                   startActivity(intent);  //abrir a segunda tela
-               } catch (FileNotFoundException e) {
-                   e.printStackTrace();
-               } catch (IOException e) {
-                   e.printStackTrace();
-               }
-           }else{
-               Toast.makeText(getApplicationContext(),"não há espaço",Toast.LENGTH_SHORT).show();
-           }
-           break;
-       case R.id.buttonE:
-               apagar();
-               break;
-   }
-}//clicar
-  private void apagar(){
-   File file = new File("/sdcard/"+"meuArq.txt");
-   file.delete();   //deleta o arquivo
-   Toast.makeText(getApplicationContext(),"excluído", Toast.LENGTH_SHORT).show();
-  }//
-}//class
-
-- activity_segunda.xml
-[source,xml]
-<?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-   xmlns:app="http://schemas.android.com/apk/res-auto"
-   xmlns:tools="http://schemas.android.com/tools"
-   android:layout_width="match_parent"
-   android:layout_height="match_parent"
-   tools:context=".Activity2">
-   <TextView
-       android:layout_width="wrap_content"
-       android:layout_height="wrap_content"
-       android:id="@+id/textView"
-       android:onClick="abrirActivity"
-       app:layout_constraintBottom_toBottomOf="parent"
-       app:layout_constraintLeft_toLeftOf="parent"
-       app:layout_constraintRight_toRightOf="parent"
-       app:layout_constraintTop_toTopOf="parent"/>
-</androidx.constraintlayout.widget.ConstraintLayout>
-
-- SegundaActivity.java
-[source,java]
-public class SegundaActivity extends AppCompatActivity {
-   private TextView textView;
-   private static final String NOME_FILE = "/sdcard/meuArq.txt";
-   @Override
-protected void onCreate(Bundle savedInstanceState) {
-   super.onCreate(savedInstanceState);
-   setContentView(R.layout.activity_2);
-   textView = findViewById(R.id.textView);
-   textView.setText(obterDados());   //chamar o método obterDados que devolve uma String
-}//onCreate
-  private String obterDados(){
-   int retorno = 0;
-   StringBuilder texto = new StringBuilder();
-   String state = Environment.getExternalStorageState();  //obtém o diretório para ter acesso ao SDCARD. A partir da API 29, pode ser usado o método getExternalFilesDir(String) obtido através do Context.
-   if(Environment.MEDIA_MOUNTED.equals(state)){  //verifica se o dispositivo está montado
-       File file = new File(NOME_FILE); //Obtém o arquivo
-       try {
-          FileInputStream fis = new FileInputStream(file);   //necessário obter uma referência de FileInputStream para ter acesso ao método de leitura
-           while((retorno = fis.read())!= -1){    //método read() retorna caractere por caractere do arquivo, quando o valor for -1 chegou-se no final do arquivo.
-               texto.append((char) retorno);  //adiciona cada caractere ao StringBuffer
-           }
-           fis.close();
-          Toast.makeText(getApplicationContext(),texto,Toast.LENGTH_SHORT).show();
-       } catch (FileNotFoundException e) {
-           e.printStackTrace();
-       } catch (IOException e) {
-           e.printStackTrace();
-       }
-   }else{
-       Toast.makeText(getApplicationContext(),"não foi possível acessar",Toast.LENGTH_SHORT).show();
-   }
-   return texto.toString();  //retorna o texto que estava no arquivo
-}//obter
-}//class
-
-- No arquivo AndroidManifest.xml deve ser acrescentado a permissão necessária: <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-
-Exemplos práticos (Armazenamento externo no Diretório Downloads):
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import android.content.Context;
+public class ManipulaArquivo {
+    private static final String FILE_NAME = "meuArq.txt";
+    public static boolean salvarDados(Context context, String dados) {
+        File file = new File(context.getExternalFilesDir(null), FILE_NAME);
+        try (FileOutputStream fos = new FileOutputStream(file)) {
+            fos.write(dados.getBytes());
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    public static String lerDados(Context context) {
+        File file = new File(context.getExternalFilesDir(null), FILE_NAME);
+        StringBuilder dados = new StringBuilder();
+        try (FileInputStream fis = new FileInputStream(file)) {
+            int letra;
+            while ((letra = fis.read()) != -1) {
+                dados.append((char) character);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return dados.toString();
+    }
+    public static boolean deletarDados(Context context) {
+        File file = new File(context.getExternalFilesDir(null), FILE_NAME);
+        return file.delete();
+    }
+}
 
 - activity_main.xml
 [source,xml]
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".MainActivity">
+    android:padding="16dp">
     <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:id="@+id/editTextNome"
-        android:hint="Digite seu nome"
-        />
-    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_margin="10dp">
-        <Button
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:id="@+id/buttonS"
-            android:text="SALVAR"/>
-        <Button
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:id="@+id/buttonE"
-            android:text="EXCLUIR"/>
-        <Button
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:id="@+id/buttonL"
-            android:text="LER"/>
-    </LinearLayout>
-    <LinearLayout
+        android:hint="Digite algo para salvar"
+        android:inputType="text"/>
+    <Button
+        android:id="@+id/buttonS"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/textViewLeitura"/>
-    </LinearLayout>
+        android:onClick="clicar"
+        android:text="Salvar" />
+    <Button
+        android:id="@+id/buttonE"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="clicar"
+        android:text="Excluir" />
 </LinearLayout>
 
 - MainActivity.java
 [source,java]
 import android.os.Bundle;
-import android.os.Environment;
-import android.util.Log;
+import androidx.appcompat.app.AppCompatActivity;
+import android.content.Intent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
-import androidx.activity.EdgeToEdge;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
 public class MainActivity extends AppCompatActivity {
     private EditText editTextNome;
-    private Button buttonS, buttonE,buttonL;
-    private TextView textViewLeitura;
+    private Button buttonS, buttonE;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         editTextNome = findViewById(R.id.editTextNome);
-        textViewLeitura = findViewById(R.id.textViewLeitura);
-        buttonE = findViewById(R.id.buttonE);
-        buttonE.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                apagar();
-            }
-        });
         buttonS = findViewById(R.id.buttonS);
-        buttonS.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                salvar();
-            }
-        });
-        buttonL = findViewById(R.id.buttonL);
-        buttonL.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String dados = lerDados();
-                textViewLeitura.setText(dados);
-            }
-        });
-    }//onCreate
-    public void salvar() {
-        String dado = editTextNome.getText().toString();
-        String state = Environment.getExternalStorageState();
-        if (Environment.MEDIA_MOUNTED.equals(state)) {
-            File file = new File(getApplicationContext().getExternalFilesDir(
-                    Environment.DIRECTORY_DOWNLOADS), "myData.txt");
-            if(file!=null){
-                FileOutputStream fos = null;
-                try {
-                    fos = new FileOutputStream(file);
-                    OutputStreamWriter osw = new OutputStreamWriter(fos);
-                    osw.write(dado);
-                    osw.close();
-                    fos.close();
-                    Toast.makeText(getApplicationContext(), "Salvo", Toast.LENGTH_SHORT).show();
-                    Log.i("File",file.getAbsolutePath());
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-            } else {
-                Toast.makeText(this, "no file", Toast.LENGTH_SHORT).show();
-            }
-        }else{
-            Toast.makeText(this, "no free", Toast.LENGTH_SHORT).show();
-        }
-    }//
-    public void apagar(){
-        File file = new File(getApplicationContext().getExternalFilesDir(
-                Environment.DIRECTORY_DOWNLOADS), "myData.txt");
-        file.delete();
-        Toast.makeText(getApplicationContext(),"excluído", Toast.LENGTH_SHORT).show();
-    }//
-    private String lerDados() {
-        StringBuffer buffer = null;
-        File file = new File(getApplicationContext().getExternalFilesDir(
-                Environment.DIRECTORY_DOWNLOADS), "myData.txt");
-        FileInputStream fileInputStream = null;
-        try {
-            fileInputStream = new FileInputStream(file);
-            int i = -1;
-            buffer = new StringBuffer();
-            while ((i = fileInputStream.read()) != -1) {
-                buffer.append((char) i);
-            }
-            return buffer.toString();
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if (fileInputStream != null) {
-                try {
-                    fileInputStream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        return buffer.toString();
+        buttonE = findViewById(R.id.buttonE);
+        Intent i = getIntent();
+        editTextNome.setText(i.getStringExtra("msg"));
     }
-}//class
+    public void clicar(View view) {
+       if(view.getId() == R.id.buttonS) {
+           String dado = editTextNome.getText().toString();
+           if (ManipulaArquivo.salvarDados(getApplicationContext(), dado)) {
+               Toast.makeText(getApplicationContext(), "Salvo com sucesso", Toast.LENGTH_SHORT).show();
+               startActivity(new Intent(getApplicationContext(), SegundaActivity.class));
+           } else {
+               Toast.makeText(getApplicationContext(), "Erro ao salvar", Toast.LENGTH_SHORT).show();
+           }
+       }
+       if(view.getId() == R.id.buttonE) {
+           // Exclui o arquivo
+           if (ManipulaArquivo.deletarDados(getApplicationContext())) {
+               Toast.makeText(getApplicationContext(), "Arquivo excluído", Toast.LENGTH_SHORT).show();
+           } else {
+               Toast.makeText(getApplicationContext(), "Erro ao excluir", Toast.LENGTH_SHORT).show();
+           }
+       }
+
+    }
+}
+
+- activity_segunda.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Texto lido do arquivo"
+        android:textSize="18sp"/>
+</LinearLayout>
+
+- SegundaActivity.java
+[source,java]
+import android.os.Bundle;
+import androidx.appcompat.app.AppCompatActivity;
+import android.widget.TextView;
+public class SegundaActivity extends AppCompatActivity {
+    private TextView textView;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_segunda);
+        textView = findViewById(R.id.textView);
+        String data = ManipulaArquivo.lerDados(getApplicationContext());
+        textView.setText(data);
+    }
+}
+
+Exemplos práticos (Armazenamento externo no Diretório Downloads):
+
+- ManipulaArquivo.java
+[source,java]
+import android.content.ContentUris;
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+import android.net.Uri;
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.util.Log;
+import java.io.InputStream;
+import java.io.OutputStream;
+public class ManipulaArquivo {
+    public static boolean salvarDados(Context context, String data) {
+        try {
+            ContentValues valores = new ContentValues();
+            valores.put(MediaStore.MediaColumns.DISPLAY_NAME, "meuArq.txt");  // Nome do arquivo
+            valores.put(MediaStore.MediaColumns.MIME_TYPE, "text/plain");  // Tipo MIME
+            valores.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS);  
+            Uri uri = context.getContentResolver().insert(MediaStore.Files.getContentUri("external"), valores);
+            if (uri != null) {
+                try (OutputStream outputStream = context.getContentResolver().openOutputStream(uri)) {
+                    if (outputStream != null) {
+                        outputStream.write(data.getBytes());
+                        return true;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            Log.e("FileManager", "Erro ao salvar o arquivo no diretório Downloads", e);
+        }
+        return false;
+    }
+    public static String lerDados(Context context) {
+        StringBuilder dados = new StringBuilder();
+        Uri uri = MediaStore.Files.getContentUri("external");
+        String selecao = MediaStore.MediaColumns.DISPLAY_NAME + " = ?";
+        String[] argumentos = new String[]{"meuArq.txt"};
+        try (Cursor cursor = context.getContentResolver().query(uri, null, selecao, argumentos, null)) {
+            if (cursor != null && cursor.moveToFirst()) {
+                int idColuna = cursor.getColumnIndex(MediaStore.MediaColumns._ID);
+                if (idColuna != -1) {
+                    long idArquivo = cursor.getLong(idColuna);
+                    Uri uriArquivo = ContentUris.withAppendedId(MediaStore.Files.getContentUri("external"), idArquivo);
+                    try (InputStream inputStream = context.getContentResolver().openInputStream(uriArquivo)) {
+                        if (inputStream != null) {
+                            int letra;
+                            while ((letra = inputStream.read()) != -1) {
+                                dados.append((char) letra);
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            Log.e("FileManager", "Erro ao ler o arquivo", e);
+        }
+        return dados.toString();
+    }
+    public static boolean deletarDados(Context context) {
+        Uri uri = MediaStore.Files.getContentUri("external");
+        String selecao = MediaStore.MediaColumns.DISPLAY_NAME + " = ?";
+        String[] argumentos = new String[]{"meuArq.txt"};
+        try {
+            int linhasDeletadas = context.getContentResolver().delete(uri,
+                    selecao,
+                    argumentos);
+            return linhasDeletadas > 0;
+        } catch (Exception e) {
+            Log.e("FileManager", "Erro ao excluir o arquivo", e);
+        }
+        return false;
+    }
+}
+
+- activity_main.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+    <EditText
+        android:id="@+id/editTextNome"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Digite algo para salvar"
+        android:inputType="text"/>
+    <Button
+        android:id="@+id/buttonS"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="clicar"
+        android:text="Salvar" />
+    <Button
+        android:id="@+id/buttonE"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="clicar"
+        android:text="Excluir" />
+</LinearLayout>
+
+- MainActivity.java
+[source,java]
+import android.os.Bundle;
+import androidx.appcompat.app.AppCompatActivity;
+import android.content.Intent;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
+public class MainActivity extends AppCompatActivity {
+    private EditText editTextNome;
+    private Button buttonS, buttonE;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        editTextNome = findViewById(R.id.editTextNome);
+        buttonS = findViewById(R.id.buttonS);
+        buttonE = findViewById(R.id.buttonE);
+        Intent i = getIntent();
+        editTextNome.setText(i.getStringExtra("msg"));
+    }
+    public void clicar(View view) {
+        if (view.getId() == R.id.buttonS) {
+            String dado = editTextNome.getText().toString();
+            if (ManipulaArquivo.salvarDados(getApplicationContext(), dado)) {
+                Toast.makeText(getApplicationContext(), "Salvo com sucesso", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(getApplicationContext(), SegundaActivity.class));
+            } else {
+                Toast.makeText(getApplicationContext(), "Erro ao salvar", Toast.LENGTH_SHORT).show();
+            }
+        }
+        if (view.getId() == R.id.buttonE) {
+            // Exclui o arquivo do diretório Downloads
+            if (ManipulaArquivo.deletarDados(getApplicationContext())) {
+                Toast.makeText(getApplicationContext(), "Arquivo excluído", Toast.LENGTH_SHORT).show();
+                editTextNome.setText("");
+            } else {
+                Toast.makeText(getApplicationContext(), "Erro ao excluir", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+}
+
+- activity_segunda.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Texto lido do arquivo"
+        android:textSize="18sp"/>
+</LinearLayout>
+
+- SegundaActivity.java
+[source,java]
+import android.os.Bundle;
+import androidx.appcompat.app.AppCompatActivity;
+import android.widget.TextView;
+public class SegundaActivity extends AppCompatActivity {
+    private TextView textView;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_segunda);
+        textView = findViewById(R.id.textView);
+        String data = ManipulaArquivo.lerDados(getApplicationContext());
+        textView.setText(data);
+    }
+}
+
+
