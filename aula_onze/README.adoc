@@ -165,7 +165,7 @@ public class SegundaActivity extends AppCompatActivity {
     }
 }
 
-Exemplos práticos (Armazenamento externo no SDCARD):
+Exemplos práticos (Armazenamento externo no Storage):
 
 - ManipulaArquivo.java
 [source,java]
