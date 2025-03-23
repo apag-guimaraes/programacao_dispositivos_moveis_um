@@ -31,11 +31,11 @@ Para maiores informações sobre as novidades no Android Studio, acesse: o canal
 O Android é um sistema operacional criado em camadas bem definidas e com funcionalidades específicas. As camadas são denominadas em:
 
 1. Kernel do linux: segurança, sólidez, ampla documentação. Os fabricantes dos aparelhos podem criar drives para um sistema amplamente conhecido. São aproveitados o gerenciamento de memória e processos do Linux;
-- Gerenciamento de hardware: drivers para CPU, memória, GPU, sensores, tela, etc.
-- Gerenciamento de processos: escalonamento de tarefas e multithreading.
+- Gerenciamento de hardware: drivers para CPU, memória, GPU, etc.
+- Gerenciamento de processos: escalonamento de processos e multithreading.
 - Gerenciamento de memória: alocação de memória física e virtual.
 - Segurança: cada aplicativo roda com um UID único.
-2. Camada de abstração de hardware: funciona como uma ponte entre o kernel Linux e as bibliotecas nativas, abstraindo os detalhes específicos do hardware. Dessa forma, o Android pode ser usado em diferentes dispositivos sem a necessidade de reescrever os códigos das camadas superiores.
+2. Camada de abstração de hardware: funciona como uma ponte entre o kernel e as bibliotecas nativas, abstraindo os detalhes específicos do hardware. Dessa forma, o Android pode ser usado em diferentes dispositivos sem a necessidade de reescrever os códigos das camadas superiores.
 3. Android Runtime: máquina virtual executa o arquivo DEX (bytecodes);
 4. Bibliotecas C/C++ nativas: alguns componentes usam bibliotecas nativas, como a SQLite;
 5. Estrutura Java API: fornecem os recursos que possibilitam a criação dos aplicativos. Activity, Service, Content Provider, Broadcast Receiver são exemplos desses recursos;
