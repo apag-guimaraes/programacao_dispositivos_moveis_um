@@ -31,10 +31,23 @@ Para maiores informações sobre as novidades no Android Studio, acesse: o canal
 O Android é um sistema operacional criado em camadas bem definidas e com funcionalidades específicas. As camadas são denominadas em:
 
 1. Kernel do linux: segurança, sólidez, ampla documentação. Os fabricantes dos aparelhos podem criar drives para um sistema amplamente conhecido. São aproveitados o gerenciamento de memória e processos do Linux;
-2. Camada de abstração de hardware: bibliotecas que implementam interfaces que permitem a comunicação do hardware com APIs de alto nível;
+- Gerenciamento de hardware: drivers para CPU, memória, GPU, sensores, tela, etc.
+- Gerenciamento de processos: escalonamento de tarefas e multithreading.
+- Gerenciamento de memória: alocação de memória física e virtual.
+- Segurança: cada aplicativo roda com um UID único.
+2. Camada de abstração de hardware: funciona como uma ponte entre o kernel Linux e as bibliotecas nativas, abstraindo os detalhes específicos do hardware. Dessa forma, o Android pode ser usado em diferentes dispositivos sem a necessidade de reescrever os códigos das camadas superiores.
 3. Android Runtime: máquina virtual executa o arquivo DEX (bytecodes);
 4. Bibliotecas C/C++ nativas: alguns componentes usam bibliotecas nativas, como a SQLite;
 5. Estrutura Java API: fornecem os recursos que possibilitam a criação dos aplicativos. Activity, Service, Content Provider, Broadcast Receiver são exemplos desses recursos;
+Gerenciadores de Sistema:
+- Activity Manager: Controla o ciclo de vida das atividades.
+- Window Manager: Gerencia janelas e layouts de UI.
+- Package Manager: Instala e gerencia APKs.
+- Location Manager: Acesso a GPS e localização por rede.
+- Content Providers: Permitem o compartilhamento de dados entre aplicativos.
+- Notifications: Sistema de notificações para o usuário.
+- Telephony: Gerenciamento de chamadas e SMS.
+- Segurança: O framework impõe o modelo de sandbox, onde cada aplicativo roda em uma VM separada com um UID único, limitando o acesso a recursos sem permissões explícitas.
 6. Aplicativos do sistema: Gmail, contatos, navegadores e outros. É a parte mais visível para o usuário. Os aplicativos podem ser desenvolvidos nativamente (para o sistema Android) e podem também ser desenvolvidos baseados na arquitetura web.
 
 - Referência: GOOGLE DEVELOPERS. Arquitetura da Plataforma. Disponível em: https://developer.android.com/guide/platform?hl=pt-br. Acesso em: 26 de jul. 2024.
@@ -72,9 +85,9 @@ Referência: GOOGLE DEVELOPERS. Fundamentos  de aplicativos. Disponível em: htt
 
 == Versões do Android
 
-Atualmente o sistema Android encontra-se na versão 13 (nível 33 em relação à API). Para mais detalhes sobre a API e novidades, acessem os links: https://developer.android.com/about/versions/13?hl=pt-br e  https://medium.com/androiddevelopers/now-in-android-74-886a95404e8b. Acesso em: 26 de jul. 2024. Para ver mais detalhes sobre as diferenças entre as APIs 32 e 33, acesse o link: https://developer.android.com/sdk/api_diff/33/changes. Acesso em: 26 de jul. 2024.
+Atualmente o sistema Android encontra-se na versão 15. Para mais detalhes sobre a API e novidades, acessem os links: https://developer.android.com/about/versions/15?hl=pt-br. Acesso em: 23 de mar. 2025. 
 
-Algumas versões anteriores ao Android 13:
+Algumas versões anteriores ao Android 15:
 
  - Android 4.4 Kit Kat;
  - Android 5 Lollipop;
@@ -84,7 +97,9 @@ Algumas versões anteriores ao Android 13:
  - Android 9 Pie;
  - Android 10;
  - Android 11;
- - Android 12.
+ - Android 12;
+ - Android 13;
+ - Android 14. 
 
 A figura 1 mostra o quantitativo das versões do Android usadas, referente ao mês de janeiro de 2023. Os dados são mantidos pela 9to5Google.
 
@@ -92,7 +107,7 @@ Figura 1
 
 image::distribuicao_versoes.png[]
 
-- Referência da imagem: https://androiddistribution.io/#/. Acesso em: 26 de jul. 2024.
+- Referência da imagem: https://androiddistribution.io/#/. Acesso em: 23 de mar. 2025.
 
 == Componentes Relevantes Usados na Implementação de Aplicativos
 
