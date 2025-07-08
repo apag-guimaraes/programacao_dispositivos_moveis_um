@@ -38,7 +38,7 @@ O Android é um sistema operacional criado em camadas bem definidas e com funcio
 - Segurança: cada aplicativo roda com um UID único.
 2. Camada de abstração de hardware: conjunto de bibliotecas que abstrai os detalhes específicos do hardware. Dessa forma, as capacidades do hardware podem ser acessadas pela API do Java. Quando um app precisa acessar uma câmera, o módulo específico da biblioteca para o hardware é carregado.
 3. Android Runtime: máquina virtual executa o arquivo DEX (bytecodes);
-4. Bibliotecas C/C ++ nativas: alguns componentes usam bibliotecas nativas, como a SQLite. Através do Android NDK, é possível desenvolver apps em C/C ++;
+4. Bibliotecas C/C mais mais nativas: alguns componentes usam bibliotecas nativas, como a SQLite. Através do Android NDK, é possível desenvolver apps em C/C mais mais;
 5. Estrutura Java API: fornecem os recursos que possibilitam a criação dos aplicativos. Activity, Service, Content Provider, Broadcast Receiver são exemplos desses recursos;
 Gerenciadores de Sistema:
 - Activity Manager: Controla o ciclo de vida das atividades.
@@ -57,7 +57,7 @@ Gerenciadores de Sistema:
 
 Após desenvolver um aplicativo, você pode testá-lo em seu próprio celular, mas caso não tenha um celular com sistema Android, você pode usar um emulador. Para criar um emulador na IDE, acesse o link disponibilizado: 
 
-- GOOGLE DEVELOPERS. Criar e gerenciar dispositivos virtuais. Disponível em: https://developer.android.com/studio/run/managing-avds?hl=pt-br. Acesso em: 26 de jul. 2024.
+- GOOGLE DEVELOPERS. Criar e gerenciar dispositivos virtuais. Disponível em: https://developer.android.com/studio/run/managing-avds?hl=pt-br. Acesso em: 08 de jul. 2025.
 
 == Estrutura do Projeto na IDE
 
@@ -79,36 +79,16 @@ Quando cria-se um novo projeto através da IDE, muitos arquivos e diretórios s�
 - O arquivo é compilado para o formato .class e depois convertido para o formato .dex;
 - Para a distribuição do app é usado um arquivo APK, que consiste no empacotamento do arquivo .dex com os arquivos de layouts, imagens, sons, metadados, etc;
 - Quando o usuário clica em um app instalado. O Android aloca um processo. Cada app roda em um processo e em uma instância da máquina virtual. A máquina virtual carrega o .DEX na memória principal. O ART gerencia a memória e a pilha de execução;
-- O ciclo de vida dos componentes (Activity) é gerenciado pelo Android. O android gerencia as persmissões e segurança. Cada app roda em seu sandbox;
+- O ciclo de vida dos componentes (Activity) é gerenciado pelo Android. O android gerencia as persmissões e segurança. Cada app roda em seu sandbox (implementada pelas permissões, onde o app define os recursos de hardware, de armazenamento que irá usar; pelo UID, ID único que define os privilégios de acesso ao sistema de arquivos e do kernel; SELinux que define as políticas de segurança em nível do kernel; No Android, os aplicativos compartilham o mesmo kernel Linux e as bibliotecas do sistema. O isolamento é feito em nível de processo e não de máquina virtual.
 - O código do app pode fazer chamadas ao sistema, ou seja, solicitar funções da API do kernel para acessar recursos de hardware, por exemplo: realizar uma escrita de arquivo.
 
-Referência: GOOGLE DEVELOPERS. Fundamentos  de aplicativos. Disponível em: https://developer.android.com/guide/components/fundamentals?hl=pt-br
+Referência: GOOGLE DEVELOPERS. Fundamentos  de aplicativos. Disponível em: https://developer.android.com/guide/components/fundamentals?hl=pt-br. Acesso em: 08 de jul. 2025.
 
 == Versões do Android
 
-Atualmente o sistema Android encontra-se na versão 15. Para mais detalhes sobre a API e novidades, acessem os links: https://developer.android.com/about/versions/15?hl=pt-br. Acesso em: 23 de mar. 2025. 
+Atualmente o sistema Android encontra-se na versão 16. Para mais detalhes sobre a API e novidades, acessem os links: https://developer.android.com/about/versions/16?hl=pt-br. Acesso em: 08 de jul. 2025. 
 
-Algumas versões anteriores ao Android 15:
 
- - Android 4.4 Kit Kat;
- - Android 5 Lollipop;
- - Android 6 Marshmallow;
- - Android 7 Nougat;
- - Android 8 Oreo;
- - Android 9 Pie;
- - Android 10;
- - Android 11;
- - Android 12;
- - Android 13;
- - Android 14. 
-
-A figura 1 mostra o quantitativo das versões do Android usadas, referente ao mês de janeiro de 2023. Os dados são mantidos pela 9to5Google.
-
-Figura 1
-
-image::distribuicao_versoes.png[]
-
-- Referência da imagem: https://androiddistribution.io/#/. Acesso em: 23 de mar. 2025.
 
 == Componentes Relevantes Usados na Implementação de Aplicativos
 
