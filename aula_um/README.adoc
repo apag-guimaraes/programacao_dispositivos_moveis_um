@@ -38,7 +38,7 @@ O Android é um sistema operacional criado em camadas bem definidas e com funcio
 - Segurança: cada aplicativo roda com um UID único.
 2. Camada de abstração de hardware: conjunto de bibliotecas que abstrai os detalhes específicos do hardware. Dessa forma, as capacidades do hardware podem ser acessadas pela API do Java. Quando um app precisa acessar uma câmera, o módulo específico da biblioteca para o hardware é carregado.
 3. Android Runtime: máquina virtual executa o arquivo DEX (bytecodes);
-4. Bibliotecas C/C++ nativas: alguns componentes usam bibliotecas nativas, como a SQLite. Através do Android NDK, é possível desenvolver apps em C/C++;
+4. Bibliotecas C/C ++ nativas: alguns componentes usam bibliotecas nativas, como a SQLite. Através do Android NDK, é possível desenvolver apps em C/C ++;
 5. Estrutura Java API: fornecem os recursos que possibilitam a criação dos aplicativos. Activity, Service, Content Provider, Broadcast Receiver são exemplos desses recursos;
 Gerenciadores de Sistema:
 - Activity Manager: Controla o ciclo de vida das atividades.
