@@ -15,16 +15,16 @@
 
 Para verificar ou instalar o OpenJDK, acesse os links disponibilizados a seguir:
 
-- OPENJDK. How to download and install prebuilt OpenJDK packages. Disponível em: https://openjdk.java.net/install/. Acesso em: 26 de jul. 2024.
-- ORACLE. Como posso definir ou alterar a variável do sistema PATH? Disponível em: https://www.java.com/pt_BR/download/help/path.xml. Acesso em: 26 de jul. 2024.
+- OPENJDK. How to download and install prebuilt OpenJDK packages. Disponível em: https://openjdk.java.net/install/. Acesso em: 08 de jul. 2025.
+- ORACLE. Como posso definir ou alterar a variável do sistema PATH? Disponível em: https://www.java.com/pt_BR/download/help/path.xml. Acesso em: 08 de jul. 2025.
 
 == Instalação da IDE
 
 Antes de instalar a IDE, por favor, verifique se o OpenJDK foi devidamente instalado, pois o Android Studio necessita do JDK para funcionar. Para a instalação do Android Studio, acesse o seguinte link:
 
-- GOOGLE DEVELOPERS. Instalar o Android Studio. Disponível em: https://developer.android.com/studio/install?hl=pt-br. Acesso em: 26 de jul. 2024.
+- GOOGLE DEVELOPERS. Instalar o Android Studio. Disponível em: https://developer.android.com/studio/install?hl=pt-br. Acesso em: 08 de jul. 2025.
 
-Para maiores informações sobre as novidades no Android Studio, acesse: o canal Android Developers. What's new in Android Studio Eletric Eel. Disponível em: https://www.youtube.com/watch?v=bVt14IBv4NA&list=RDCMUCVHFbqXqoYvEWM1Ddxl0QDg&index=2. Acesso em: 26 de jul. 2024.
+Para maiores informações sobre as novidades no Android Studio, acesse: o canal Android Developers. Disponível em: https://www.youtube.com/watch?v=bVt14IBv4NA&list=RDCMUCVHFbqXqoYvEWM1Ddxl0QDg&index=2. Acesso em: 08 de jul. 2025.
 
 == Arquitetura do Sistema Android
 
@@ -34,10 +34,11 @@ O Android é um sistema operacional criado em camadas bem definidas e com funcio
 - Gerenciamento de hardware: drivers para CPU, memória, GPU, etc.
 - Gerenciamento de processos: escalonamento de processos e multithreading.
 - Gerenciamento de memória: alocação de memória física e virtual.
+- Sistema de arquivos.
 - Segurança: cada aplicativo roda com um UID único.
-2. Camada de abstração de hardware: funciona como uma ponte entre o kernel e as bibliotecas nativas, abstraindo os detalhes específicos do hardware. Dessa forma, o Android pode ser usado em diferentes dispositivos sem a necessidade de reescrever os códigos das camadas superiores.
+2. Camada de abstração de hardware: conjunto de bibliotecas que abstrai os detalhes específicos do hardware. Dessa forma, as capacidades do hardware podem ser acessadas pela API do Java. Quando um app precisa acessar uma câmera, o módulo específico da biblioteca para o hardware é carregado.
 3. Android Runtime: máquina virtual executa o arquivo DEX (bytecodes);
-4. Bibliotecas C/C++ nativas: alguns componentes usam bibliotecas nativas, como a SQLite;
+4. Bibliotecas C/C++ nativas: alguns componentes usam bibliotecas nativas, como a SQLite. Através do Android NDK, é possível desenvolver apps em C/C++;
 5. Estrutura Java API: fornecem os recursos que possibilitam a criação dos aplicativos. Activity, Service, Content Provider, Broadcast Receiver são exemplos desses recursos;
 Gerenciadores de Sistema:
 - Activity Manager: Controla o ciclo de vida das atividades.
@@ -50,7 +51,7 @@ Gerenciadores de Sistema:
 - Segurança: O framework impõe o modelo de sandbox, onde cada aplicativo roda em uma VM separada com um UID único, limitando o acesso a recursos sem permissões explícitas.
 6. Aplicativos do sistema: Gmail, contatos, navegadores e outros. É a parte mais visível para o usuário. Os aplicativos podem ser desenvolvidos nativamente (para o sistema Android) e podem também ser desenvolvidos baseados na arquitetura web.
 
-- Referência: GOOGLE DEVELOPERS. Arquitetura da Plataforma. Disponível em: https://developer.android.com/guide/platform?hl=pt-br. Acesso em: 26 de jul. 2024.
+- Referência: GOOGLE DEVELOPERS. Arquitetura da Plataforma. Disponível em: https://developer.android.com/guide/platform?hl=pt-br. Acesso em: 08 de jul. 2025.
 
 == Uso do Emulador
 
