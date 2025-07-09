@@ -38,8 +38,8 @@ O Android é um sistema operacional criado em camadas bem definidas e com funcio
 - Segurança: cada aplicativo roda com um UID único.
 2. Camada de abstração de hardware: conjunto de bibliotecas que abstrai os detalhes específicos do hardware. Dessa forma, as capacidades do hardware podem ser acessadas pela API do Java. Quando um app precisa acessar uma câmera, o módulo específico da biblioteca para o hardware é carregado.
 3. Android Runtime: máquina virtual executa o arquivo DEX (bytecodes);
-4. Bibliotecas C/C mais mais nativas: alguns componentes usam bibliotecas nativas, como a SQLite. Através do Android NDK, é possível desenvolver apps em C/C mais mais;
-5. Estrutura Java API: fornecem os recursos que possibilitam a criação dos aplicativos. Activity, Service, Content Provider, Broadcast Receiver são exemplos desses recursos;
+4. Bibliotecas nativas: alguns componentes usam bibliotecas nativas, como a SQLite. Através do Android NDK, é possível desenvolver apps em C/C mais mais;
+5. Framework Java API: fornecem os recursos que possibilitam a criação dos aplicativos. Activity, Service, Content Provider, Broadcast Receiver são exemplos desses recursos;
 Gerenciadores de Sistema:
 - Activity Manager: Controla o ciclo de vida das atividades.
 - Window Manager: Gerencia janelas e layouts de UI.
@@ -48,8 +48,8 @@ Gerenciadores de Sistema:
 - Content Providers: Permitem o compartilhamento de dados entre aplicativos.
 - Notifications: Sistema de notificações para o usuário.
 - Telephony: Gerenciamento de chamadas e SMS.
-- Segurança: O framework impõe o modelo de sandbox, onde cada aplicativo roda em uma VM separada com um UID único, limitando o acesso a recursos sem permissões explícitas.
-6. Aplicativos do sistema: Gmail, contatos, navegadores e outros. É a parte mais visível para o usuário. Os aplicativos podem ser desenvolvidos nativamente (para o sistema Android) e podem também ser desenvolvidos baseados na arquitetura web.
+- Segurança: O framework impõe o modelo de sandbox, onde cada aplicativo roda em uma instância da VM separada com um UID único, limitando o acesso a recursos sem permissões explícitas.
+6. Aplicativos do sistema: Gmail, contatos, navegadores e outros. É a parte acessível aos usuários finais. Os aplicativos podem ser desenvolvidos em Java, Kotlin e C/C mais mais.
 
 - Referência: GOOGLE DEVELOPERS. Arquitetura da Plataforma. Disponível em: https://developer.android.com/guide/platform?hl=pt-br. Acesso em: 08 de jul. 2025.
 
@@ -75,27 +75,81 @@ Quando cria-se um novo projeto através da IDE, muitos arquivos e diretórios s�
 
 == Do Desenvolvimento até a Execução
 
-- Inicialmente o programador escreve o código-fonte em Java;
-- O arquivo é compilado para o formato .class e depois convertido para o formato .dex;
-- Para a distribuição do app é usado um arquivo APK, que consiste no empacotamento do arquivo .dex com os arquivos de layouts, imagens, sons, metadados, etc;
-- Quando o usuário clica em um app instalado. O Android aloca um processo. Cada app roda em um processo e em uma instância da máquina virtual. A máquina virtual carrega o .DEX na memória principal. O ART gerencia a memória e a pilha de execução;
-- O ciclo de vida dos componentes (Activity) é gerenciado pelo Android. O android gerencia as persmissões e segurança. Cada app roda em seu sandbox (implementada pelas permissões, onde o app define os recursos de hardware, de armazenamento que irá usar; pelo UID, ID único que define os privilégios de acesso ao sistema de arquivos e do kernel; SELinux que define as políticas de segurança em nível do kernel; No Android, os aplicativos compartilham o mesmo kernel Linux e as bibliotecas do sistema. O isolamento é feito em nível de processo e não de máquina virtual.
-- O código do app pode fazer chamadas ao sistema, ou seja, solicitar funções da API do kernel para acessar recursos de hardware, por exemplo: realizar uma escrita de arquivo.
+### Do Desenvolvimento ao Funcionamento de um App Android
+
+1. **Desenvolvimento**: O programador escreve o código-fonte em Java (ou Kotlin), criando a lógica do aplicativo.
+
+2. **Compilação**: O código-fonte é compilado para o formato `.class` e, em seguida, convertido para o formato `.dex` (Dalvik Executable), otimizado para dispositivos Android.
+
+3. **Empacotamento**: Para distribuir o aplicativo, é gerado um arquivo **APK** (Android Package), que reúne o arquivo `.dex`, layouts (XML), imagens, sons e metadados, como informações do aplicativo.
+
+4. **Execução**: Quando o usuário abre o app, o Android cria um processo dedicado para ele. Cada aplicativo roda em sua própria instância de máquina virtual, e o arquivo `.dex` é carregado na memória principal. O **ART** (Android Runtime) gerencia a memória e a execução do código.
+
+5. **Ciclo de Vida e Gerenciamento**: O Android controla o ciclo de vida dos componentes do app, como as **Activities** (telas do aplicativo). Ele também gerencia permissões e segurança, garantindo que cada app opere em um ambiente isolado (**sandbox**). Esse isolamento é implementado por:
+   - **Permissões**: O app declara quais recursos (como hardware ou armazenamento) deseja acessar.
+   - **UID**: Um ID único que define os privilégios de acesso ao sistema de arquivos e ao kernel.
+   - **SELinux**: Políticas de segurança em nível de kernel para reforçar o isolamento.
+
+6. **Compartilhamento de Recursos**: Todos os aplicativos Android compartilham o mesmo kernel Linux e bibliotecas do sistema, mas o isolamento ocorre no nível do processo, não da máquina virtual.
+
+7. **Chamadas ao Sistema**: O app pode solicitar funções do sistema (via APIs do kernel) para interagir com recursos do dispositivo, como gravar arquivos ou acessar hardware.
 
 Referência: GOOGLE DEVELOPERS. Fundamentos  de aplicativos. Disponível em: https://developer.android.com/guide/components/fundamentals?hl=pt-br. Acesso em: 08 de jul. 2025.
 
 == Versões do Android
 
-Atualmente o sistema Android encontra-se na versão 16. Para mais detalhes sobre a API e novidades, acessem os links: https://developer.android.com/about/versions/16?hl=pt-br. Acesso em: 08 de jul. 2025. 
+Atualmente o sistema Android encontra-se na versão 16. Para mais detalhes sobre a API e novidades, acessem os links: https://developer.android.com/about/versions/16?hl=pt-br. 
 
+Versões anteriores à versão 16:
+
+- Android 1.0: API Level 1
+- Android 1.1 (Petit Four): API Level 2
+- Android 1.5 (Cupcake): API Level 3
+- Android 1.6 (Donut): API Level 4
+- Android 2.0 (Eclair): API Level 5
+- Android 2.1 (Eclair): API Level 7
+- Android 2.2 (Froyo): API Level 8
+- Android 2.3 (Gingerbread): API Level 9
+- Android 2.3.3 (Gingerbread): API Level 10
+- Android 3.0 (Honeycomb): API Level 11
+- Android 3.1 (Honeycomb): API Level 12
+- Android 3.2 (Honeycomb): API Level 13
+- Android 4.0 (Ice Cream Sandwich): API Level 14
+- Android 4.0.3 (Ice Cream Sandwich): API Level 15
+- Android 4.1 (Jelly Bean): API Level 16
+- Android 4.2 (Jelly Bean): API Level 17
+- Android 4.3 (Jelly Bean): API Level 18
+- Android 4.4 (KitKat): API Level 19
+- Android 4.4W (KitKat Wear): API Level 20
+- Android 5.0 (Lollipop): API Level 21
+- Android 5.1 (Lollipop): API Level 22
+- Android 6.0 (Marshmallow): API Level 23
+- Android 7.0 (Nougat): API Level 24
+- Android 7.1 (Nougat): API Level 25
+- Android 8.0 (Oreo): API Level 26
+- Android 8.1 (Oreo): API Level 27
+- Android 9 (Pie): API Level 28
+- Android 10: API Level 29
+- Android 11: API Level 30
+- Android 12: API Level 31
+- Android 12L: API Level 32
+- Android 13: API Level 33
+- Android 14: API Level 34
+- Android 15: API Level 35
+
+Referência: Wikipédia, "Android version history," https://en.wikipedia.org/wiki/Android_version_history. Acessado em 9 de jul. de 2025.
 
 
 == Componentes Relevantes Usados na Implementação de Aplicativos
 
-- Activity: é ponto de entrada do usuário com o aplicativo. Representa a tela do aplicativo;
-- Service: permite tarefas serem executadas em segunda plano (background), sem interface com o usuário. Mesmo após o encerramento do app, a tarefa continua em execução;
-- Content Provider: permite acesso aos dados de um app, por exemplo, um banco de dados com outros apps;
-- Broadcast Receiver: recebe e responde a eventos/mensagens do sistema ou de outros apps.
+Os componentes são os blocos de construção relevantes para o desenvolvimento de um app. Os componentes são pontos de entrada sendo acessados pelos usuários, por outros apps e pelo próprio sistema. Cada componente tem um ciclo de vida e função definida. No Android tem-se 4 componentes: 
+
+- Activity: ponto de entrada que permite a interação do usuário com o app. (Interface independente).
+- Service: componente cujo objetivo é manter aexecução em segundo plano (Sem interface).
+- Broadcast Receiver: componente que possibilita o sistema enviar eventos fora do fluxo normal de um app sendo manuseado por um usuário.
+- Content Provoder: componente que permite o compartilhamento de dados privados de um app com outros apps. 
+
+Referência: GOOGLE DEVELOPERS. Fundamentos  de aplicativos. Disponível em: https://developer.android.com/guide/components/fundamentals?hl=pt-br. Acesso em: 08 de jul. 2025.
 
 == Activity
 
