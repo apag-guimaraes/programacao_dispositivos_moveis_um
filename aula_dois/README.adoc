@@ -13,21 +13,26 @@
 
 == Classe Context
 
-Trata-se de uma classe abstrata. Através dela seu app tem acesso aos recursos de layouts, imagens, strings, SharedPreferences, banco de dados, Services, BroadcastReceiver, etc.
-Alguns tipos de contexto: 
+No desenvolvimento para Android, o Contexto (Context) é um conceito fundamental que representa o estado atual do aplicativo ou de um objeto dentro dele. Trata-se de uma classe abstrata que funciona como uma interface que permite que objetos acessem informações e recursos do sistema Android, como serviços, atividades, recursos do aplicativo (como strings, layouts e imagens) e outras funcionalidades específicas da plataforma. 
 
-- ApplicationContext: representa o contexto global do app, escopo de vida a nível de app;
-- ActivityContext: associado a uma atividade específica, escopo de vida a nível de atividade, usado para acessar recursos específicos da atividade como views, exibir caixas de diálogo.
+Dois principais contextos usados no desenvolvimento inicial de apps:
+- Application Context:
+    Representa o contexto global do aplicativo, com um ciclo de vida ligado ao processo inteiro do app.
+    Acessado via getApplicationContext().
+    Ideal para operações que não dependem de uma interface de usuário, como acessar SharedPreferences, strings, imagens, temas.
+- Activity Context:
+    Vinculado a uma Activity específica, com ciclo de vida associado a ela.
+    Acessado diretamente com this dentro de uma Activity.
+    Usado para operações relacionadas à interface do usuário, como inflar layouts, exibir dialogs ou gerenciar views.
+    Exemplo de uso: Carregar um layout com LayoutInflater.from(this) ou exibir um Toast.
 
-Application (é uma classe base, a primeira a ser criada, tem a função de manter um contexto global para o aplicativo, possibilita armazenar dados globais) é um Context;
-Activity (usada para criar e gerenciar a interface do usuário) é um Context;
-Service (usada para executar tarefas em segundo plano) é um Context.
+As classes Application, Activity e Service são implementações da classe abstrata Context.
 
 - Referência: STACK OVER FLOW. O que é um context no Android. Disponível em: https://pt.stackoverflow.com/questions/38853/o-que-%C3%A9-um-context-no-android. Pergunta realizada pelo usuário <https://pt.stackoverflow.com/users/6699/felipe-rce> e respondida pelo usuário <https://pt.stackoverflow.com/users/357/piovezan>. 
 
 = Linear Layout
 
-O layout pode ser visto como um container, pois nele vão estar as views como um botão, um campo de entrada de texto, uma imagem e outras views. Existem vários tipos de layout que o SDK oferece que serão vistos em outros exemplos. O Linear Layout é o mais simples dos layouts, nele pode ser configurado dois tipos de orientações. Qual a diferença entre o Linear Layout com orientação vertical e com orientação horizontal?
+O layout pode ser visto como uma caixa, pois nele vão estar as views como: um botão, um campo de entrada de texto, uma imagem e outras views. Existem vários tipos de layout que o SDK oferece que serão vistos em outros exemplos. O Linear Layout é o mais simples dos layouts, nele pode ser configurado dois tipos de orientações. Qual a diferença entre o Linear Layout com orientação vertical e com orientação horizontal?
 
 A figura 1 mostra as posições dos elementos quando usa-se o linear layout com orientação verticial.
 
@@ -51,7 +56,6 @@ Exemplos práticos (linear layout, view, activity e intent)
 
 - MainActivity.java
 [source,java]
-package com.example.applinearviewactivityintent;
 import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -118,7 +122,6 @@ public class MainActivity extends AppCompatActivity {
 
 - SegundaActivity.java
 [source,java]
-package com.example.applinearviewactivityintent;
 import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
