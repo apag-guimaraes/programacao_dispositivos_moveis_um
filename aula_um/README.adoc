@@ -169,36 +169,42 @@ Métodos dos ciclos de vida:
     protected void onCreate(Bundle savedInstanceState) {
 //único método cuja a implementação é obrigatória;
 //executado apenas uma única vez durante todo o ciclo da atividade;
-//usado para configurações iniciais da atividade.
+//usado para configurações iniciais da atividade como os componentes visuais e também para restaurar dados salvos (use o Bundle).
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toast.makeText(getApplicationContext(), "OnCreate", Toast.LENGTH_SHORT).show();
     }
+
 - onStart
 [source,java]
 @Override
     protected void onStart() {
 //a atividade está visível, porém não esta apta para atender as solicitações do usuário.
+//estado de preparação da Activity
         super.onStart();
         Toast.makeText(getApplicationContext(), "OnStart", Toast.LENGTH_SHORT).show();
     }
+
 - onResume
 [source,java]
 @Override
     protected void onResume() {
 //a atividade está apta para atender as solicitações do usuário.
+//coloque aqui recursos que consomem processamento.
         super.onResume();
         Toast.makeText(getApplicationContext(), "OnResume", Toast.LENGTH_SHORT).show();
     }
+
 - onPause
 [source,java]
  @Override
     protected void onPause() {
-//método chamado quando activity não tem mais foco;
+//método chamado quando activity não tem mais foco, mas ainda é visível.
 //a atividade não está mais em primeiro plano, mas ainda existe uma referência dela.
         super.onPause();
         Toast.makeText(getApplicationContext(), "OnPause", Toast.LENGTH_SHORT).show();
     }
+
 - onStop
 [source,java]
  @Override
@@ -208,16 +214,19 @@ Métodos dos ciclos de vida:
         super.onStop();
         Toast.makeText(getApplicationContext(), "OnStop", Toast.LENGTH_SHORT).show();
     }
+
 - onDestroy
 [source,java]
  @Override
 //depois da execução deste método, a atividade é destruída.
+//libere todos os recursos usados!!
     protected void onDestroy() {
         super.onDestroy();
         Toast.makeText(getApplicationContext(), "OnDestroy", Toast.LENGTH_SHORT).show();
     }
 
-- Exemplo prático:
+
+= Exemplo prático:
 
 - MainActivity.java
 [source,java]
@@ -314,7 +323,7 @@ public class Activity2 extends AppCompatActivity {
 }
 
 - activity_2.xml
-[source.xml]
+[source,xml]
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -362,4 +371,137 @@ Bundle bundle = new Bundle();
 bundle.putString("key", "value");
 intent.putExtras(bundle);
 startActivity(intent);
+
+= Exemplo prático
+
+- activity_main.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+    <EditText
+        android:id="@+id/editTextWord"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="60dp"
+        android:ems="10"
+        android:inputType="text"
+        android:hint="Word"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+    <Button
+        android:id="@+id/buttonClick"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="388dp"
+        android:text="Click"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+- MainActivity.java
+[source,java]
+import android.content.Intent;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+public class MainActivity extends AppCompatActivity {
+    private static final String TAG = "MainActivity";
+    private static final String KEY = "key_word";
+    private EditText editTextWord;
+    private Button buttonClick;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        editTextWord = findViewById(R.id.editTextWord);
+        buttonClick= findViewById(R.id.buttonClick);
+        // Restaurar estado
+        if (savedInstanceState != null) {
+            String word = savedInstanceState.getString(KEY);
+            editTextWord.setText(word);
+            Log.d(TAG, editTextWord.toString());
+        }
+        buttonClick.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String word = editTextWord.getText().toString();
+                Intent intent = new Intent(MainActivity.this,
+                        SecondActivity.class);
+                intent.putExtra("data", word);
+                startActivity(intent);
+            }
+        });
+    }
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        // Salvar a palavra no Bundle
+        outState.putString(KEY, editTextWord.getText().toString());
+    }
+}
+
+- activity_second.xml
+[source,java]
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".SecondActivity">
+
+    <TextView
+        android:id="@+id/textViewWord"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TextView"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+- SecondActivity.java
+[source,java]
+
+import android.os.Bundle;
+import android.widget.TextView;
+import androidx.appcompat.app.AppCompatActivity;
+
+public class SecondActivity extends AppCompatActivity {
+    private TextView textViewPalavra;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_second);
+        textViewPalavra = findViewById(R.id.textViewWord);
+        // Recuperar a palavra enviada pela MainActivity
+        String word = getIntent().getStringExtra("data");
+        if (word != null) {
+            textViewPalavra.setText("word: " + word);
+        } else {
+            textViewPalavra.setText("nothing");
+        }
+    }
+}
+
+
 
