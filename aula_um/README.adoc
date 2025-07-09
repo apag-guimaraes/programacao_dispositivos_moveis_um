@@ -226,7 +226,7 @@ Métodos dos ciclos de vida:
     }
 
 
-= Exemplo prático:
+=== Exemplo prático:
 
 - MainActivity.java
 [source,java]
@@ -372,7 +372,7 @@ bundle.putString("key", "value");
 intent.putExtras(bundle);
 startActivity(intent);
 
-= Exemplo prático
+=== Exemplo prático
 
 - activity_main.xml
 [source,xml]
