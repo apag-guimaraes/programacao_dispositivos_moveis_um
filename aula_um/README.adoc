@@ -137,7 +137,7 @@ Versões anteriores à versão 16:
 - Android 14: API Level 34
 - Android 15: API Level 35
 
-Referência: Wikipédia, "Android version history," https://en.wikipedia.org/wiki/Android_version_history. Acessado em 9 de jul. de 2025.
+Referência: WIKIPEDIA, Android version history. Disponível em: https://en.wikipedia.org/wiki/Android_version_history. Acessado em 9 de jul. de 2025.
 
 
 == Componentes Relevantes Usados na Implementação de Aplicativos
