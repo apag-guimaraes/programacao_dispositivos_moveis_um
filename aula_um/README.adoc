@@ -75,8 +75,6 @@ Quando cria-se um novo projeto através da IDE, muitos arquivos e diretórios s�
 
 == Do Desenvolvimento até a Execução
 
-### Do Desenvolvimento ao Funcionamento de um App Android
-
 1. **Desenvolvimento**: O programador escreve o código-fonte em Java (ou Kotlin), criando a lógica do aplicativo.
 
 2. **Compilação**: O código-fonte é compilado para o formato `.class` e, em seguida, convertido para o formato `.dex` (Dalvik Executable), otimizado para dispositivos Android.
