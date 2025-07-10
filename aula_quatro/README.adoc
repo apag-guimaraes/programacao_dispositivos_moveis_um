@@ -11,25 +11,30 @@
 //make slides
 //make ebook
 
-= List View
+== List View
 
-A List View é um grupo de views cujo objetivo é apresentar itens no sentido vertical, ou seja um embaixo do outro. Cada item é uma view. As listas podem ser simples e personalizadas. O componente ListView não consegue acessar os dados a serem mostrados diretamente. Para esse propósito, é necessário usar um Adapter. Dessa forma, é usado um ListAdapter, que implementa as funcionalidades da interface Adapter, esta classe tem acesso direto aos dados a serem visualizados. Se for usado uma lista simples, basta usar a estrutura pronta que o Android fornece, mas na lista personalizada é necessário usar um Adaptar específico para dar suporte aos dados que serão mostrados.
+A ListView é um componente do Android utilizado como um contêiner para exibir uma lista de itens dispostos verticalmente, ou seja, um item abaixo do outro. Cada item da lista é representado por uma View. As listas podem ser simples ou personalizadas, dependendo das necessidades da aplicação.
 
-ListView é conteiner responsável em exibir as views.
-Adapter tem a função de criar e fornecer as views que são mostradas no ListView. Existem algumas variações:
+O componente ListView não acessa diretamente os dados a serem exibidos. Para isso, é necessário utilizar um Adapter, que atua como uma ponte entre os dados e a interface visual. O ListAdapter, por exemplo, implementa as funcionalidades da interface Adapter e tem acesso direto aos dados que serão apresentados. Em listas simples, é possível utilizar estruturas prontas fornecidas pelo Android. Já em listas personalizadas, é necessário criar um Adapter específico para suportar os dados e o layout desejado.
 
-- ArrayAdapter: Adapter simples que usa uma lista de objetos (ArrayList) para criar views.
-- CursorAdapter: Adapter que pode ser usado com dados retornados de um banco de dados.
-- BaseAdapter: Adapter que permite criar adaptadores personalizados para criar views personalizadas.
+Funções dos Componentes
+ListView: Contêiner responsável por exibir as Views que compõem a lista.
+Adapter: Responsável por criar e fornecer as Views exibidas na ListView, conectando os dados ao componente visual.
 
-Para mais detalhes sobre este componente veja: GOOGLE DEVELOPERS. ListView. Disponível em:  https://developer.android.com/reference/android/widget/ListView. Acesso em: 23 ago.2024.
+Tipos de Adapters
+Existem diferentes tipos de Adapters que podem ser utilizados com a ListView, dependendo do tipo de dado e da complexidade da interface:
+ArrayAdapter: Um Adapter simples que utiliza uma lista de objetos (como um ArrayList) para criar as Views. Ideal para listas simples.
+CursorAdapter: Projetado para trabalhar com dados provenientes de um banco de dados, como resultados de consultas.
+BaseAdapter: Permite a criação de Adapters personalizados, oferecendo flexibilidade para desenvolver Views com layouts e comportamentos específicos.
+
+Para mais detalhes sobre este componente veja: GOOGLE DEVELOPERS. ListView. Disponível em:  https://developer.android.com/reference/android/widget/ListView. Acesso em: 10 jul. 2025.
       
-Exemplos práticos (lista simples)
+=== Exemplos práticos (lista simples)
 
 - string.xml
 [source,xml]
 <resources>
-    <string name="app_name">ExemploListaSimples</string>
+    <string name="app_name">ListViewSimples</string>
     <string-array name="c">
         <item>C é uma linguagem que usa o paradigma estruturado</item>
         <item>C tem uma sintaxe simples</item>
@@ -71,7 +76,7 @@ Exemplos práticos (lista simples)
     android:orientation="vertical"
     android:padding="16dp">
     <ListView
-        android:id="@+id/listaLinguagens"
+        android:id="@+id/listViewLinguagens"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 </LinearLayout>
@@ -80,7 +85,7 @@ Exemplos práticos (lista simples)
 [source,java]
 import java.util.ArrayList;
 public class Linguagem {
-    private ArrayList<String> listaLinguagens;
+    private final ArrayList<String> listaLinguagens;
     public Linguagem() {
         listaLinguagens = new ArrayList<>();
         preencherLista();
@@ -94,10 +99,13 @@ public class Linguagem {
         listaLinguagens.add("PYTHON");
     }
     public ArrayList<String> getListaLinguagens() {
-        return listaLinguagens;
+        return new ArrayList<>(listaLinguagens); // Return a copy to prevent external modification
     }
     public String getLinguagem(int position) {
-        return listaLinguagens.get(position);
+        if (position >= 0 && position < listaLinguagens.size()) {
+            return listaLinguagens.get(position);
+        }
+        throw new IndexOutOfBoundsException("Invalid position: " + position);
     }
 }
 
@@ -120,7 +128,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        listViewLinguagens = findViewById(R.id.listaLinguagens);
+        listViewLinguagens = findViewById(R.id.listViewLinguagens);
         linguagem = new Linguagem();
         preencherAdapter();
         listViewLinguagens.setAdapter(adapter);
@@ -135,20 +143,20 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
         String item = adapterView.getItemAtPosition(i).toString();
-        abrirTela(item);  
+        abrirTela(item);
     }
     public void abrirTela(String item) {
         Intent intent;
         switch (item) {
             case "C":
                 intent = new Intent(MainActivity.this,
-                        Activity2.class);
+                        SegundaActivity.class);
                 intent.putExtra("linguagem", "C");
                 startActivity(intent);
                 break;
             case "JAVA":
                 intent = new Intent(MainActivity.this,
-                        Activity2.class);
+                        SegundaActivity.class);
                 intent.putExtra("linguagem", "JAVA");
                 startActivity(intent);
                 break;
@@ -166,7 +174,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 }
 
-- activity_2.xml
+- activity_segunda.xml
 [source,xml]
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -182,7 +190,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"/>
 </LinearLayout>
 
-- Activity2.java
+- SegundaActivity.java
 [source,java]
 import android.content.Intent;
 import android.os.Bundle;
@@ -190,40 +198,41 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import java.util.HashMap;
 import java.util.Map;
-public class Activity2 extends AppCompatActivity {
-    private static final Map<String, Integer> linguagemParaCaracteristicas
-            = new HashMap<>();
+public class SegundaActivity extends AppCompatActivity {
+    private static final Map<String, Integer> linguagemCaracteristicas = new HashMap<>();
     static {
-        linguagemParaCaracteristicas.put("C", R.array.c);
-        linguagemParaCaracteristicas.put("JAVA", R.array.java);
-        linguagemParaCaracteristicas.put("KOTLIN", R.array.kotlin);
-        linguagemParaCaracteristicas.put("LUA", R.array.lua);
-        linguagemParaCaracteristicas.put("PASCAL", R.array.pascal);
-        linguagemParaCaracteristicas.put("PYTHON", R.array.python);
+        linguagemCaracteristicas.put("C", R.array.c);
+        linguagemCaracteristicas.put("JAVA", R.array.java);
+        linguagemCaracteristicas.put("KOTLIN", R.array.kotlin);
+        linguagemCaracteristicas.put("LUA", R.array.lua);
+        linguagemCaracteristicas.put("PASCAL", R.array.pascal);
+        linguagemCaracteristicas.put("PYTHON", R.array.python);
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_2);
+        setContentView(R.layout.activity_segunda);
         Intent intent = getIntent();
         String linguagemSelecionada = intent.getStringExtra("linguagem");
-        Integer arrayResId = linguagemParaCaracteristicas.get(linguagemSelecionada.toUpperCase());
+        String texto = getCaracteristicas(linguagemSelecionada);
+        TextView textViewCaracteristicas = findViewById(R.id.textViewCaracteristicas);
+        textViewCaracteristicas.setText(texto);
+    }
+    public String getCaracteristicas(String linguagemSelecionada) {
+        Integer arrayResId = linguagemCaracteristicas.get(linguagemSelecionada.toUpperCase());
         if (arrayResId != null) {
             String[] caracteristicas = getResources().getStringArray(arrayResId);
-            TextView textViewCaracteristicas = findViewById(R.id.textViewCaracteristicas);
             StringBuilder caracteristicasTexto = new StringBuilder();
             for (String caracteristica : caracteristicas) {
                 caracteristicasTexto.append(caracteristica).append("\n");
             }
-            textViewCaracteristicas.setText(caracteristicasTexto.toString());
-        } else {
-            TextView textViewCaracteristicas = findViewById(R.id.textViewCaracteristicas);
-            textViewCaracteristicas.setText("Características não disponíveis para essa linguagem.");
+            return caracteristicasTexto.toString();
         }
+        return "Características não disponíveis para essa linguagem.";
     }
 }
 
-Exemplos práticos (lista personalizada)
+=== Exemplos práticos (lista personalizada)
 
 - colors.xml
 [source,xml]
