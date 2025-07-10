@@ -1,10 +1,6 @@
 == Densidades independentes de pixels
 
-[![Assista ao vídeo](https://img.youtube.com/vi/zhszwkcay2A/maxresdefault.jpg)](https://www.youtube.com/watch?v=zhszwkcay2A)
-
 [![Assista ao vídeo](https://img.youtube.com/vi/zhszwkcay2A/hqdefault.jpg)](https://www.youtube.com/watch?v=zhszwkcay2A)
-
-[![Assista ao vídeo](https://img.youtube.com/vi/zhszwkcay2A/0.jpg)](https://www.youtube.com/watch?v=zhszwkcay2A)
 
 == Exemplos práticos (App Lanchonete)
 
