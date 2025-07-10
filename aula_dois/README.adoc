@@ -281,8 +281,11 @@ public class MainActivity extends AppCompatActivity {
 </resources>
 
 OBS: acrescentar no projeto:
+
      - adicionar as imagens depois de gerá-las no App Icon Generator no projeto;
+
      - criar um novo ícone através do Image Asset;
+
      - alterar os atributos android:icon="@mipmap/ic_ifto" e android:roundIcon="@mipmap/ic_ifto_round" no arquivo AndroidManifest.xml.
 
 Cores definidas no arquivo colors.xml com base no Material Theme Builder
@@ -332,11 +335,18 @@ Cores definidas no arquivo colors.xml com base no Material Theme Builder
             padding: 2px 4px;
             border-radius: 4px;
         }
+        a {
+            color: #3c6939;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
     <h1>Cores do Material Design 3 no Aplicativo Android</h1>
-    <p>A tabela abaixo descreve as cores definidas no arquivo <code>colors.xml</code>, com base no <strong>Material Theme Builder</strong> (Material Design 3), incluindo seus significados (aplicações) e exemplos no contexto de um aplicativo Android com um <code>EditText</code> e botões "Submit", "Cancel" e "Explore".</p>
+    <p>A tabela abaixo descreve as cores definidas no arquivo <code>colors.xml</code>, com base no <strong>Material Theme Builder</strong> (Material Design 3), incluindo suas aplicações no contexto de um aplicativo Android com um <code>EditText</code> e botões "Submit", "Cancel" e "Explore".</p>
     <table>
         <tr>
             <th>Cor</th>
@@ -372,7 +382,7 @@ Cores definidas no arquivo colors.xml com base no Material Theme Builder
         </tr>
         <tr>
             <td><strong>onError</strong></td>
-            <td>Texto ou ícones sobre a cor de erro</td>
+            <td>Texto ou ícones sobre a cor de erro.</td>
         </tr>
         <tr>
             <td><strong>background</strong></td>
@@ -380,7 +390,7 @@ Cores definidas no arquivo colors.xml com base no Material Theme Builder
         </tr>
         <tr>
             <td><strong>onBackground</strong></td>
-            <td>Texto ou ícones principais sobre o fundo. Por exemplo: Texto digitado no <code>EditText</code></td>
+            <td>Texto ou ícones principais sobre o fundo. Exemplo: Texto digitado no <code>EditText</code>.</td>
         </tr>
         <tr>
             <td><strong>surface</strong></td>
@@ -388,14 +398,14 @@ Cores definidas no arquivo colors.xml com base no Material Theme Builder
         </tr>
         <tr>
             <td><strong>onSurface</strong></td>
-            <td>Texto ou ícones sobre superfícies, incluindo dicas (hints).Texto e dica "Enter your name" no <code>EditText</code> </td>
+            <td>Texto ou ícones sobre superfícies, incluindo dicas (hints). Exemplo: Texto e dica "Enter your name" no <code>EditText</code>.</td>
         </tr>
     </table>
-<h2>Notas</h2>
+    <h2>Notas</h2>
     <ul>
         <li><strong>Conformidade</strong>: As cores seguem o <strong>Material Design 3</strong>, geradas pelo <a href="https://m3.material.io/theme-builder" target="_blank">Material Theme Builder</a>.</li>
-        
+        <li><strong>Aplicação</strong>: Usadas no aplicativo Android com <code>EditText</code> e botões, com <code>error</code> aplicado dinamicamente para validação.</li>
+        <li><strong>Acessibilidade</strong>: Cores "on" (ex.: <code>onPrimary</code>, <code>onSurface</code>) garantem legibilidade com alto contraste.</li>
     </ul>
 </body>
 </html>
-
