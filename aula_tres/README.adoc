@@ -1,3 +1,6 @@
+== Densidades independentes de pixels
+
+video::zhszwkcay2A[youtube,width=640,height=480]
 
 == Exemplos práticos (App Lanchonete)
 
