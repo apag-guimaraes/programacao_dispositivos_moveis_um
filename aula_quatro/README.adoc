@@ -243,32 +243,6 @@ public class SegundaActivity extends AppCompatActivity {
     <color name="red">#DC3737</color>
 </resources>
 
-- item_lista.xml
-[source,xml]
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:padding="10dp"
-    >
-    <ImageView
-        android:id="@+id/imagem"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:src="@mipmap/ic_launcher"
-        />
-    <TextView
-        android:id="@+id/texto"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:gravity="center_vertical"
-        android:textColor="@color/black"
-        android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
-</LinearLayout>
-
 - activity_main.xml
 [source,xml]
 <?xml version="1.0" encoding="UTF-8"?>
@@ -280,12 +254,38 @@ public class SegundaActivity extends AppCompatActivity {
     android:padding="10dp"
     >
     <ListView
-        android:id="@+id/lista"
+        android:id="@+id/listViewItens"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:divider="@color/red"
         android:dividerHeight="1dp"
-       />
+        />
+</LinearLayout>
+
+- item_lista.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="10dp"
+    >
+    <ImageView
+        android:id="@+id/imagemViewItens"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:src="@mipmap/ic_launcher"
+        />
+    <TextView
+        android:id="@+id/textoViewItens"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center_vertical"
+        android:textColor="@color/black"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 </LinearLayout>
 
 - ItemLista.java
@@ -360,9 +360,9 @@ public class MeuAdapter extends BaseAdapter {
             convertView = inflater.inflate(R.layout.item_lista, parent, false);
         }
         ItemLista item = getItem(position);
-        TextView texto = convertView.findViewById(R.id.texto);
+        TextView texto = convertView.findViewById(R.id.textoViewItens);
         texto.setText(item.getNome());
-        ImageView imagem = convertView.findViewById(R.id.imagem);
+        ImageView imagem = convertView.findViewById(R.id.imagemViewItens);
         imagem.setImageResource(item.getImagem());
         return convertView;
     }
@@ -385,7 +385,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        listView = findViewById(R.id.lista);
+        listView = findViewById(R.id.listViewItens);
         listView.setOnItemClickListener(this);
         repositorioItens = new RepositorioItens();
         List<ItemLista> itens = repositorioItens.obterItens();
@@ -398,9 +398,4 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         Toast.makeText(this, "Você Clicou em: " + item.getNome(), Toast.LENGTH_LONG).show();
     }
 }
-
-
-
-
-
 
