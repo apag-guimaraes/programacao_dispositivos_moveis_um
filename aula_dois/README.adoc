@@ -288,7 +288,7 @@ OBS: acrescentar no projeto:
 
      - alterar os atributos android:icon="@mipmap/ic_ifto" e android:roundIcon="@mipmap/ic_ifto_round" no arquivo AndroidManifest.xml.
 
-Cores definidas no arquivo colors.xml com base no Material Theme Builder
+A tabela abaixo descreve as cores definidas no arquivo colors.xml, com base no Material Theme Builder (disponível em: https://material-foundation.github.io/material-theme-builder/). 
 
 image::tabela_cores.png[width=700,height=700]
            
