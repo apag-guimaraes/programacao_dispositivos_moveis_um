@@ -135,7 +135,6 @@ public class CalculoModel {
         this.total = total;
     }
     public void addCafe(int quantidade) {
-
         total += quantidade * CAFE_PRECO;
     }
     public void addBolo(int quantidade) {
