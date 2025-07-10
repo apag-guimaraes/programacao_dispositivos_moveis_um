@@ -162,9 +162,9 @@ public class SegundaActivity extends AppCompatActivity {
 
 == Algumas Ferramentas para Cores / Imagens / Ícones
 
-O Material Theme Builder é a ferramenta oficial do Google para criar esquemas de cores baseados no Material Design 3, segue o link para acesso: https://material-foundation.github.io/material-theme-builder/. Acesso em: 09 de jul. 2025. Para saber mais informações sobre cores, acesse o link: https://m3.material.io/styles/color/system/how-the-system-works.
+O Material Theme Builder é a ferramenta oficial do Google para criar esquemas de cores baseados no Material Design 3, segue o link para acesso: https://material-foundation.github.io/material-theme-builder/. Para saber mais informações sobre cores, segue o link: https://m3.material.io/styles/color/system/how-the-system-works.
 
-A ferramenta App Icon Generator pode ser usada para criar as imagens com diferentes resoluções, segue o link: https://appicon.co/. Acesso em: 09 de jul. 2025. Depois de criar as várias versões da imagem, use o recurso Resource Manager no Android Studio para adicionar as imagens.
+A ferramenta App Icon Generator pode ser usada para criar as imagens com diferentes resoluções, segue o link para acesso: https://appicon.co/. Depois de criar as várias versões da imagem, use o recurso Resource Manager no Android Studio para adicionar as imagens no projeto.
 
 Para saber mais detalhes sobre os estilos e tamanhos referentes ao texto, acesse o material disponibilizado pela Google, Material Design. Disponível em: https://material.io/develop/android/theming/typography.
 
