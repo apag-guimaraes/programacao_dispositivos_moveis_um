@@ -1,283 +1,289 @@
 
 == Exemplos práticos (App Lanchonete)
 
+- activity_main.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+    <ImageView
+        android:id="@+id/imageViewBolo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/bolo_de_fuba"
+        android:layout_gravity="center"
+        android:contentDescription="Imagem de bolo"
+        android:layout_marginBottom="16dp"/>
+    <ImageView
+        android:id="@+id/imageViewCafe"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/coffee"
+        android:layout_gravity="center"
+        android:contentDescription="Imagem de café"
+        android:layout_marginBottom="16dp"/>
+    <TextView
+        android:id="@+id/textViewTotal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="R$ 0.00"
+        android:textSize="20sp"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="*** Usando TableRow ***"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"/>
+    <TableRow android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:src="@drawable/coffee"/>
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:src="@drawable/bolo_de_fuba"/>
+    </TableRow>
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/blue"
+            android:gravity="center"
+            android:text="Café"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"/>
+        <TextView android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/green"
+            android:gravity="center"
+            android:text="Bolo"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"/>
+    </TableRow>
+    </LinearLayout>
+</LinearLayout>
+
+- activity_cafe.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+    <EditText
+        android:id="@+id/editTextQuantidadeCafe"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Quantidade:"
+        android:inputType="number"
+        android:layout_marginBottom="16dp"/>
+    <Button
+        android:id="@+id/buttonCafe"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Adicionar Café"/>
+</LinearLayout>
+
+- activity_bolo.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+    <EditText
+        android:id="@+id/editTextQuantidadeBolo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Quantidade:"
+        android:inputType="number"
+        android:layout_marginBottom="16dp"/>
+    <Button
+        android:id="@+id/buttonBolo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Adicionar Bolo"/>
+</LinearLayout>
+
+- CalculoModel.java
+[source,java]
+public class CalculoModel {
+    private double total;
+    private static final double CAFE_PRECO = 2.50;
+    private static final double BOLO_PRECO = 5.00;
+    public CalculoModel() {
+        this.total = 0.0;
+    }
+    public double getTotal() {
+        return total;
+    }
+    public void setTotal(double total) {
+        this.total = total;
+    }
+    public void addCafe(int quantidade) {
+
+        total += quantidade * CAFE_PRECO;
+    }
+    public void addBolo(int quantidade) {
+        total += quantidade * BOLO_PRECO;
+    }
+}
+
 - MainActivity.java
 [source,java]
-package com.example.app_lanchonete;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
-public class MainActivity extends AppCompatActivity {
-    private ImageView imageViewBolo, imageViewCafe;
-    private Button buttonCalcular;
-    private TextView textViewResultado;
-    private double valores;
+public class MainActivity extends AppCompatActivity
+        implements View.OnClickListener {
+    private ImageView imageViewBolo;
+    private ImageView imageViewCafe;
+    private TextView textViewTotal;
+    private CalculoModel model;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        imageViewBolo = findViewById(R.id.imageBolo);
-        imageViewCafe = findViewById(R.id.imageCafe);
-        buttonCalcular = findViewById(R.id.btCalcular);
-        textViewResultado = findViewById(R.id.textViewResultado);
+        imageViewBolo = findViewById(R.id.imageViewBolo);
+        imageViewCafe = findViewById(R.id.imageViewCafe);
+        textViewTotal = findViewById(R.id.textViewTotal);
+        model = new CalculoModel();
+        imageViewBolo.setOnClickListener(this);
+        imageViewCafe.setOnClickListener(this);
         Intent intent = getIntent();
-        if (intent != null) {
-            double valor = intent.getDoubleExtra("total", 0);
-            // double valorBolo = intent.getDoubleExtra("totalBolo", 0);
-            valores = valores + valor;
+        if (intent != null && intent.hasExtra("total")) {
+            model.setTotal(intent.getDoubleExtra("total",
+                    0.0));
+            Log.e("Main",""+model.getTotal());
+            alterarTotal();
         }
     }
-    public void escolher(View view) {
-        if (R.id.imageBolo == view.getId()) {
-            Intent intentBolo = new Intent(getApplicationContext(), ActivityBolo.class);
-            if (valores != 0) {
-                intentBolo.putExtra("valores", valores);
-            }
+    @Override
+    public void onClick(View view) {
+        int viewId = view.getId();
+        if (viewId == R.id.imageViewBolo) {
+            Intent intentBolo = new Intent(this,
+                    BoloActivity.class);
+            intentBolo.putExtra("total", model.getTotal());
             startActivity(intentBolo);
-        }
-        if (R.id.imageCafe == view.getId()) {
-            Intent intentCafe = new Intent(getApplicationContext(), ActivityCafe.class);
-            if (valores != 0) {
-                intentCafe.putExtra("valores", valores);
-            }
+        } else if (viewId == R.id.imageViewCafe) {
+            Intent intentCafe = new Intent(this,
+                    CafeActivity.class);
+            intentCafe.putExtra("total", model.getTotal());
             startActivity(intentCafe);
         }
-        if (R.id.btCalcular == view.getId()) {
-            textViewResultado.setText(String.valueOf(valores));
-        }
     }
-}//class
+    // alterar a view com o valor obtido do modelo
+    private void alterarTotal() {
+        textViewTotal.setText(String.format("R$ %.2f", model.getTotal()));
+    }
+}
 
-- ActivityCafe.java
+- CafeActivity.java
 [source,java]
-package com.example.app_lanchonete;
-import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-public class ActivityCafe extends AppCompatActivity {
+import androidx.appcompat.app.AppCompatActivity;
+public class CafeActivity extends AppCompatActivity implements View.OnClickListener {
     private EditText editTextQuantidadeCafe;
     private Button buttonCafe;
-    private Double valores;
+    private CalculoModel model;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cafe);
         editTextQuantidadeCafe = findViewById(R.id.editTextQuantidadeCafe);
         buttonCafe = findViewById(R.id.buttonCafe);
+        model = new CalculoModel();
+        buttonCafe.setOnClickListener(this);
         Intent intent = getIntent();
-        if (intent != null){
-            valores = intent.getDoubleExtra("valores", 0);
+        if (intent != null && intent.hasExtra("total")) {
+            model.setTotal(intent.getDoubleExtra("total",
+                    0.0));
+            Log.e("Main",""+model.getTotal());
         }
     }
-    public void clicar(View view){
-        int unidade = Integer.parseInt(editTextQuantidadeCafe.getText().toString());
-        double total = (unidade * 2.50);
-        Intent intent  = new Intent(getApplicationContext(), MainActivity.class);
-        valores = valores + total;
-        intent.putExtra("total", valores);
-        startActivity(intent);
-    }//
+    @Override
+    public void onClick(View view) {
+        if (view.getId() == R.id.buttonCafe) {
+            try {
+                int quantidade = Integer.parseInt(editTextQuantidadeCafe.getText().toString());
+                model.addCafe(quantidade);
+                Intent intent = new Intent(this, MainActivity.class);
+                intent.putExtra("total", model.getTotal());
+                startActivity(intent);
+            } catch (NumberFormatException e) {
+                editTextQuantidadeCafe.setError("Por favor, insira um número válido");
+            }
+        }
+    }
 }
 
-- ActivityBolo.java
+- BoloActivity.java
 [source,java]
-package com.example.app_lanchonete;
-import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-public class ActivityBolo extends AppCompatActivity {
+import androidx.appcompat.app.AppCompatActivity;
+public class BoloActivity extends AppCompatActivity implements View.OnClickListener {
     private EditText editTextQuantidadeBolo;
-    private Button buttonAdicionar;
-    private Double valores;
+    private Button buttonBolo;
+    private CalculoModel model;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bolo);
         editTextQuantidadeBolo = findViewById(R.id.editTextQuantidadeBolo);
-        buttonAdicionar = findViewById(R.id.buttonAdicionar);
+        buttonBolo = findViewById(R.id.buttonBolo);
+        model = new CalculoModel();
+        buttonBolo.setOnClickListener(this);
         Intent intent = getIntent();
-        if (intent != null){
-            valores = intent.getDoubleExtra("valores", 0);
+        if (intent != null && intent.hasExtra("total")) {
+            model.setTotal(intent.getDoubleExtra("total", 0.0));
+            Log.e("Main",""+model.getTotal());
         }
     }
-    public void clicar(View view){
-        int unidade = Integer.parseInt(editTextQuantidadeBolo.getText().toString());
-        double total = (unidade * 4.50);
-        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-        valores = valores + total;
-        intent.putExtra("total", valores);
-        startActivity(intent);
+    @Override
+    public void onClick(View view) {
+        if (view.getId() == R.id.buttonBolo) {
+            try {
+                int quantidade = Integer.parseInt(editTextQuantidadeBolo.getText().toString());
+                model.addBolo(quantidade);
+                Intent intent = new Intent(this, MainActivity.class);
+                intent.putExtra("total", model.getTotal());
+                startActivity(intent);
+            } catch (NumberFormatException e) {
+                editTextQuantidadeBolo.setError("Por favor, insira um número válido");
+            }
+        }
     }
 }
-
-- activity_main.xml
-[source,xml]
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_margin="10dp"
-    android:orientation="vertical" tools:context=".MainActivity">
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="@string/card_pio"
-        android:textAppearance="@style/TextAppearance.AppCompat.Large"/>
-    <TableLayout android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <TableRow android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <ImageView android:id="@+id/imageCafe"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:onClick="escolher"
-                android:src="@drawable/xicara_de_cafe"/>
-            <ImageView android:id="@+id/imageBolo"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:onClick="escolher"
-                android:src="@drawable/bolo"/>
-        </TableRow>
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <TextView android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:background="@color/ciano50"
-                android:gravity="center"
-                android:text="@string/caf"
-                android:textAppearance="@style/TextAppearance.AppCompat.Medium"/>
-            <TextView android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:background="@color/amarelo50"
-                android:gravity="center"
-                android:text="@string/bolo"
-                android:textAppearance="@style/TextAppearance.AppCompat.Medium"/>
-        </TableRow>
-        <LinearLayout android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-            <Button android:id="@+id/btCalcular"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:onClick="escolher"
-                android:text="Calcular"/>
-            <TextView android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/textViewResultado"/>
-        </LinearLayout>
-    </TableLayout>
-</LinearLayout>
-   
-- activity_cafe.xml
-[source,xml]
-<?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_margin="20dp"
-    tools:context=".ActivityCafe">
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="#A8FF9800"
-        android:layout_marginTop="32dp"
-        android:gravity="center"
-        android:text="Valor da Unidade:R$2,50"
-        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-    <EditText
-        android:id="@+id/editTextQuantidadeCafe"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="32dp"
-        android:layout_marginEnd="16dp"
-        android:hint="digite a quantidade: "
-        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView"/>
-    <Button
-        android:id="@+id/buttonCafe"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:onClick="clicar"
-        android:text="Adicionar"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="32dp"
-        android:layout_marginEnd="16dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editTextQuantidadeCafe" />
-</androidx.constraintlayout.widget.ConstraintLayout>
-
-- activity_bolo.xml
-[source,xml]
-<?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".ActivityBolo">
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:background="#A8FF9800"
-        android:gravity="center"
-        android:text="Valor da Unidade:R$4,50"
-        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-    <EditText
-        android:id="@+id/editTextQuantidadeBolo"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="32dp"
-        android:layout_marginEnd="16dp"
-        android:hint="digite a quantidade: "
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView2"/>
-    <Button
-        android:id="@+id/buttonAdicionar"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="32dp"
-        android:layout_marginEnd="16dp"
-        android:onClick="clicar"
-        android:text="Adicionar"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editTextQuantidadeBolo" />
-</androidx.constraintlayout.widget.ConstraintLayout>
 
 == Exemplos práticos (IMC)
 
