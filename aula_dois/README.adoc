@@ -290,7 +290,7 @@ OBS: acrescentar no projeto:
 
 Cores definidas no arquivo colors.xml com base no Material Theme Builder
 
-image::tabela_cores.png
+image::tabela_cores.png[width=300,height=300]
            
           
        
