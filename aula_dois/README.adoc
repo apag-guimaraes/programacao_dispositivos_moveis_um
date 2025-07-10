@@ -160,7 +160,7 @@ public class SegundaActivity extends AppCompatActivity {
         />
 </LinearLayout>
 
-== Algumas Ferramentas para Cores/Imagens/Ícones
+== Algumas Ferramentas para Cores / Imagens / Ícones
 
 O Material Theme Builder é a ferramenta oficial do Google para criar esquemas de cores baseados no Material Design 3, segue o link para acesso: https://m3.material.io/styles/color/system/how-the-system-works. Acesso em: 09 de jul. 2025.
 
@@ -190,7 +190,6 @@ Para saber mais detalhes sobre os estilos e tamanhos referentes ao texto, acesse
         android:padding="12dp"
         android:textColor="@color/onSurface"
         android:textColorHint="@color/onSurface" />
-
     <Button
         android:id="@+id/buttonSubmit"
         android:layout_width="wrap_content"
