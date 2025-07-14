@@ -1,6 +1,6 @@
 = Preferências Compartilhadas (Shared Preferences)
 
-Segundo a Google Developers (2020) "Um objeto SharedPreferences indica um arquivo que contém pares de chave-valor e fornece métodos simples para leitura
+Segundo a Google Developers (2025) "Um objeto SharedPreferences indica um arquivo que contém pares de chave-valor e fornece métodos simples para leitura
 e gravação. Cada arquivo SharedPreferences é gerenciado pelo framework e pode ser privado ou compartilhado."
 
 Caso em seu aplicativo, você queria armazenar dados pequenos do usuário, o SharedPreferences é uma excelente opção. Como especificado na documentação, 
@@ -9,7 +9,7 @@ trata-se de um objeto formado pelo par chave-valor. Para aqueles que já manipul
 Referências do texto entre aspas: 
 
 - GOOGLE DEVELOPERS. Salvar dados chave-valor. Disponível em: <https://developer.android.com/training/data-storage/shared-preferences>. 
-Acessado em: 23 de ago. 2024. 
+Acessado em: 14 de jul. 2025. 
 
 Exemplos práticos
 
