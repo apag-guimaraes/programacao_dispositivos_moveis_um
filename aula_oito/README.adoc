@@ -2,7 +2,7 @@
 
 O SDK do Android fornece estilos e temas definidos para ser usado em um app. Quando um projeto na IDE é criado um tema já é disponibilizado, mas o desenvolvedor pode optar também criar ou personalizar seus próprios estilos e temas.
 
-Exemplos práticos (Estilos e Temas)
+=== Exemplos práticos (Estilos e Temas)
 
 - colors.xml
 [source,xml]
@@ -124,7 +124,7 @@ public class MainActivity extends AppCompatActivity {
 
 Você pode aproveitar os recursos de estilização para personalizar as formas dos Buttons. 
 
-Exemplos práticos (Botões Personalizados)
+=== Exemplos práticos (Botões Personalizados)
 
 - colors.xml
 [source,xml]
@@ -215,7 +215,7 @@ Referências do texto entre aspas:
 
 Adicionar o botão flutuante em seu projeto, é uma tarefa simples. Para adicionar a tag <com.google.android.material.floatingactionbutton.FloatingActionButton /> juntamente com alguns atributos no arquivo de xml de layout. E depois usar a classe FloatingActionButton em uma classe .java.
 
-Exemplos práticos (Botão Flutuante)
+=== Exemplos práticos (Botão Flutuante)
 
 - activity_main.xml
 [source,xml]
