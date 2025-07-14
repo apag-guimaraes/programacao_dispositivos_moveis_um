@@ -2,7 +2,7 @@
 
 = Barra de Ações (App Bar)
 
-A barra de ações é um componente fundamental em aplicativos, servindo tanto para identificar a aplicação quanto para oferecer funcionalidades adicionais, como o menu flutuante, que proporciona opções extras ao usuário. Existem duas classes principais para implementar a barra de ações no Android:
+A barra de ações é um componente importante, pois além de servir de identificação do app para o usuário, o componente pode oferecer funcionalidades adicionais, como o menu flutuante. Existem duas classes principais para implementar a barra de ações no Android:
 
 - ActionBar: Implementação nativa do Android, já integrada ao sistema, mas com menos opções de personalização.
 - Toolbar: Classe mais moderna e amplamente utilizada, que oferece maior flexibilidade para customização e integração com designs modernos.
@@ -10,10 +10,10 @@ A barra de ações é um componente fundamental em aplicativos, servindo tanto p
 A Toolbar é a escolha preferida na maioria dos projetos atuais devido à sua versatilidade e suporte a recursos avançados.
 Materiais para mais detalhes:
 
-- GOOGLE DEVELOPERS. Adicionar barra de apps. Disponível em: https://developer.android.com/training/appbar#lessons. Acessado em: 23 ago. 2024.
-- GOOGLE DEVELOPERS. Adicionar e processsar ações. Disponível em: https://developer.android.com/training/appbar/actions. Acessado em: 23 ago. 2024.
-- GOOGLE DEVELOPERS. Configurar a barra de apps. Disponível em: https://developer.android.com/training/appbar/setting-up. Acessado em: 23 ago. 2024.
-- STACKOVERFLOW. Qual a diferença de uma toolbar para uma action bar? 2017. Disponível em: https://pt.stackoverflow.com/questions/178775/qual-a-diferen%C3%A7a-de-uma-toolbar-para-uma-action-bar. Pergunta feita pela usuário Aline (https://pt.stackoverflow.com/users/36515/aline) e respondida pelo usuário (https://pt.stackoverflow.com/users/2541/ramaral). Acessado em: 23 ago. 2024.
+- GOOGLE DEVELOPERS. Adicionar barra de apps. Disponível em: https://developer.android.com/training/appbar#lessons. Acessado em: 14 jul. 2025.
+- GOOGLE DEVELOPERS. Adicionar e processsar ações. Disponível em: https://developer.android.com/training/appbar/actions. Acessado em: 14 jul. 2025.
+- GOOGLE DEVELOPERS. Configurar a barra de apps. Disponível em: https://developer.android.com/training/appbar/setting-up. Acessado em: 14 jul. 2025.
+- STACKOVERFLOW. Qual a diferença de uma toolbar para uma action bar? 2017. Disponível em: https://pt.stackoverflow.com/questions/178775/qual-a-diferen%C3%A7a-de-uma-toolbar-para-uma-action-bar. Pergunta feita pela usuário Aline (https://pt.stackoverflow.com/users/36515/aline) e respondida pelo usuário (https://pt.stackoverflow.com/users/2541/ramaral). Acessado em: 14 jul. 2025.
 
 Exemplos práticos
 
@@ -177,14 +177,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.TextView;
 public class JavaActivity extends AppCompatActivity {
-    private TextView textView_java;
+    private TextView textViewJava;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_java);
-        textView_java = findViewById(R.id.textView_java);
+        textViewJava = findViewById(R.id.textViewJava);
         String msg = getIntent().getStringExtra("dados");
-        textView_java.setText(msg);
+        textViewJava.setText(msg);
     }//onCreate
 }//class
 
@@ -198,7 +198,7 @@ public class JavaActivity extends AppCompatActivity {
     android:layout_height="match_parent"
     tools:context=".JavaActivity">
     <TextView
-        android:id="@+id/textView_java"
+        android:id="@+id/textViewJava"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/java"
@@ -212,12 +212,17 @@ public class JavaActivity extends AppCompatActivity {
 [source,java]
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
+import android.widget.TextView;
 public class PhpActivity extends AppCompatActivity {
+    private TextView textViewPhp;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_php);
-    }
+        textViewPhp = findViewById(R.id.textViewPhp);
+        String msg = getIntent().getStringExtra("dados");
+        textViewPhp.setText(msg);
+    }//onCreate
 }
 
 - activity_php.xml
@@ -229,18 +234,32 @@ public class PhpActivity extends AppCompatActivity {
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".PhpActivity">
+    <TextView
+        android:id="@+id/textViewPhp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/php"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
 
 - CActivity.java
 [source,java]
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
+import android.widget.TextView;
 public class CActivity extends AppCompatActivity {
+    private TextView textViewC;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_cactivity);
-    }
+        setContentView(R.layout.activity_c);
+        textViewC = findViewById(R.id.textViewC);
+        String msg = getIntent().getStringExtra("dados");
+        textViewC.setText(msg);
+    }//onCreate
 }
 
 - activity_c.xml
@@ -252,6 +271,15 @@ public class CActivity extends AppCompatActivity {
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".CActivity">
+    <TextView
+        android:id="@+id/textViewC"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/c"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
 
 OBS: Depois faça o teste com o emulador configurado com o tema escuro.
