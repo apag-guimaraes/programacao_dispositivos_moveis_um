@@ -203,15 +203,14 @@ public class MainActivity extends AppCompatActivity {
     }
 }
 
-Segundo a Google Developers (2019), "um botão de ação flutuante (FAB, na sigla em inglês) é um botão circular que aciona a ação principal na IU do seu app." 
+Segundo a Google Developers (2025), "um botão de ação flutuante (FAB, na sigla em inglês) é um botão circular que aciona a ação principal na IU do seu app." 
 
-Ainda, de acordo com a Google Developers (2021), "Os botões de ação flutuantes são usados para um tipo especial de ação promovida. Eles são diferenciados por um ícone circulado flutuando acima da IU e têm comportamentos de movimento especiais relacionados à transformação, lançamento e transferência do ponto de ancoragem."
+Ainda, de acordo com a Google Developers (2025), "Os botões de ação flutuantes são usados para um tipo especial de ação promovida. Eles são diferenciados por um ícone circulado flutuando acima da IU e têm comportamentos de movimento especiais relacionados à transformação, lançamento e transferência do ponto de ancoragem."
 
 Referências do texto entre aspas: 
 
-- GOOGLE DEVELOPERS. Adicionar um botão flutuante. Disponível em: <https://developer.android.com/guide/topics/ui/floating-action-button?hl=pt-br>. Acesso em: 23 ago. 2024.
-
-- GOOGLE DEVELOPERS.FloatingActionButton. Disponível em: <https://developer.android.com/reference/com/google/android/material/floatingactionbutton/FloatingActionButton?hl=pt-br>. Acesso em: 23 ago. 2024.
+- GOOGLE DEVELOPERS. Adicionar um botão flutuante. Disponível em: <https://developer.android.com/guide/topics/ui/floating-action-button?hl=pt-br>. Acesso em: 14 jul. 2025.
+- GOOGLE DEVELOPERS.FloatingActionButton. Disponível em: <https://developer.android.com/reference/com/google/android/material/floatingactionbutton/FloatingActionButton?hl=pt-br>. Acesso em: 14 jul. 2025.
 
 Adicionar o botão flutuante em seu projeto, é uma tarefa simples. Para adicionar a tag <com.google.android.material.floatingactionbutton.FloatingActionButton /> juntamente com alguns atributos no arquivo de xml de layout. E depois usar a classe FloatingActionButton em uma classe .java.
 
