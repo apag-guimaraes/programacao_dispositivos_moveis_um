@@ -2,8 +2,12 @@
 
 = Barra de Ações (App Bar)
 
-A barra de ações é um item importante para seu app, além de identificá-lo, este oferece outros recursos com o menu flutuante, muito usado para dar mais opções ao usuário. Para implementar o AppBar pode ser usado a classe ActionBar e ToolBar. Nativamente, o AppBar vem implementado pela ActionBar, porém, a mais usada atualmente é a classe ToolBar.
+A barra de ações é um componente fundamental em aplicativos, servindo tanto para identificar a aplicação quanto para oferecer funcionalidades adicionais, como o menu flutuante, que proporciona opções extras ao usuário de forma prática. Existem duas classes principais para implementar a barra de ações no Android:
 
+- ActionBar: Implementação nativa do Android, já integrada ao sistema, mas com menos opções de personalização.
+- Toolbar: Classe mais moderna e amplamente utilizada, que oferece maior flexibilidade para customização e integração com designs modernos.
+
+A Toolbar é a escolha preferida na maioria dos projetos atuais devido à sua versatilidade e suporte a recursos avançados.
 Materiais para mais detalhes:
 
 - GOOGLE DEVELOPERS. Adicionar barra de apps. Disponível em: https://developer.android.com/training/appbar#lessons. Acessado em: 23 ago. 2024.
