@@ -19,7 +19,7 @@ Material para mais detalhes:
 
 - GOOGLE DEVELOPERS. Caixas de diálogo. Disponível em: https://developer.android.com/guide/topics/ui/dialogs?hl=pt-br#java. Acessado em: 21 ago. 2024.
 
-Exemplos práticos (AlertDialog Basic)
+=== Exemplos práticos (AlertDialog Basic)
 
 - activity_main.xml
 [source,xml]
@@ -43,7 +43,6 @@ Exemplos práticos (AlertDialog Basic)
 
 - MyDialogFragment.java
 [source,java]
-package com.example.alertdialogfragmenttest;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -96,7 +95,6 @@ public class MyDialogFragment extends DialogFragment {
 
 - MainActivity.java
 [source,java]
-package com.example.alertdialogfragmenttest;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -121,7 +119,17 @@ public class MainActivity extends AppCompatActivity {
     }//private
 }//class
 
-Exemplos práticos (AlertDialog Personalizado)
+=== Exemplos práticos (AlertDialog Personalizado)
+
+- colors.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="red">#D02C2C</color>
+    <color name="green">#4CAF50</color>
+</resources>
 
 - activity_main.xml
 [source,xml]
@@ -146,7 +154,6 @@ Exemplos práticos (AlertDialog Personalizado)
 
 - MyDialogFragment.java
 [source,java]
-package com.example.alertdialogpersonalizado;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -191,7 +198,6 @@ public class MyDialogFragment extends DialogFragment {
 
 - MainActivity.java
 [source,java]
-package com.example.alertdialogpersonalizado;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import android.content.DialogInterface;
@@ -228,7 +234,7 @@ public class MainActivity extends AppCompatActivity {
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_margin="10dp"
     android:padding="20dp"
-    android:background="@color/teal_200"
+    android:background="@color/red"
     android:layout_height="wrap_content">
     <ImageView
         android:layout_width="wrap_content"
@@ -252,11 +258,11 @@ public class MainActivity extends AppCompatActivity {
             android:layout_height="wrap_content"
             android:text="teste"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-            android:background="@color/purple_200"/>
+            android:background="@color/green"/>
     </LinearLayout>
 </LinearLayout>
 
-Exemplos práticos (AlertDialog List)
+=== Exemplos práticos (AlertDialog List)
 
 - activity_main.xml
 [source,xml]
@@ -293,7 +299,6 @@ Exemplos práticos (AlertDialog List)
 
 - MyDialogFragment.java
 [source,java]
-package com.example.alertdialoglist;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.res.Resources;
@@ -331,7 +336,6 @@ public class MyDialogFragment extends DialogFragment {
 
 - MainActivity.java
 [source,java]
-package com.example.alertdialoglist;
 import androidx.appcompat.app.AppCompatActivity;
 import android.content.res.Resources;
 import android.os.Bundle;
@@ -357,7 +361,7 @@ public class MainActivity extends AppCompatActivity {
     }
 }//class
 
-Exemplos práticos (AlertDialog with multiple choice)
+=== Exemplos práticos (AlertDialog with multiple choice)
 
 - activity_main.xml
 [source,xml]
@@ -394,7 +398,6 @@ Exemplos práticos (AlertDialog with multiple choice)
 
 - MyDialogFragment.java
 [source,java]
-package com.example.alertdialogfragmenttest;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.res.Resources;
@@ -433,7 +436,6 @@ public class MyDialogFragment extends DialogFragment {
 
 - MainActivity.java
 [source,java]
-package com.example.alertdialogfragmenttest;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -454,7 +456,7 @@ public class MainActivity extends AppCompatActivity {
    }//onCreate
    private void openAlertDialog(){
        MyDialogFragment mdf = new MyDialogFragment();   //criação do objeto da classe MyDialogFragment
-       mdf.show(getSupportFragmentManager(),"clima");    //chame o método show passando um gerenciador de fragmento e a tag necessária para salvar/restaurar os dados referente do fragmento
+       mdf.show(getSupportFragmentManager(),"semana");    //chame o método show passando um gerenciador de fragmento e a tag necessária para salvar/restaurar os dados referente do fragmento
    }//open
 }//class
 
