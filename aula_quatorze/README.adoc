@@ -1,73 +1,84 @@
 = Card View
 
-Permite que a construção do layout baseado em cartões. Para mais detalhes sobre Card View: GOOGLE DEVELOPERS. Criar um layout baseado em cards. Disponível
-em: https://developer.android.com/guide/topics/ui/layout/cardview?hl=pt-br. Acesso: 09 de set. 2024.
+Permite a construção do layout baseado em cartões. Para mais detalhes sobre Card View: GOOGLE DEVELOPERS. Criar um layout baseado em cards. Disponível
+em: https://developer.android.com/guide/topics/ui/layout/cardview?hl=pt-br. Acesso: 14 de jul. 2025.
 
-Exemplos práticos:
+=== Exemplos práticos:
+
+- colors.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="red">#D31B1B</color>
+    <color name="green">#4CAF50</color>
+    <color name="blue">#03A9F4</color>
+</resources>
 
 - main_activity.xml
 [source,xml]
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-   xmlns:app="http://schemas.android.com/apk/res-auto"
-   xmlns:tools="http://schemas.android.com/tools"
-   android:layout_width="match_parent"
-   android:layout_height="match_parent"
-   android:orientation="vertical"
-   tools:context=".MainActivity">
-   <LinearLayout
-       android:layout_width="match_parent"
-       android:layout_height="match_parent"
-       android:orientation="vertical">
-       <androidx.cardview.widget.CardView
-           android:layout_width="match_parent"
-           android:layout_height="wrap_content"
-           android:layout_margin="10dp"
-           app:cardBackgroundColor="@color/purple_200"
-           app:cardCornerRadius="20dp"
-           app:cardElevation="10dp"
-           app:cardUseCompatPadding="true">
-           <ImageView
-               android:id="@+id/imgBolo"
-               android:layout_width="200dp"
-               android:layout_height="200dp"
-               android:layout_gravity="center"
-               android:layout_margin="10dp"
-               android:src="@drawable/bolo" />
-       </androidx.cardview.widget.CardView>
-       <androidx.cardview.widget.CardView
-           android:layout_width="match_parent"
-           android:layout_height="wrap_content"
-           android:layout_margin="10dp"
-           app:cardBackgroundColor="@color/purple_200"
-           app:cardCornerRadius="20dp"
-           app:cardElevation="10dp"
-           app:cardUseCompatPadding="true">
-           <ImageView
-               android:id="@+id/imgCafe"
-               android:layout_width="200dp"
-               android:layout_height="200dp"
-               android:layout_gravity="center"
-               android:layout_margin="10dp"
-               android:src="@drawable/cafe" />
-       </androidx.cardview.widget.CardView>
-       <androidx.cardview.widget.CardView
-           android:layout_width="match_parent"
-           android:layout_height="wrap_content"
-           android:layout_margin="10dp"
-           app:cardBackgroundColor="@color/purple_200"
-           app:cardCornerRadius="20dp"
-           app:cardElevation="10dp"
-          app:cardUseCompatPadding="true">
-           <ImageView
-               android:id="@+id/imgPizza"
-               android:layout_width="200dp"
-               android:layout_height="200dp"
-               android:layout_gravity="center"
-               android:layout_margin="10dp"
-               android:src="@drawable/pizza" />
-       </androidx.cardview.widget.CardView>
-   </LinearLayout>
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            app:cardBackgroundColor="@color/green"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="10dp"
+            app:cardUseCompatPadding="true">
+            <ImageView
+                android:id="@+id/imgBolo"
+                android:layout_width="200dp"
+                android:layout_height="200dp"
+                android:layout_gravity="center"
+                android:layout_margin="10dp"
+                android:src="@drawable/bolo_de_fuba" />
+        </androidx.cardview.widget.CardView>
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            app:cardBackgroundColor="@color/red"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="10dp"
+            app:cardUseCompatPadding="true">
+            <ImageView
+                android:id="@+id/imgCafe"
+                android:layout_width="200dp"
+                android:layout_height="200dp"
+                android:layout_gravity="center"
+                android:layout_margin="10dp"
+                android:src="@drawable/coffee" />
+        </androidx.cardview.widget.CardView>
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            app:cardBackgroundColor="@color/blue"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="10dp"
+            app:cardUseCompatPadding="true">
+            <ImageView
+                android:id="@+id/imgPizza"
+                android:layout_width="200dp"
+                android:layout_height="200dp"
+                android:layout_gravity="center"
+                android:layout_margin="10dp"
+                android:src="@drawable/book__1_" />
+        </androidx.cardview.widget.CardView>
+    </LinearLayout>
 </ScrollView>
 
 - MainActivity.java
@@ -84,9 +95,9 @@ public class MainActivity extends AppCompatActivity {
 
 = Recycler View
 
-Recurso que permite criar listas dinâmicas com mais eficiência e economia de recursos. Para mais detalhes sobre Recycler View: GOOGLE DEVELOPERS. Criar listas dinâmicas com o Recycler View. Disponível em: https://developer.android.com/guide/topics/ui/layout/recyclerview?hl=pt-br. Acesso: 09 de set. 2024.
+Recurso que permite criar listas dinâmicas com mais eficiência e economia de recursos. Para mais detalhes sobre Recycler View: GOOGLE DEVELOPERS. Criar listas dinâmicas com o Recycler View. Disponível em: https://developer.android.com/guide/topics/ui/layout/recyclerview?hl=pt-br. Acesso: 14 de jul. 2025.
 
-Exemplos práticos:
+=== Exemplos práticos:
 
 - main_activity.xml
 [source,xml]
