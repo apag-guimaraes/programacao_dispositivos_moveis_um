@@ -264,4 +264,34 @@ public class ItemData {
     }
 }
 
+- MainActivity.java
+[source,java]
+import android.os.Bundle;
+import android.widget.Toast;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import java.util.ArrayList;
+public class MainActivity extends AppCompatActivity {
+    private RecyclerView recyclerView;
+    private ItemAdapter adapter;
+    private ArrayList<ItemModel> itemList;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        recyclerView = findViewById(R.id.recycleView);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        itemList = ItemData.getItems();
+        adapter = new ItemAdapter(this, itemList, new ItemAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(ItemModel item) {
+                Toast.makeText(MainActivity.this, "Clicou em: " + item.getTexto(), Toast.LENGTH_SHORT).show();
+            }
+        });
+        recyclerView.setAdapter(adapter);
+    }
+}
+
+
 
