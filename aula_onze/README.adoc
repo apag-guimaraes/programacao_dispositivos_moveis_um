@@ -192,7 +192,7 @@ public class SegundaActivity extends AppCompatActivity {
         Intent intent = new Intent(SegundaActivity.this, MainActivity.class);
         intent.putExtra("texto", textViewTexto.getText().toString());
         startActivity(intent);
-        finish(); // evita empilhamento de activities
+        finish(); 
     }
 }//class
 
@@ -393,7 +393,7 @@ public class SegundaActivity extends AppCompatActivity {
         Intent intent = new Intent(SegundaActivity.this, MainActivity.class);
         intent.putExtra("texto", textViewTexto.getText().toString());
         startActivity(intent);
-        finish(); // evita empilhamento de activities
+        finish(); 
     }
 }
 
