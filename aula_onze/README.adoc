@@ -10,16 +10,18 @@ Exemplos práticos (Armazenamento interno):
 - ManipulaArquivo.java
 [source,java]
 import android.content.Context;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 public class ManipulaArquivo {
-    private Context context;
+    private final Context context;
     public ManipulaArquivo(Context context) {
         this.context = context;
     }
-    public void salvarArquivo(String nome, String conteudo) throws IOException {
-        try (FileOutputStream fos = context.openFileOutput(nome, Context.MODE_PRIVATE)) {
+    public void salvarArquivo(String nome, String conteudo, boolean append) throws IOException {
+        File arquivo = new File(context.getFilesDir(), nome);
+        try (FileOutputStream fos = new FileOutputStream(arquivo, append)) {
             fos.write(conteudo.getBytes());
         }
     }
@@ -36,10 +38,11 @@ public class ManipulaArquivo {
     public void deletarArquivo(String nome) {
         context.deleteFile(nome);
     }
-}
+}//class
 
 - activity_main.xml
 [source,xml]
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -52,68 +55,85 @@ public class ManipulaArquivo {
         android:hint="Digite algo"
         android:inputType="text" />
     <Button
-        android:id="@+id/buttonS"
+        android:id="@+id/buttonSalvar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="clicar"
         android:text="Salvar" />
     <Button
-        android:id="@+id/buttonE"
+        android:id="@+id/buttonExcluir"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="clicar"
         android:text="Excluir" />
 </LinearLayout>
 
-- MainAcitivty.java
+- MainActivity.java
 [source,java]
-import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
+import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+import androidx.appcompat.app.AppCompatActivity;
 import java.io.IOException;
 public class MainActivity extends AppCompatActivity {
-    private EditText editTextNome;
-    private Button buttonS, buttonE;
+    private EditText editTextTexto;
+    private Button buttonSalvar, buttonExcluir;
     private ManipulaArquivo arquivo;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        editTextNome = findViewById(R.id.editTextTexto);
-        buttonS = findViewById(R.id.buttonS);
-        buttonE = findViewById(R.id.buttonE);
+        editTextTexto = findViewById(R.id.editTextTexto);
+        buttonSalvar = findViewById(R.id.buttonSalvar);
+        buttonExcluir = findViewById(R.id.buttonExcluir);
         arquivo = new ManipulaArquivo(this);
         Intent intent = getIntent();
         if (intent != null && intent.hasExtra("texto")) {
-            editTextNome.setText(intent.getStringExtra("texto"));
+            String texto = intent.getStringExtra("texto");
+            editTextTexto.setText(texto);
         }
-    }
-    public void clicar(View v) {
-        try {
-            if (v.getId() == R.id.buttonS) {
-                String conteudo = editTextNome.getText().toString();
-                arquivo.salvarArquivo("meuArq.txt", conteudo); 
-                Toast.makeText(this, "Salvo", Toast.LENGTH_SHORT).show();
-                editTextNome.setText("");
-                startActivity(new Intent(this, SegundaActivity.class)); 
-            } else if (v.getId() == R.id.buttonE) {
-                arquivo.deletarArquivo("meuArq.txt"); 
-                editTextNome.setText("");
-                Toast.makeText(this, "Arquivo excluído", Toast.LENGTH_SHORT).show();
+        buttonSalvar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                salvarTexto();
             }
+        });
+        buttonExcluir.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                excluirArquivo();
+            }
+        });
+    }
+    private void salvarTexto() {
+        String conteudo = editTextTexto.getText().toString();
+        try {
+            arquivo.salvarArquivo("meuArq.txt", conteudo,true);
+            Toast.makeText(this, "Texto salvo com sucesso", Toast.LENGTH_SHORT).show();
+            editTextTexto.setText("");
+            Intent intent = new Intent(MainActivity.this, SegundaActivity.class);
+            startActivity(intent);
         } catch (IOException e) {
             e.printStackTrace();
-            Toast.makeText(this, "Erro ao salvar/excluir", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Erro ao salvar o arquivo", Toast.LENGTH_SHORT).show();
         }
     }
-}
+    private void excluirArquivo() {
+        try {
+            arquivo.deletarArquivo("meuArq.txt");
+            editTextTexto.setText("");
+            Toast.makeText(this, "Arquivo excluído", Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Erro ao excluir o arquivo", Toast.LENGTH_SHORT).show();
+        }
+    }
+}//class
 
 - activity_segunda.xml
-[source,xml]
+[source,xml] 
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -126,82 +146,96 @@ public class MainActivity extends AppCompatActivity {
         android:text="Texto da primeira tela"
         android:textSize="18sp" />
     <Button
-        android:id="@+id/buttonBack"
+        android:id="@+id/buttonVoltar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="abrirTela"
         android:text="Voltar" />
 </LinearLayout>
 
 - SegundaActivity.java
 [source,java]
-import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
+import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
+import androidx.appcompat.app.AppCompatActivity;
 import java.io.IOException;
 public class SegundaActivity extends AppCompatActivity {
     private TextView textViewTexto;
+    private Button buttonBack;
     private ManipulaArquivo arquivo;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_segunda);
         textViewTexto = findViewById(R.id.textViewTexto);
+        buttonBack = findViewById(R.id.buttonVoltar);
         arquivo = new ManipulaArquivo(this);
         try {
-            String texto = arquivo.lerArquivo("meuArq.txt"); 
+            String texto = arquivo.lerArquivo("meuArq.txt");
             textViewTexto.setText(texto);
         } catch (IOException e) {
             e.printStackTrace();
             textViewTexto.setText("Erro ao carregar conteúdo");
+            Toast.makeText(this, "Erro ao ler o arquivo", Toast.LENGTH_SHORT).show();
         }
+        buttonBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                voltarParaMain();
+            }
+        });
     }
-    public void abrirTela(View view) {
-        Intent intent = new Intent(this, MainActivity.class);
+    private void voltarParaMain() {
+        Intent intent = new Intent(SegundaActivity.this, MainActivity.class);
         intent.putExtra("texto", textViewTexto.getText().toString());
-        startActivity(intent); 
+        startActivity(intent);
+        finish(); // evita empilhamento de activities
     }
-}
+}//class
 
-Exemplos práticos (Armazenamento externo no Storage):
+Exemplos práticos (Armazenamento no External Storage):
 
 - ManipulaArquivo.java
 [source,java]
+import android.content.Context;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import android.content.Context;
 public class ManipulaArquivo {
-    private static final String FILE_NAME = "meuArq.txt";
-    public static boolean salvarDados(Context context, String dados) {
-        File file = new File(context.getExternalFilesDir(null), FILE_NAME);
-        try (FileOutputStream fos = new FileOutputStream(file)) {
-            fos.write(dados.getBytes());
-            return true;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
+    private final Context context;
+    public ManipulaArquivo(Context context) {
+        this.context = context;
+    }
+    private File getArquivo(String nome) {
+        File dir = context.getExternalFilesDir(null);
+        return new File(dir, nome);
+    }
+    public void salvarArquivo(String nome, String conteudo) throws IOException {
+        File arquivo = getArquivo(nome);
+        try (FileOutputStream fos = new FileOutputStream(arquivo,true)) {
+            fos.write(conteudo.getBytes());
         }
     }
-    public static String lerDados(Context context) {
-        File file = new File(context.getExternalFilesDir(null), FILE_NAME);
-        StringBuilder dados = new StringBuilder();
-        try (FileInputStream fis = new FileInputStream(file)) {
+    public String lerArquivo(String nome) throws IOException {
+        File arquivo = getArquivo(nome);
+        StringBuilder sb = new StringBuilder();
+        try (FileInputStream fis = new FileInputStream(arquivo)) {
             int letra;
             while ((letra = fis.read()) != -1) {
-                dados.append((char) character);
+                sb.append((char) letra);
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
-        return dados.toString();
+        return sb.toString();
     }
-    public static boolean deletarDados(Context context) {
-        File file = new File(context.getExternalFilesDir(null), FILE_NAME);
-        return file.delete();
+    public void deletarArquivo(String nome) {
+        File arquivo = getArquivo(nome);
+        if (arquivo.exists()) {
+            arquivo.delete();
+        }
     }
 }
 
@@ -242,37 +276,59 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+import java.io.IOException;
 public class MainActivity extends AppCompatActivity {
-    private EditText editTextNome;
-    private Button buttonS, buttonE;
+    private EditText editTextTexto;
+    private Button buttonSalvar, buttonExcluir;
+    private ManipulaArquivo arquivo;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        editTextNome = findViewById(R.id.editTextNome);
-        buttonS = findViewById(R.id.buttonS);
-        buttonE = findViewById(R.id.buttonE);
-        Intent i = getIntent();
-        editTextNome.setText(i.getStringExtra("msg"));
+        editTextTexto = findViewById(R.id.editTextTexto);
+        buttonSalvar = findViewById(R.id.buttonSalvar);
+        buttonExcluir = findViewById(R.id.buttonExcluir);
+        arquivo = new ManipulaArquivo(this);
+        Intent intent = getIntent();
+        if (intent != null && intent.hasExtra("texto")) {
+            String texto = intent.getStringExtra("texto");
+            editTextTexto.setText(texto);
+        }
+        buttonSalvar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                salvarTexto();
+            }
+        });
+        buttonExcluir.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                excluirArquivo();
+            }
+        });
     }
-    public void clicar(View view) {
-       if(view.getId() == R.id.buttonS) {
-           String dado = editTextNome.getText().toString();
-           if (ManipulaArquivo.salvarDados(getApplicationContext(), dado)) {
-               Toast.makeText(getApplicationContext(), "Salvo com sucesso", Toast.LENGTH_SHORT).show();
-               startActivity(new Intent(getApplicationContext(), SegundaActivity.class));
-           } else {
-               Toast.makeText(getApplicationContext(), "Erro ao salvar", Toast.LENGTH_SHORT).show();
-           }
-       }
-       if(view.getId() == R.id.buttonE) {
-           // Exclui o arquivo
-           if (ManipulaArquivo.deletarDados(getApplicationContext())) {
-               Toast.makeText(getApplicationContext(), "Arquivo excluído", Toast.LENGTH_SHORT).show();
-           } else {
-               Toast.makeText(getApplicationContext(), "Erro ao excluir", Toast.LENGTH_SHORT).show();
-           }
-       }
+    private void salvarTexto() {
+        String conteudo = editTextTexto.getText().toString();
+        try {
+            arquivo.salvarArquivo("meuArq.txt", conteudo);
+            Toast.makeText(this, "Texto salvo com sucesso", Toast.LENGTH_SHORT).show();
+            editTextTexto.setText("");
+            Intent intent = new Intent(MainActivity.this, SegundaActivity.class);
+            startActivity(intent);
+        } catch (IOException e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Erro ao salvar o arquivo", Toast.LENGTH_SHORT).show();
+        }
+    }
+    private void excluirArquivo() {
+        try {
+            arquivo.deletarArquivo("meuArq.txt");
+            editTextTexto.setText("");
+            Toast.makeText(this, "Arquivo excluído", Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Erro ao excluir o arquivo", Toast.LENGTH_SHORT).show();
+        }
     }
 }
 
@@ -285,27 +341,59 @@ public class MainActivity extends AppCompatActivity {
     android:orientation="vertical"
     android:padding="16dp">
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/textViewTexto"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Texto lido do arquivo"
-        android:textSize="18sp"/>
+        android:text="Texto da primeira tela"
+        android:textSize="18sp" />
+    <Button
+        android:id="@+id/buttonVoltar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Voltar" />
 </LinearLayout>
 
 - SegundaActivity.java
 [source,java]
+import android.content.Intent;
 import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
+import androidx.appcompat.app.AppCompatActivity;
+import java.io.IOException;
 public class SegundaActivity extends AppCompatActivity {
-    private TextView textView;
+    private TextView textViewTexto;
+    private Button buttonBack;
+    private ManipulaArquivo arquivo;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_segunda);
-        textView = findViewById(R.id.textView);
-        String data = ManipulaArquivo.lerDados(getApplicationContext());
-        textView.setText(data);
+        textViewTexto = findViewById(R.id.textViewTexto);
+        buttonBack = findViewById(R.id.buttonVoltar);
+        arquivo = new ManipulaArquivo(this);
+        try {
+            String texto = arquivo.lerArquivo("meuArq.txt");
+            textViewTexto.setText(texto);
+        } catch (IOException e) {
+            e.printStackTrace();
+            textViewTexto.setText("Erro ao carregar conteúdo");
+            Toast.makeText(this, "Erro ao ler o arquivo", Toast.LENGTH_SHORT).show();
+        }
+        buttonBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                voltarParaMain();
+            }
+        });
+    }
+    private void voltarParaMain() {
+        Intent intent = new Intent(SegundaActivity.this, MainActivity.class);
+        intent.putExtra("texto", textViewTexto.getText().toString());
+        startActivity(intent);
+        finish(); // evita empilhamento de activities
     }
 }
 
