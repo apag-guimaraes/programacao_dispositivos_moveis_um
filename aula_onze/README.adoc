@@ -164,14 +164,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import java.io.IOException;
 public class SegundaActivity extends AppCompatActivity {
     private TextView textViewTexto;
-    private Button buttonBack;
+    private Button buttonVoltar;
     private ManipulaArquivo arquivo;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_segunda);
         textViewTexto = findViewById(R.id.textViewTexto);
-        buttonBack = findViewById(R.id.buttonVoltar);
+        buttonVoltar = findViewById(R.id.buttonVoltar);
         arquivo = new ManipulaArquivo(this);
         try {
             String texto = arquivo.lerArquivo("meuArq.txt");
@@ -181,7 +181,7 @@ public class SegundaActivity extends AppCompatActivity {
             textViewTexto.setText("Erro ao carregar conteúdo");
             Toast.makeText(this, "Erro ao ler o arquivo", Toast.LENGTH_SHORT).show();
         }
-        buttonBack.setOnClickListener(new View.OnClickListener() {
+        buttonVoltar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 voltarParaMain();
@@ -365,14 +365,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import java.io.IOException;
 public class SegundaActivity extends AppCompatActivity {
     private TextView textViewTexto;
-    private Button buttonBack;
+    private Button buttonVoltar;
     private ManipulaArquivo arquivo;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_segunda);
         textViewTexto = findViewById(R.id.textViewTexto);
-        buttonBack = findViewById(R.id.buttonVoltar);
+        buttonVoltar = findViewById(R.id.buttonVoltar);
         arquivo = new ManipulaArquivo(this);
         try {
             String texto = arquivo.lerArquivo("meuArq.txt");
@@ -382,7 +382,7 @@ public class SegundaActivity extends AppCompatActivity {
             textViewTexto.setText("Erro ao carregar conteúdo");
             Toast.makeText(this, "Erro ao ler o arquivo", Toast.LENGTH_SHORT).show();
         }
-        buttonBack.setOnClickListener(new View.OnClickListener() {
+        buttonVoltar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 voltarParaMain();
