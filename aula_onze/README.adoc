@@ -3,7 +3,7 @@
 Para mais detalhes sobre as formas de armazenar dados no Android acesse:
 
 GOOGLE DEVELOPERS. Visão geral do armazenamento de dados e arquivos. 
-Disponível em: https://developer.android.com/training/data-storage?hl=pt-br. Acesso em: 06 set. 2024.
+Disponível em: https://developer.android.com/training/data-storage?hl=pt-br. Acesso em: 16 ago. 2025.
 
 Exemplos práticos (Armazenamento interno):
 
@@ -184,11 +184,11 @@ public class SegundaActivity extends AppCompatActivity {
         buttonVoltar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                voltarParaMain();
+                voltarTela();
             }
         });
     }
-    private void voltarParaMain() {
+    private void voltarTela() {
         Intent intent = new Intent(SegundaActivity.this, MainActivity.class);
         intent.putExtra("texto", textViewTexto.getText().toString());
         startActivity(intent);
@@ -385,11 +385,11 @@ public class SegundaActivity extends AppCompatActivity {
         buttonVoltar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                voltarParaMain();
+                voltarTela();
             }
         });
     }
-    private void voltarParaMain() {
+    private void voltarTela() {
         Intent intent = new Intent(SegundaActivity.this, MainActivity.class);
         intent.putExtra("texto", textViewTexto.getText().toString());
         startActivity(intent);
