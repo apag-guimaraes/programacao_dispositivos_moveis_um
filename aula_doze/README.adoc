@@ -2,84 +2,17 @@
 
 Para ver mais detalhes sobre a persistência em banco de dados: 
 
-GOOGLE DEVELOPERS. Salvar dados usando o SQLite. Disponível em: https://developer.android.com/training/data-storage/sqlite?hl=pt-br. Acesso em: 06 set. 2024.
+GOOGLE DEVELOPERS. Salvar dados usando o SQLite. Disponível em: https://developer.android.com/training/data-storage/sqlite?hl=pt-br. Acesso em: 17 ago. 2025.
 
 Exemplos práticos:
 
 Versão 1:
-
-- activity_main.xml
-[source,xml]
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".MainActivity">
-    <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:hint="digite seu nome"
-        android:id="@+id/editTextNome"
-        />
-    <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:hint="digite seu telefone"
-        android:id="@+id/editTextTelefone"
-        />
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-        <Button
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="SAVE"
-            android:onClick="clicar"
-            android:id="@+id/buttonS"/>
-        <Button
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="LIST"
-            android:onClick="clicar"
-            android:id="@+id/buttonL"/>
-        <Button
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="DELETE"
-            android:onClick="clicar"
-            android:id="@+id/buttonD"/>
-    </LinearLayout>
-</LinearLayout>
-
-- activity_2.xml
-[source,xml]
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".Activity2">
-    <ListView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/lista"/>
-</LinearLayout>
 
 - Pessoa.java
 [source,java]
 import android.os.Parcel;
 import android.os.Parcelable;
 import androidx.annotation.NonNull;
-import java.io.Serializable;
 public class Pessoa implements Parcelable {
     private int id;
     private String nome, telefone;
@@ -87,7 +20,7 @@ public class Pessoa implements Parcelable {
         this.id = id;
         this.nome = nome;
         this.telefone = telefone;
-    }//
+    }
     public Pessoa() {
     }
     protected Pessoa(Parcel in) {
@@ -125,11 +58,7 @@ public class Pessoa implements Parcelable {
     }
     @Override
     public String toString() {
-        return "Pessoa{" +
-                "id=" + id +
-                ", nome='" + nome + '\'' +
-                ", telefone='" + telefone + '\'' +
-                '}';
+        return nome + " - " + telefone;
     }
     @Override
     public int describeContents() {
@@ -157,10 +86,10 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String NOME = "nome";
     public static final String TELEFONE = "telefone";
     private static final String CRIA_TABELA =
-            "CREATE TABLE "+BANCO_TABELA +
-                    "("+ID +" INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    NOME+" TEXT, "+TELEFONE+" TEXT"+")";
-    private static final String DELETA_TABELA = "DROP TABLE IF EXISTS "+
+            "CREATE TABLE " + BANCO_TABELA +
+                    "(" + ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    NOME + " TEXT, " + TELEFONE + " TEXT" + ")";
+    private static final String DELETA_TABELA = "DROP TABLE IF EXISTS " +
             BANCO_TABELA;
     public DBHelper(@Nullable Context context) {
         super(context, BANCO_NOME, null, BANCO_VERSAO);
@@ -199,48 +128,93 @@ public class DatabaseManager {
         ContentValues values = new ContentValues();
         values.put(DBHelper.NOME, p.getNome());
         values.put(DBHelper.TELEFONE, p.getTelefone());
-        long linhaID = database.insert(DBHelper.BANCO_TABELA,
-                null,values);
-        return linhaID;
-    }//adicionar
+        return database.insert(DBHelper.BANCO_TABELA,
+                null, values);
+    }
     public ArrayList<Pessoa> listar(){
-        ArrayList<Pessoa>dados = new ArrayList<>();
-        String consulta = "SELECT * FROM "+ DBHelper.BANCO_TABELA;
-        Cursor cursor = database.rawQuery(consulta,null);
+        ArrayList<Pessoa> dados = new ArrayList<>();
+        String consulta = "SELECT * FROM " + DBHelper.BANCO_TABELA;
+        Cursor cursor = database.rawQuery(consulta, null);
         while(cursor.moveToNext()){
             Pessoa p = new Pessoa();
-            p.setId(Integer.parseInt(cursor.getString(0)));
+            p.setId(cursor.getInt(0));
             p.setNome(cursor.getString(1));
             p.setTelefone(cursor.getString(2));
             dados.add(p);
-        }//while
+        }
         cursor.close();
         return dados;
-    }//listar
+    }
     public int atualizar(Pessoa p){
         ContentValues values = new ContentValues();
-        values.put(DBHelper.NOME,p.getNome());
-        values.put(DBHelper.TELEFONE,p.getTelefone());
-        String where = DBHelper.ID+"=?";
-        String args[]={String.valueOf(p.getId())};
-        int linhaID = database.update(DBHelper.BANCO_TABELA,
-                values,where,args);
-        return linhaID;
-    }//atualizar
+        values.put(DBHelper.NOME, p.getNome());
+        values.put(DBHelper.TELEFONE, p.getTelefone());
+        String where = DBHelper.ID + "=?";
+        String[] args = {String.valueOf(p.getId())};
+        return database.update(DBHelper.BANCO_TABELA,
+                values, where, args);
+    }
     public int excluir(Pessoa p){
-        String where = DBHelper.ID+"=?";
-        String args[]={String.valueOf(p.getId())};
-        int retorno = database.delete(DBHelper.BANCO_TABELA,where,args);
-        return retorno;
-    }//excluir
+        String where = DBHelper.ID + "=?";
+        String[] args = {String.valueOf(p.getId())};
+        return database.delete(DBHelper.BANCO_TABELA, where, args);
+    }
 }//class
+
+- activity_main.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    tools:context=".MainActivity">
+    <EditText
+        android:id="@+id/editTextNome"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Digite seu nome" />
+    <EditText
+        android:id="@+id/editTextTelefone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Digite seu telefone"
+        android:inputType="phone" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="16dp">
+        <Button
+            android:id="@+id/buttonS"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="SAVE"
+            android:onClick="clicar" />
+        <Button
+            android:id="@+id/buttonL"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="LIST"
+            android:onClick="clicar" />
+        <Button
+            android:id="@+id/buttonD"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="DELETE"
+            android:onClick="clicar" />
+    </LinearLayout>
+</LinearLayout>
 
 - MainActivity.java
 [source,java]
 import androidx.appcompat.app.AppCompatActivity;
-import android.content.Context;
 import android.content.Intent;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -259,18 +233,17 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         editTextNome = findViewById(R.id.editTextNome);
         editTextTelefone = findViewById(R.id.editTextTelefone);
-        buttonS= findViewById(R.id.buttonS);
-        buttonL= findViewById(R.id.buttonL);
-        buttonD= findViewById(R.id.buttonD);
+        buttonS = findViewById(R.id.buttonS);
+        buttonL = findViewById(R.id.buttonL);
+        buttonD = findViewById(R.id.buttonD);
         databaseManager = new DatabaseManager(this);
         databaseManager.open();
-        p= (Pessoa) getIntent()
-                .getParcelableExtra("dado");
-        if(p!=null){
+        p = getIntent().getParcelableExtra("dado");
+        if(p != null){
             editTextNome.setText(p.getNome());
             editTextTelefone.setText(p.getTelefone());
         }
-    }//onCreate
+    }
     public void clicar(View view) {
         if (view.getId() == R.id.buttonS ) {
             if (p == null) {
@@ -279,13 +252,13 @@ public class MainActivity extends AppCompatActivity {
                 p.setTelefone(editTextTelefone.getText().toString());
                 long retorno = databaseManager.adicionar(p);
                 if (retorno != -1) {
-                    Toast.makeText(MainActivity.this, "salvo",
+                    Toast.makeText(MainActivity.this, "Salvo",
                             Toast.LENGTH_SHORT).show();
                     p = null;
                     editTextNome.setText("");
                     editTextTelefone.setText("");
                 } else {
-                    Toast.makeText(MainActivity.this, "não salvo",
+                    Toast.makeText(MainActivity.this, "Erro ao salvar",
                             Toast.LENGTH_SHORT).show();
                 }
             } else {
@@ -293,44 +266,46 @@ public class MainActivity extends AppCompatActivity {
                 p.setTelefone(editTextTelefone.getText().toString());
                 int retorno = databaseManager.atualizar(p);
                 if (retorno != 0) {
-                    Toast.makeText(MainActivity.this, "salvo",
+                    Toast.makeText(MainActivity.this, "Atualizado",
                             Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(MainActivity.this, "não salvo",
+                    Toast.makeText(MainActivity.this, "Erro ao atualizar",
                             Toast.LENGTH_SHORT).show();
                 }
             }
         }
-            if (view.getId() == R.id.buttonL ) {
-                ArrayList<Pessoa> dados = databaseManager.listar();
-                Log.i("dados",dados.toString());
-                if (dados != null) {
-                    Intent it = new Intent(MainActivity.this,
-                            Activity2.class);
-                    //it.putExtra("dados", dados);
-                    it.putParcelableArrayListExtra("dados",dados);
-                    startActivity(it);
-                    //finish();
-                }//if
-                else {
-                    Toast.makeText(MainActivity.this, "sem dados",
+        if (view.getId() == R.id.buttonL ) {
+            ArrayList<Pessoa> dados = databaseManager.listar();
+            Log.i("dados", dados.toString());
+            if (dados != null && !dados.isEmpty()) {
+                Intent it = new Intent(MainActivity.this,
+                        SegundaActivity.class);
+                it.putParcelableArrayListExtra("dados", dados);
+                startActivity(it);
+            } else {
+                Toast.makeText(MainActivity.this, "Sem dados",
+                        Toast.LENGTH_SHORT).show();
+            }
+        }
+        if (view.getId() == R.id.buttonD) {
+            if (p != null) {
+                int retorno = databaseManager.excluir(p);
+                if (retorno > 0) {
+                    Toast.makeText(MainActivity.this, "Dados deletados",
+                            Toast.LENGTH_SHORT).show();
+                    editTextNome.setText("");
+                    editTextTelefone.setText("");
+                    p = null;
+                } else {
+                    Toast.makeText(MainActivity.this, "Erro ao deletar",
                             Toast.LENGTH_SHORT).show();
                 }
-            }
-        if (view.getId() == R.id.buttonD) {
-            int retorno = databaseManager.excluir(p);
-            if (retorno > 0) {
-                Toast.makeText(MainActivity.this, "dados deletados",
-                        Toast.LENGTH_SHORT).show();
-                editTextNome.setText("");
-                editTextTelefone.setText("");
-                p = null;
             } else {
-                Toast.makeText(MainActivity.this, "erro ao deletar",
+                Toast.makeText(MainActivity.this, "Nenhum registro selecionado",
                         Toast.LENGTH_SHORT).show();
             }
-        }//if
-    }//clicar
+        }
+    }
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -338,7 +313,22 @@ public class MainActivity extends AppCompatActivity {
     }
 }//class
 
-- Activity2.java
+- activity_segunda.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".SegundaActivity">
+    <ListView
+        android:id="@+id/lista"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+</LinearLayout>
+
+- SegundaActivity.java
 [source,java]
 import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
@@ -349,77 +339,40 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import java.util.ArrayList;
-public class Activity2 extends AppCompatActivity
+public class SegundaActivity extends AppCompatActivity
         implements AdapterView.OnItemClickListener {
     private ListView lista;
     private ArrayAdapter<Pessoa> adapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_2);
+        setContentView(R.layout.activity_segunda);
         lista = findViewById(R.id.lista);
-        Bundle extras = getIntent().getExtras();
-        ArrayList<Pessoa> dados = extras.getParcelableArrayList("dados");
-        Log.i("dados2",dados.toString());
-        if(dados!=null){
+        ArrayList<Pessoa> dados = getIntent().getParcelableArrayListExtra("dados");
+        Log.i("dados2", String.valueOf(dados));
+        if(dados != null && !dados.isEmpty()){
             adapter = new ArrayAdapter<>(this,
-                    android.R.layout.simple_list_item_1,dados);
+                    android.R.layout.simple_list_item_1, dados);
             lista.setAdapter(adapter);
             lista.setOnItemClickListener(this);
         }
-    }//onCreate
+    }
     @Override
     public void onItemClick(AdapterView<?> parent, View view,
                             int position, long id) {
         Pessoa p = (Pessoa) parent.getItemAtPosition(position);
-        Intent it = new Intent(Activity2.this,
+        Intent it = new Intent(SegundaActivity.this,
                 MainActivity.class);
-        it.putExtra("dado",p);
+        it.putExtra("dado", p);
         startActivity(it);
-    }//onItem
-}
+        finish();
+    }
+}//class
 
 Versão 2:
 
-- activity_main.xml
-[source,xml]
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".MainActivity">
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-        <Button
-            android:id="@+id/buttonInsert"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:onClick="clicar"
-            android:text="Insert" />
-        <Button
-            android:id="@+id/buttonList"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:onClick="clicar"
-            android:text="List" />
-    </LinearLayout>
-    <TextView
-        android:id="@+id/textViewResult"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="result" />
-</LinearLayout>
-
 - User.java
-[source,java]
+[source.java]
 public class User {
     private long id;
     private String name;
@@ -429,38 +382,32 @@ public class User {
         this.name = name;
         this.age = age;
     }
-   public long getId() {
-        return id;
-    }
-    public void setId(long id) {
-        this.id = id;
-    }
-    public String getName() {
-        return name;
-    }
-    public void setName(String name) {
-        this.name = name;
-    }
-    public int getAge() {
-        return age;
-    }
-    public void setAge(int age) {
-        this.age = age;
-    }
+    public long getId() { return id; }
+    public void setId(long id) { this.id = id; }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+    public int getAge() { return age; }
+    public void setAge(int age) { this.age = age; }
     @Override
     public String toString() {
-        return "User{" +
-                "id=" + id +
+        return "User{id=" + id +
                 ", name='" + name + '\'' +
-                ", age=" + age +
-                '}';
+                ", age=" + age + '}';
     }
-}//
+}
+
+- UserContract.java
+[source,java]
+import android.provider.BaseColumns;
+public class UserContract implements BaseColumns {
+    public static final String TABLE_NAME = "user";
+    public static final String COLUMN_NAME = "name";
+    public static final String COLUMN_AGE = "age";
+}
 
 - UserDAO.java
 [source,java]
 import android.content.ContentValues;
-import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import java.util.ArrayList;
@@ -471,49 +418,38 @@ public class UserDAO {
         this.db = db;
     }
     public long insertUser(String name, int age) {
-        if(db!=null){
+        if (db != null) {
             ContentValues values = new ContentValues();
             values.put(UserContract.COLUMN_NAME, name);
             values.put(UserContract.COLUMN_AGE, age);
-            long id = db.insert(UserContract.TABLE_NAME,null,values);
-            return id;
-        }else{
-            return -1;
+            return db.insert(UserContract.TABLE_NAME, null, values);
         }
-    }//
+        return -1;
+    }
     public List<User> getAll() {
-        if(db!=null) {
-            List<User> users = new ArrayList<>();
-            String[] columns = {UserContract._ID, UserContract.COLUMN_NAME, UserContract.COLUMN_AGE};
-            Cursor cursor = db.query(UserContract.TABLE_NAME, columns,
-                    null, null, null, null,
-                    null);
+        List<User> users = new ArrayList<>();
+        if (db != null) {
+            String[] columns = {
+                    UserContract._ID,
+                    UserContract.COLUMN_NAME,
+                    UserContract.COLUMN_AGE
+            };
+            Cursor cursor = db.query(
+                    UserContract.TABLE_NAME,
+                    columns,
+                    null, null, null, null, null
+            );
             while (cursor.moveToNext()) {
-                int id = cursor.getColumnIndex(UserContract._ID);
-                long id_user = cursor.getLong(id);
-                int name = cursor.getColumnIndex(UserContract.COLUMN_NAME);
-                String name_user = cursor.getString(name);
-                int age = cursor.getColumnIndex(UserContract.COLUMN_AGE);
-                int age_user = cursor.getInt(age);
+                long id_user = cursor.getLong(cursor.getColumnIndexOrThrow(UserContract._ID));
+                String name_user = cursor.getString(cursor.getColumnIndexOrThrow(UserContract.COLUMN_NAME));
+                int age_user = cursor.getInt(cursor.getColumnIndexOrThrow(UserContract.COLUMN_AGE));
                 users.add(new User(id_user, name_user, age_user));
-            }//while
+            }
             cursor.close();
-            return users;
-        }else{
-            return null;
         }
-    }//
-}//class
-
-- UserContract.java
-[source,java]
-import android.provider.BaseColumns;
-public class UserContract implements BaseColumns {
-    //public static final String _ID = "_id" é fornecido pela interface
-    public static final String TABLE_NAME = "user";
-    public static final String COLUMN_NAME = "name";
-    public static final String COLUMN_AGE = "age";
-}//class
+        return users;
+    }
+}
 
 - DBHelper.java
 [source,java]
@@ -525,12 +461,11 @@ public class DBHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 1;
     private static final String SQL_CREATE_TABLE =
             "CREATE TABLE " + UserContract.TABLE_NAME + " (" +
-                    UserContract._ID + " INTEGER PRIMARY KEY," +
-                    UserContract.COLUMN_NAME + " TEXT," +
+                    UserContract._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    UserContract.COLUMN_NAME + " TEXT, " +
                     UserContract.COLUMN_AGE + " INTEGER)";
     public DBHelper(Context context) {
-      super(context, DATABASE_NAME,
-                null, DATABASE_VERSION);
+        super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
     @Override
     public void onCreate(SQLiteDatabase db) {
@@ -538,10 +473,10 @@ public class DBHelper extends SQLiteOpenHelper {
     }
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // caso uma coluna seja adicionada,
-        // use este método para atualização do banco de dados
+        db.execSQL("DROP TABLE IF EXISTS " + UserContract.TABLE_NAME);
+        onCreate(db);
     }
-}//class
+}
 
 - DBManager.java
 [source,java]
@@ -559,16 +494,52 @@ public class DBManager {
     public void close() {
         dbHelper.close();
     }
-    public SQLiteDatabase getDatabase(){
+    public SQLiteDatabase getDatabase() {
         return database;
     }
 }
+
+- activity_main.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <Button
+            android:id="@+id/buttonInsert"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:onClick="clicar"
+            android:text="Inserir" />
+        <Button
+            android:id="@+id/buttonList"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:onClick="clicar"
+            android:text="Listar" />
+    </LinearLayout>
+    <TextView
+        android:id="@+id/textViewResult"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:text="resultado" />
+</LinearLayout>
 
 - MainActivity.java
 [source,java]
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
-import android.database.Cursor;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -576,7 +547,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
     private UserDAO userDAO;
     private DBManager databaseManager;
-    private Button buttonInsert,buttonList;
+    private Button buttonInsert, buttonList;
     private TextView textViewResult;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -588,85 +559,137 @@ public class MainActivity extends AppCompatActivity {
         buttonInsert = findViewById(R.id.buttonInsert);
         buttonList = findViewById(R.id.buttonList);
         textViewResult = findViewById(R.id.textViewResult);
-    }//
-    public void clicar(View view){
-        if(view.getId() == R.id.buttonInsert){
-            long userId1 = userDAO.insertUser("Ana",30);
-            long userId2 = userDAO.insertUser("Rodrigo",20);
-            String result = userId1 +"-"+ userId2;
+    }
+    public void clicar(View view) {
+        if (view.getId() == R.id.buttonInsert) {
+            long userId1 = userDAO.insertUser("Ana", 30);
+            long userId2 = userDAO.insertUser("Rodrigo", 20);
+            String result = "Inserted IDs: " + userId1 + " - " + userId2;
             textViewResult.setText(result);
         }
-        if(view.getId() == R.id.buttonList){
+        if (view.getId() == R.id.buttonList) {
             List<User> dados = userDAO.getAll();
             textViewResult.setText(dados.toString());
         }
-    }//
+    }
     @Override
     protected void onDestroy() {
         super.onDestroy();
         databaseManager.close();
     }
-}//class
+}
 
-- Versão 3:
+Versão 3 (2 entidades e multiplicidade 1:1):
 
-- activity_main.xml
-[source,xml]
-<?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".view.MainActivity">
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!"
-        android:id="@+id/textViewTexto"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+- DBHelper.java
+[source,java]
+import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+public class DBHelper extends SQLiteOpenHelper {
+    private static final String DATABASE_NAME = "escola.db";
+    private static final int DATABASE_VERSION = 1;
+    public DBHelper(Context context) {
+        super(context, DATABASE_NAME, null, DATABASE_VERSION);
+    }
+    @Override
+    public void onCreate(SQLiteDatabase db) {
+        db.execSQL(
+                "CREATE TABLE disciplina (" +
+                        "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                        "nome TEXT UNIQUE)"
+        );
+        db.execSQL(
+                "CREATE TABLE aluno (" +
+                        "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                        "nome TEXT UNIQUE, " +
+                        "disciplina_id INTEGER UNIQUE, " + // garante 1:1
+                        "FOREIGN KEY(disciplina_id) REFERENCES disciplina(id) ON DELETE CASCADE)"
+        );
+    }
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        db.execSQL("DROP TABLE IF EXISTS aluno");
+        db.execSQL("DROP TABLE IF EXISTS disciplina");
+        onCreate(db);
+    }
+}
+
+- DBManager.java
+[source,java]
+import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
+public class DBManager {
+    private DBHelper dbHelper;
+    private SQLiteDatabase database;
+    public DBManager(Context context) {
+        dbHelper = new DBHelper(context);
+    }
+    public void open() {
+        database = dbHelper.getWritableDatabase();
+        database.setForeignKeyConstraintsEnabled(true); // obrigatório para FK
+    }
+    public void close() {
+        dbHelper.close();
+    }
+    public SQLiteDatabase getDatabase() {
+        return database;
+    }
+}
 
 - Aluno.java
 [source,java]
 public class Aluno {
     private long id;
     private String nome;
-    private int idade;
-    public Aluno(long id, String nome, int idade) {
+    private long disciplinaId;
+    public Aluno(long id, String nome, long disciplinaId) {
         this.id = id;
         this.nome = nome;
-        this.idade = idade;
+        this.disciplinaId = disciplinaId;
     }
-    public long getId() {
-        return id;
-    }
-    public void setId(long id) {
-        this.id = id;
-    }
-    public String getNome() {
-        return nome;
-    }
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-    public int getIdade() {
-        return idade;
-    }
-    public void setIdade(int idade) {
-        this.idade = idade;
-    }
+    public long getId() { return id; }
+    public String getNome() { return nome; }
+    public long getDisciplinaId() { return disciplinaId; }
     @Override
     public String toString() {
         return "Aluno{" +
                 "id=" + id +
                 ", nome='" + nome + '\'' +
-                ", idade=" + idade +
+                ", disciplinaId=" + disciplinaId +
                 '}';
+    }
+}
+
+- AlunoDAO.java
+[source,java]
+import android.content.ContentValues;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import java.util.ArrayList;
+import java.util.List;
+public class AlunoDAO {
+    private SQLiteDatabase db;
+    public AlunoDAO(SQLiteDatabase db) {
+        this.db = db;
+    }
+    public long insert(String nome, long disciplinaId) {
+        ContentValues values = new ContentValues();
+        values.put("nome", nome);
+        values.put("disciplina_id", disciplinaId);
+        return db.insert("aluno", null, values);
+    }
+    public List<Aluno> getAll() {
+        List<Aluno> list = new ArrayList<>();
+        Cursor cursor = db.query("aluno", null, null, null, null, null, null);
+        while (cursor.moveToNext()) {
+            long id = cursor.getLong(cursor.getColumnIndexOrThrow("id"));
+            String nome = cursor.getString(cursor.getColumnIndexOrThrow("nome"));
+            long disciplinaId = cursor.getLong(cursor.getColumnIndexOrThrow("disciplina_id"));
+            list.add(new Aluno(id, nome, disciplinaId));
+        }
+        cursor.close();
+        return list;
     }
 }
 
@@ -675,136 +698,140 @@ public class Aluno {
 public class Disciplina {
     private long id;
     private String nome;
-    private String codigo;
-    private long alunoId;
-    public Disciplina(long id, String nome, String codigo, long alunoId) {
+    public Disciplina(long id, String nome) {
         this.id = id;
         this.nome = nome;
-        this.codigo = codigo;
-        this.alunoId = alunoId;
     }
-    public long getId() {
-        return id;
-    }
-    public void setId(long id) {
-        this.id = id;
-    }
-    public String getNome() {
-        return nome;
-    }
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-    public String getCodigo() {
-        return codigo;
-    }
-    public void setCodigo(String codigo) {
-        this.codigo = codigo;
-    }
-    public long getAlunoId() {
-        return alunoId;
-    }
-    public void setAlunoId(long alunoId) {
-        this.alunoId = alunoId;
-    }
-}
-
-- AlunoDAO.java
-[source,java]
-import android.content.ContentValues;
-import android.content.Context;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import com.example.bancosqlite_1_n.modelo.Aluno;
-import java.util.ArrayList;
-import java.util.List;
-public class AlunoDAO {
-    private DBHelper dbHelper;
-    public AlunoDAO(Context context) {
-        dbHelper = new DBHelper(context);
-    }
-    public long inserirAluno(String nome, int idade) {
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(DatabaseContract.AlunoEntry.COLUMN_NOME, nome);
-        values.put(DatabaseContract.AlunoEntry.COLUMN_IDADE, idade);
-        return db.insert(DatabaseContract.AlunoEntry.TABLE_NAME, null, values);
-    }
-    public List<Aluno> listarAlunos() {
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
-        List<Aluno> alunos = new ArrayList<>();
-        Cursor cursor = db.query(
-                DatabaseContract.AlunoEntry.TABLE_NAME,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null
-        );
-        while (cursor.moveToNext()) {
-            int id_aluno = cursor.getColumnIndex(DatabaseContract.AlunoEntry._ID);
-            long id = cursor.getLong(id_aluno);
-            int nome_aluno = cursor.getColumnIndex(DatabaseContract.AlunoEntry.COLUMN_NOME);
-            String nome = cursor.getString(nome_aluno);
-            int idade_aluno = cursor.getColumnIndex(DatabaseContract.AlunoEntry.COLUMN_IDADE);
-            int idade = cursor.getInt(idade_aluno);
-            alunos.add(new Aluno(id, nome, idade));
-        }
-        cursor.close();
-        return alunos;
+    public long getId() { return id; }
+    public String getNome() { return nome; }
+    @Override
+    public String toString() {
+        return "Disciplina{" +
+                "id=" + id +
+                ", nome='" + nome + '\'' +
+                '}';
     }
 }
 
 - DisciplinaDAO.java
 [source,java]
 import android.content.ContentValues;
-import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import com.example.bancosqlite_1_n.modelo.Disciplina;
 import java.util.ArrayList;
 import java.util.List;
 public class DisciplinaDAO {
-    private DBHelper dbHelper;
-    public DisciplinaDAO(Context context) {
-        dbHelper = new DBHelper(context);
+    private SQLiteDatabase db;
+    public DisciplinaDAO(SQLiteDatabase db) {
+        this.db = db;
     }
-    public long inserirDisciplina(String nome, String codigo, long alunoId) {
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
+    public long insert(String nome) {
         ContentValues values = new ContentValues();
-        values.put(DatabaseContract.DisciplinaEntry.COLUMN_NOME, nome);
-        values.put(DatabaseContract.DisciplinaEntry.COLUMN_CODIGO, codigo);
-        values.put(DatabaseContract.DisciplinaEntry.COLUMN_ALUNO_ID, alunoId);
-        return db.insert(DatabaseContract.DisciplinaEntry.TABLE_NAME, null, values);
+        values.put("nome", nome);
+        return db.insert("disciplina", null, values);
     }
-    public List<Disciplina> listarDisciplinasPorAluno(long alunoId) {
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
-        List<Disciplina> disciplinas = new ArrayList<>();
-        String selection = DatabaseContract.DisciplinaEntry.COLUMN_ALUNO_ID + " = ?";
-        String[] selectionArgs = { String.valueOf(alunoId) };
-        Cursor cursor = db.query(
-                DatabaseContract.DisciplinaEntry.TABLE_NAME,
-                null,
-                selection,
-                selectionArgs,
-                null,
-                null,
-                null
-        );
+    public List<Disciplina> getAll() {
+        List<Disciplina> list = new ArrayList<>();
+        Cursor cursor = db.query("disciplina", null, null, null, null, null, null);
         while (cursor.moveToNext()) {
-            int id_disciplina = cursor.getColumnIndex(DatabaseContract.DisciplinaEntry._ID);
-            long id = cursor.getLong(id_disciplina);
-            int nome_disciplina = cursor.getColumnIndex(DatabaseContract.DisciplinaEntry.COLUMN_NOME);
-            String nome = cursor.getString(nome_disciplina);
-            int codigo_disciplina = cursor.getColumnIndex(DatabaseContract.DisciplinaEntry.COLUMN_CODIGO);
-            String codigo = cursor.getString(codigo_disciplina);
-            disciplinas.add(new Disciplina(id, nome, codigo, alunoId));
+            long id = cursor.getLong(cursor.getColumnIndexOrThrow("id"));
+            String nome = cursor.getString(cursor.getColumnIndexOrThrow("nome"));
+            list.add(new Disciplina(id, nome));
         }
         cursor.close();
-        return disciplinas;
+        return list;
     }
 }
+
+- activity_main.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <Button
+            android:id="@+id/buttonInserir"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:onClick="clicar"
+            android:text="Inserir" />
+        <Button
+            android:id="@+id/buttonListar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:onClick="clicar"
+            android:text="Listar" />
+    </LinearLayout>
+    <TextView
+        android:id="@+id/textViewResult"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="resultado" />
+</LinearLayout>
+
+- MainActivity.java
+[source,java]
+import android.os.Bundle;
+import androidx.appcompat.app.AppCompatActivity;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
+import java.util.List;
+public class MainActivity extends AppCompatActivity {
+    private DBManager dbManager;
+    private AlunoDAO alunoDAO;
+    private DisciplinaDAO disciplinaDAO;
+    private Button btnInsert, btnList;
+    private TextView textViewResult;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        dbManager = new DBManager(this);
+        dbManager.open();
+        alunoDAO = new AlunoDAO(dbManager.getDatabase());
+        disciplinaDAO = new DisciplinaDAO(dbManager.getDatabase());
+        btnInsert = findViewById(R.id.buttonInserir);
+        btnList = findViewById(R.id.buttonListar);
+        textViewResult = findViewById(R.id.textViewResult);
+    }
+    public void clicar(View view) {
+        if (view.getId() == R.id.buttonInserir) {
+            long mat1 = disciplinaDAO.insert("Matemática");
+            long hist1 = disciplinaDAO.insert("História");
+            long aluno1 = alunoDAO.insert("Ana", mat1);
+            long aluno2 = alunoDAO.insert("João", hist1);
+            long aluno3 = alunoDAO.insert("João", mat1); // deve falhar (nome UNIQUE)
+            textViewResult.setText("Mat=" + mat1 + " Hist=" + hist1 +
+                    "\nAluno1=" + aluno1 +
+                    "\nAluno2=" + aluno2 +
+                    "\nAluno3=" + aluno3);
+        }
+        if (view.getId() == R.id.buttonListar) {
+            List<Aluno> alunos = alunoDAO.getAll();
+            List<Disciplina> disciplinas = disciplinaDAO.getAll();
+            textViewResult.setText("Alunos: " + alunos + "\nDisciplinas: " + disciplinas);
+        }
+    }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        dbManager.close();
+    }
+}
+
+Versão 4 (2 entidades e multiplicidade N:N):
 
 - DatabaseContract.java
 [source,java]
@@ -819,8 +846,11 @@ public final class DatabaseContract {
     public static class DisciplinaEntry implements BaseColumns {
         public static final String TABLE_NAME = "disciplina";
         public static final String COLUMN_NOME = "nome";
-        public static final String COLUMN_CODIGO = "codigo";
+    }
+    public static class AlunoDisciplinaEntry implements BaseColumns {
+        public static final String TABLE_NAME = "aluno_disciplina";
         public static final String COLUMN_ALUNO_ID = "aluno_id";
+        public static final String COLUMN_DISCIPLINA_ID = "disciplina_id";
     }
 }
 
@@ -832,68 +862,288 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DBHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "escola.db";
     private static final int DATABASE_VERSION = 1;
-    private static final String SQL_CREATE_ALUNO_TABLE =
-            "CREATE TABLE " + DatabaseContract.AlunoEntry.TABLE_NAME + " (" +
-                    DatabaseContract.AlunoEntry._ID + " INTEGER PRIMARY KEY," +
-                    DatabaseContract.AlunoEntry.COLUMN_NOME + " TEXT," +
-                    DatabaseContract.AlunoEntry.COLUMN_IDADE + " INTEGER)";
-    private static final String SQL_CREATE_DISCIPLINA_TABLE =
-            "CREATE TABLE " + DatabaseContract.DisciplinaEntry.TABLE_NAME + " (" +
-                    DatabaseContract.DisciplinaEntry._ID + " INTEGER PRIMARY KEY," +
-                    DatabaseContract.DisciplinaEntry.COLUMN_NOME + " TEXT," +
-                    DatabaseContract.DisciplinaEntry.COLUMN_CODIGO + " TEXT," +
-                    DatabaseContract.DisciplinaEntry.COLUMN_ALUNO_ID + " INTEGER," +
-                    "FOREIGN KEY(" + DatabaseContract.DisciplinaEntry.COLUMN_ALUNO_ID + ") REFERENCES " +
-                    DatabaseContract.AlunoEntry.TABLE_NAME + "(" + DatabaseContract.AlunoEntry._ID + "))";
     public DBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL(SQL_CREATE_ALUNO_TABLE);
-        db.execSQL(SQL_CREATE_DISCIPLINA_TABLE);
+        db.execSQL(
+                "CREATE TABLE " + DatabaseContract.AlunoEntry.TABLE_NAME + " (" +
+                        DatabaseContract.AlunoEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+                        DatabaseContract.AlunoEntry.COLUMN_NOME + " TEXT UNIQUE," +
+                        DatabaseContract.AlunoEntry.COLUMN_IDADE + " INTEGER)"
+        );
+        db.execSQL(
+                "CREATE TABLE " + DatabaseContract.DisciplinaEntry.TABLE_NAME + " (" +
+                        DatabaseContract.DisciplinaEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+                        DatabaseContract.DisciplinaEntry.COLUMN_NOME + " TEXT UNIQUE)"
+        );
+        db.execSQL(
+                "CREATE TABLE " + DatabaseContract.AlunoDisciplinaEntry.TABLE_NAME + " (" +
+                        DatabaseContract.AlunoDisciplinaEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+                        DatabaseContract.AlunoDisciplinaEntry.COLUMN_ALUNO_ID + " INTEGER," +
+                        DatabaseContract.AlunoDisciplinaEntry.COLUMN_DISCIPLINA_ID + " INTEGER," +
+                        "UNIQUE(" + DatabaseContract.AlunoDisciplinaEntry.COLUMN_ALUNO_ID + "," +
+                        DatabaseContract.AlunoDisciplinaEntry.COLUMN_DISCIPLINA_ID + ")," +
+                        "FOREIGN KEY(" + DatabaseContract.AlunoDisciplinaEntry.COLUMN_ALUNO_ID + ") REFERENCES " +
+                        DatabaseContract.AlunoEntry.TABLE_NAME + "(" + DatabaseContract.AlunoEntry._ID + ") ON DELETE CASCADE," +
+                        "FOREIGN KEY(" + DatabaseContract.AlunoDisciplinaEntry.COLUMN_DISCIPLINA_ID + ") REFERENCES " +
+                        DatabaseContract.DisciplinaEntry.TABLE_NAME + "(" + DatabaseContract.DisciplinaEntry._ID + ") ON DELETE CASCADE)"
+        );
     }
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // caso haja atualização no esquema do banco de dados
+        db.execSQL("DROP TABLE IF EXISTS " + DatabaseContract.AlunoDisciplinaEntry.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + DatabaseContract.AlunoEntry.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + DatabaseContract.DisciplinaEntry.TABLE_NAME);
+        onCreate(db);
     }
 }
+
+- DBManager.java
+[source,java]
+import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
+public class DBManager {
+    private DBHelper dbHelper;
+    private SQLiteDatabase database;
+    public DBManager(Context context) {
+        dbHelper = new DBHelper(context);
+    }
+    public void open() {
+        database = dbHelper.getWritableDatabase();
+        database.setForeignKeyConstraintsEnabled(true);
+    }
+    public void close() {
+        dbHelper.close();
+    }
+    public SQLiteDatabase getDatabase() {
+        return database;
+    }
+}
+
+- Aluno.java
+[source.java]
+public class Aluno {
+    private long id;
+    private String nome;
+    private int idade;
+    public Aluno(long id, String nome, int idade) {
+        this.id = id;
+        this.nome = nome;
+        this.idade = idade;
+    }
+    public long getId() { return id; }
+    public String getNome() { return nome; }
+    public int getIdade() { return idade; }
+    @Override
+    public String toString() {
+        return "Aluno{" + "id=" + id + ", nome='" + nome + '\'' + ", idade=" + idade + '}';
+    }
+}
+
+- AlunoDAO.java
+[source,java]
+import android.content.ContentValues;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import java.util.ArrayList;
+import java.util.List;
+public class AlunoDAO {
+    private SQLiteDatabase db;
+    public AlunoDAO(SQLiteDatabase db) {
+        this.db = db;
+    }
+    public long insert(String nome, int idade) {
+        ContentValues values = new ContentValues();
+        values.put("nome", nome);
+        values.put("idade", idade);
+        return db.insert("aluno", null, values);
+    }
+    public List<Aluno> getAll() {
+        List<Aluno> list = new ArrayList<>();
+        Cursor cursor = db.query("aluno", null, null, null, null, null, null);
+        while (cursor.moveToNext()) {
+            long id = cursor.getLong(cursor.getColumnIndexOrThrow("id"));
+            String nome = cursor.getString(cursor.getColumnIndexOrThrow("nome"));
+            int idade = cursor.getInt(cursor.getColumnIndexOrThrow("idade"));
+            list.add(new Aluno(id, nome, idade));
+        }
+        cursor.close();
+        return list;
+    }
+}
+
+- Disciplina.java
+[source,java]
+public class Disciplina {
+    private long id;
+    private String nome;
+    public Disciplina(long id, String nome) {
+        this.id = id;
+        this.nome = nome;
+    }
+    public long getId() { return id; }
+    public String getNome() { return nome; }
+    @Override
+    public String toString() {
+        return "Disciplina{" + "id=" + id + ", nome='" + nome + '\'' + '}';
+    }
+}
+
+- DisciplinaDAO.java
+[source,java]
+import android.content.ContentValues;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import java.util.ArrayList;
+import java.util.List;
+public class DisciplinaDAO {
+    private SQLiteDatabase db;
+    public DisciplinaDAO(SQLiteDatabase db) {
+        this.db = db;
+    }
+    public long insert(String nome) {
+        ContentValues values = new ContentValues();
+        values.put("nome", nome);
+        return db.insert("disciplina", null, values);
+    }
+    public List<Disciplina> getAll() {
+        List<Disciplina> list = new ArrayList<>();
+        Cursor cursor = db.query("disciplina", null, null, null, null, null, null);
+        while (cursor.moveToNext()) {
+            long id = cursor.getLong(cursor.getColumnIndexOrThrow("id"));
+            String nome = cursor.getString(cursor.getColumnIndexOrThrow("nome"));
+            list.add(new Disciplina(id, nome));
+        }
+        cursor.close();
+        return list;
+    }
+}
+
+- AlunoDisciplinaDAO.java
+[source,java]
+import android.content.ContentValues;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import java.util.ArrayList;
+import java.util.List;
+public class AlunoDisciplinaDAO {
+    private SQLiteDatabase db;
+    public AlunoDisciplinaDAO(SQLiteDatabase db) {
+        this.db = db;
+    }
+    public long linkAlunoDisciplina(long alunoId, long disciplinaId) {
+        ContentValues values = new ContentValues();
+        values.put("aluno_id", alunoId);
+        values.put("disciplina_id", disciplinaId);
+        return db.insert("aluno_disciplina", null, values);
+    }
+    public List<String> getAlunosDisciplinas() {
+        List<String> list = new ArrayList<>();
+        Cursor cursor = db.rawQuery(
+                "SELECT a.nome, d.nome FROM aluno_disciplina ad " +
+                        "JOIN aluno a ON a.id = ad.aluno_id " +
+                        "JOIN disciplina d ON d.id = ad.disciplina_id", null
+        );
+        while (cursor.moveToNext()) {
+            String aluno = cursor.getString(0);
+            String disciplina = cursor.getString(1);
+            list.add(aluno + " -> " + disciplina);
+        }
+        cursor.close();
+        return list;
+    }
+}
+
+- activity_main.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <Button
+            android:id="@+id/buttonInserir"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:onClick="clicar"
+            android:text="Inserir" />
+        <Button
+            android:id="@+id/buttonListar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:onClick="clicar"
+            android:text="Listar" />
+    </LinearLayout>
+    <TextView
+        android:id="@+id/textViewResult"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="resultado" />
+</LinearLayout>
+
 
 - MainActivity.java
 [source,java]
 import android.os.Bundle;
-import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
-import com.example.bancosqlite_1_n.R;
-import com.example.bancosqlite_1_n.modelo.Disciplina;
-import com.example.bancosqlite_1_n.persistencia.AlunoDAO;
-import com.example.bancosqlite_1_n.persistencia.DisciplinaDAO;
 import java.util.List;
 public class MainActivity extends AppCompatActivity {
+    private DBManager dbManager;
     private AlunoDAO alunoDAO;
     private DisciplinaDAO disciplinaDAO;
-    private TextView textViewTexto;
-    private String msg;
+    private AlunoDisciplinaDAO alunoDisciplinaDAO;
+    private Button btnInserir, btnListar;
+    private TextView textViewResult;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        textViewTexto = findViewById(R.id.textViewTexto);
-        alunoDAO = new AlunoDAO(this);
-        disciplinaDAO = new DisciplinaDAO(this);
-        long alunoId = alunoDAO.inserirAluno("Ana", 20);
-        disciplinaDAO.inserirDisciplina("Matemática", "MAT101", alunoId);
-        disciplinaDAO.inserirDisciplina("Biologia", "BIO101", alunoId);
-        Toast.makeText(MainActivity.this,alunoId+"",Toast.LENGTH_LONG).show();
-        List<Disciplina> disciplinas101 = disciplinaDAO.listarDisciplinasPorAluno(alunoId);
-        for (Disciplina disciplina : disciplinas101) {
-            msg = "ID aluno: " + disciplina.getAlunoId() +
-                    " Nome da disciplina: " + disciplina.getNome()
-                    + ", código da disciplina: " + disciplina.getCodigo();
+        dbManager = new DBManager(this);
+        dbManager.open();
+        alunoDAO = new AlunoDAO(dbManager.getDatabase());
+        disciplinaDAO = new DisciplinaDAO(dbManager.getDatabase());
+        alunoDisciplinaDAO = new AlunoDisciplinaDAO(dbManager.getDatabase());
+        btnInserir = findViewById(R.id.buttonInserir);
+        btnListar = findViewById(R.id.buttonListar);
+        textViewResult = findViewById(R.id.textViewResult);
+    }
+    public void clicar(View view) {
+        if (view.getId() == R.id.buttonInserir) {
+            long aluno1 = alunoDAO.insert("Ana", 20);
+            long aluno2 = alunoDAO.insert("João", 22);
+            long disc1 = disciplinaDAO.insert("Matemática");
+            long disc2 = disciplinaDAO.insert("História");
+            alunoDisciplinaDAO.linkAlunoDisciplina(aluno1, disc1);
+            alunoDisciplinaDAO.linkAlunoDisciplina(aluno1, disc2); // N:N
+            alunoDisciplinaDAO.linkAlunoDisciplina(aluno2, disc1);
+            textViewResult.setText("Inserido com sucesso!");
         }
-        textViewTexto.setText(msg);
+        if (view.getId() == R.id.buttonListar) {
+            List<String> list = alunoDisciplinaDAO.getAlunosDisciplinas();
+            StringBuilder sb = new StringBuilder();
+            for (String s : list) sb.append(s).append("\n");
+            textViewResult.setText(sb.toString());
+        }
+    }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        dbManager.close();
     }
 }
 
