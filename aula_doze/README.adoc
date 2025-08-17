@@ -627,7 +627,7 @@ public class DBManager {
     }
     public void open() {
         database = dbHelper.getWritableDatabase();
-        database.setForeignKeyConstraintsEnabled(true); // obrigatório para FK
+        database.setForeignKeyConstraintsEnabled(true); 
     }
     public void close() {
         dbHelper.close();
@@ -812,7 +812,7 @@ public class MainActivity extends AppCompatActivity {
             long hist1 = disciplinaDAO.insert("História");
             long aluno1 = alunoDAO.insert("Ana", mat1);
             long aluno2 = alunoDAO.insert("João", hist1);
-            long aluno3 = alunoDAO.insert("João", mat1); // deve falhar (nome UNIQUE)
+            long aluno3 = alunoDAO.insert("João", mat1); 
             textViewResult.setText("Mat=" + mat1 + " Hist=" + hist1 +
                     "\nAluno1=" + aluno1 +
                     "\nAluno2=" + aluno2 +
@@ -1129,7 +1129,7 @@ public class MainActivity extends AppCompatActivity {
             long disc1 = disciplinaDAO.insert("Matemática");
             long disc2 = disciplinaDAO.insert("História");
             alunoDisciplinaDAO.linkAlunoDisciplina(aluno1, disc1);
-            alunoDisciplinaDAO.linkAlunoDisciplina(aluno1, disc2); // N:N
+            alunoDisciplinaDAO.linkAlunoDisciplina(aluno1, disc2); 
             alunoDisciplinaDAO.linkAlunoDisciplina(aluno2, disc1);
             textViewResult.setText("Inserido com sucesso!");
         }
