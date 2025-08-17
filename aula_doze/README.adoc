@@ -603,7 +603,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 "CREATE TABLE aluno (" +
                         "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                         "nome TEXT UNIQUE, " +
-                        "disciplina_id INTEGER UNIQUE, " + // garante 1:1
+                        "disciplina_id INTEGER UNIQUE, " + 
                         "FOREIGN KEY(disciplina_id) REFERENCES disciplina(id) ON DELETE CASCADE)"
         );
     }
