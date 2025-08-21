@@ -1,12 +1,17 @@
 = Biblioteca ROOM
 
-O SDK do Android fornece uma biblioteca que facilita o uso do banco de dados. Conforme consta na documentação oficial, a biblioteca ROOM adiciona uma camada de abstração retirando as implementações mais complexas do banco SQLite. Para mais detalhes, acesse a página: GOOGLE DEVELOPERS. Salvar dados em um banco de dados local usando Room. Disponível em: https://developer.android.com/training/data-storage/room?hl=pt-br. Acessado em 9 set. 2024.
+O SDK do Android fornece uma biblioteca que facilita o uso do banco de dados. Conforme consta na documentação oficial, a biblioteca ROOM adiciona uma camada de abstração retirando as implementações mais complexas do banco SQLite. Para mais detalhes, acesse a página: GOOGLE DEVELOPERS. Salvar dados em um banco de dados local usando Room. Disponível em: https://developer.android.com/training/data-storage/room?hl=pt-br. Acessado em 20 ago. 2025.
 
 Para usar a lib ROOM no seu projeto, primeiramente é necessário importar a biblioteca. Dessa forma, deve-se ir no arquivo Gradle a nível de app e adicionar as duas linhas no bloco de dependências:
 
 [source,xml]
 implementation ("androidx.room:room-runtime:2.4.0")
 annotationProcessor ("androidx.room:room-compiler:2.4.0")
+
+ou
+
+implementation("androidx.room:room-runtime:2.7.0-rc03")
+annotationProcessor("androidx.room:room-compiler:2.7.0-rc03")
 
 Exemplos práticos:
 
@@ -19,31 +24,30 @@ Versão 1:
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="10dp"
+    android:padding="10dp"
     android:orientation="vertical"
     tools:context=".MainActivity">
     <EditText
         android:id="@+id/editTextNome"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
         android:layout_marginTop="20dp"
-        android:hint="digite seu nome" />
+        android:hint="Digite seu nome" />
     <EditText
         android:id="@+id/editTextTelefone"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:hint="digite seu telefone" />
+        android:hint="Digite seu telefone" />
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:layout_marginTop="20dp">
         <Button
             android:id="@+id/buttonS"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginRight="5dp"
+            android:layout_marginEnd="5dp"
             android:layout_weight="1"
             android:onClick="clicar"
             android:text="Salvar" />
@@ -51,7 +55,7 @@ Versão 1:
             android:id="@+id/buttonL"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginRight="5dp"
+            android:layout_marginEnd="5dp"
             android:layout_weight="1"
             android:onClick="clicar"
             android:text="Listar" />
@@ -65,20 +69,19 @@ Versão 1:
     </LinearLayout>
 </LinearLayout>
 
-- activity_2.xml
+- activity_segunda.xml
 [source,xml]
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".Activity2">
+    tools:context=".SegundaActivity">
     <ListView
         android:id="@+id/lista"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 </LinearLayout>
 
 - Pessoa.java
@@ -88,9 +91,8 @@ import android.os.Parcelable;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
-import java.io.Serializable;
 @Entity
-public class Pessoa implements Serializable {
+public class Pessoa implements Parcelable {
     @PrimaryKey(autoGenerate = true)
     private int id;
     @ColumnInfo(name = "nome")
@@ -102,35 +104,52 @@ public class Pessoa implements Serializable {
         this.nome = nome;
         this.telefone = telefone;
     }
-    public Pessoa() {
+    public Pessoa() {}
+    protected Pessoa(Parcel in) {
+        id = in.readInt();
+        nome = in.readString();
+        telefone = in.readString();
     }
-     public int getId() {
-        return id;
-    }
-    public void setId(int id) {
-        this.id = id;
-    }
-    public String getNome() {
-        return nome;
-    }
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-    public String getTelefone() {
-        return telefone;
-    }
-    public void setTelefone(String telefone) {
-        this.telefone = telefone;
-    }
+    public static final Creator<Pessoa> CREATOR = new Creator<Pessoa>() {
+        @Override
+        public Pessoa createFromParcel(Parcel in) {
+            return new Pessoa(in);
+        }
+        @Override
+        public Pessoa[] newArray(int size) {
+            return new Pessoa[size];
+        }
+    };
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
+    public String getNome() { return nome; }
+    public void setNome(String nome) { this.nome = nome; }
+    public String getTelefone() { return telefone; }
+    public void setTelefone(String telefone) { this.telefone = telefone; }
     @Override
     public String toString() {
-        return "Pessoa{" +
-                "id=" + id +
-                ", nome='" + nome + '\'' +
-                ", telefone='" + telefone + '\'' +
-                '}';
+        return nome + " - " + telefone;
     }
-}//class
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+    @Override
+    public void writeToParcel(Parcel parcel, int flags) {
+        parcel.writeInt(id);
+        parcel.writeString(nome);
+        parcel.writeString(telefone);
+    }
+}
+
+- Banco.java
+[source,java]
+import androidx.room.Database;
+import androidx.room.RoomDatabase;
+@Database(entities = {Pessoa.class}, version = 1)
+public abstract class Banco extends RoomDatabase {
+    public abstract PessoaDao pessoaDao();
+}
 
 - PessoaDao.java
 [source,java]
@@ -143,22 +162,13 @@ import java.util.List;
 @Dao
 public interface PessoaDao {
     @Insert
-    public long adicionar(Pessoa p);
+    long adicionar(Pessoa p);
     @Query("SELECT * FROM pessoa")
-    public List<Pessoa> listar();
+    List<Pessoa> listar();
     @Update
-    public int atualizar(Pessoa p);
+    int atualizar(Pessoa p);
     @Delete
-    public int excluir(Pessoa p);
-}
-
-- Banco.java
-[source,java]
-import androidx.room.Database;
-import androidx.room.RoomDatabase;
-@Database(entities = {Pessoa.class}, version = 1)
-public abstract class Banco extends RoomDatabase {
-    public abstract PessoaDao pessoaDao();
+    int excluir(Pessoa p);
 }
 
 - MainActivity.java
@@ -166,6 +176,7 @@ public abstract class Banco extends RoomDatabase {
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.room.Room;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -174,7 +185,7 @@ import android.widget.Toast;
 import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity {
     private EditText editTextNome, editTextTelefone;
-    private Button butttonS, buttonD, buttonL;
+    private Button buttonS, buttonD, buttonL;
     private Pessoa p;
     private PessoaDao dao;
     @Override
@@ -183,89 +194,106 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         editTextNome = findViewById(R.id.editTextNome);
         editTextTelefone = findViewById(R.id.editTextTelefone);
-        butttonS = findViewById(R.id.buttonS);
+        buttonS = findViewById(R.id.buttonS);
         buttonD = findViewById(R.id.buttonD);
         buttonL = findViewById(R.id.buttonL);
-        p = (Pessoa) getIntent().getSerializableExtra("dado");
-        if (p != null) {
-            editTextNome.setText(p.getNome());
-            editTextTelefone.setText(p.getTelefone());
+        // necessário fazer o teste da versão >API 33
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            p = getIntent().getParcelableExtra("dado", Pessoa.class);
+        } else {
+            p = getIntent().getParcelableExtra("dado");
+        }
+        if(p!=null){
+            editTextNome.setText(p.getNome().toString());
+            editTextTelefone.setText(p.getTelefone().toString());
         }
         Banco db = Room.databaseBuilder(getApplicationContext(),
-                Banco.class, "meu_banco")
+                        Banco.class, "meu_banco")
                 .allowMainThreadQueries().build();
         dao = db.pessoaDao();
-    }//onCreate
+    }
     public void clicar(View view) {
-            if (view.getId()==R.id.buttonS) {
-                if (p == null) {
-                    p = new Pessoa();
-                    p.setNome(editTextNome.getText().toString());
-                    p.setTelefone(editTextTelefone.getText().toString());
-                    long retorno = dao.adicionar(p);
-                    if (retorno != -1) {
-                        Toast.makeText(MainActivity.this, "Salvo", Toast.LENGTH_SHORT).show();
-                        p = null;
-                        editTextNome.setText("");
-                        editTextTelefone.setText("");
-                    } else {
-                        Toast.makeText(MainActivity.this, "Não salvo", Toast.LENGTH_SHORT).show();
-                    }
+        if (view.getId() == R.id.buttonS) {
+            if (p == null) {
+                p = new Pessoa();
+                p.setNome(editTextNome.getText().toString());
+                p.setTelefone(editTextTelefone.getText().toString());
+                long retorno = dao.adicionar(p);
+                if (retorno != -1) {
+                    Toast.makeText(MainActivity.this, "Salvo", Toast.LENGTH_SHORT).show();
+                    p = null;
+                    editTextNome.setText("");
+                    editTextTelefone.setText("");
                 } else {
-                    p.setNome(editTextNome.getText().toString());
-                    p.setTelefone(editTextTelefone.getText().toString());
-                    int retorno = dao.atualizar(p);
-                    if (retorno != 0) {
-                        Toast.makeText(MainActivity.this, "Salvo", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(MainActivity.this, "Não salvo", Toast.LENGTH_SHORT).show();
-                    }
+                    Toast.makeText(MainActivity.this, "Não salvo", Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                p.setNome(editTextNome.getText().toString());
+                p.setTelefone(editTextTelefone.getText().toString());
+                int retorno = dao.atualizar(p);
+                if (retorno != 0) {
+                    Toast.makeText(MainActivity.this, "Atualizado", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(MainActivity.this, "Erro ao atualizar", Toast.LENGTH_SHORT).show();
                 }
             }
-        if (view.getId()==R.id.buttonL) {
-            ArrayList<Pessoa> dados = (ArrayList) dao.listar();
-            if (dados != null) {
-                Intent intent = new Intent(MainActivity.this, MainActivity2.class);
-                intent.putExtra("dados", dados);
+        }
+        if (view.getId() == R.id.buttonL) {
+            ArrayList<Pessoa> dados = (ArrayList<Pessoa>) dao.listar();
+            if (dados != null && !dados.isEmpty()) {
+                Intent intent = new Intent(MainActivity.this, SegundaActivity.class);
+                intent.putParcelableArrayListExtra("dados", dados);
                 startActivity(intent);
                 finish();
             } else {
                 Toast.makeText(MainActivity.this, "Sem dados", Toast.LENGTH_SHORT).show();
             }
         }
-        if (view.getId()==R.id.buttonD) {
-            int retorno = dao.excluir(p);
-            if (retorno > 0) {
-                Toast.makeText(MainActivity.this, "Deletado", Toast.LENGTH_SHORT).show();
-                p = null;
-                editTextNome.setText("");
-                editTextTelefone.setText("");
+        if (view.getId() == R.id.buttonD) {
+            if (p != null) {
+                int retorno = dao.excluir(p);
+                if (retorno > 0) {
+                    Toast.makeText(MainActivity.this, "Deletado", Toast.LENGTH_SHORT).show();
+                    p = null;
+                    editTextNome.setText("");
+                    editTextTelefone.setText("");
+                } else {
+                    Toast.makeText(MainActivity.this, "Erro ao deletar", Toast.LENGTH_SHORT).show();
+                }
             } else {
-                Toast.makeText(MainActivity.this, "Erro", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, "Nenhum registro selecionado", Toast.LENGTH_SHORT).show();
             }
         }
-    }//clicar
-}//class
+    }
+}
 
-- Activity2.java
+- SegundaActivity.java
 [source,java]
 import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import java.util.ArrayList;
-public class Activity2 extends AppCompatActivity  implements AdapterView.OnItemClickListener {
+public class SegundaActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
     private ListView listView;
     private ArrayAdapter<Pessoa> adapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_2);
+        setContentView(R.layout.activity_segunda);
         listView = findViewById(R.id.lista);
-        ArrayList<Pessoa> dados = (ArrayList<Pessoa>) getIntent().getSerializableExtra("dados");
+        // necessário fazer o teste da versão >API 33
+        ArrayList<Pessoa> dados;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            dados = getIntent().getParcelableArrayListExtra("dados", Pessoa.class);
+        } else {
+            dados = getIntent().getParcelableArrayListExtra("dados");
+        }
+        if (dados == null) dados = new ArrayList<>();
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, dados);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(this);
@@ -273,9 +301,10 @@ public class Activity2 extends AppCompatActivity  implements AdapterView.OnItemC
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
         Pessoa p = (Pessoa) adapterView.getItemAtPosition(i);
-        Intent intent = new Intent(Activity2.this, MainActivity.class);
-        intent.putExtra("dado", p);
+        Intent intent = new Intent(SegundaActivity.this, MainActivity.class);
+        intent.putExtra("dado", p); 
         startActivity(intent);
+        finish();
     }
 }
 
