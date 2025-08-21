@@ -311,6 +311,456 @@ public class SegundaActivity extends AppCompatActivity implements AdapterView.On
 
 Versão 2: Esse exemplo é uma adaptação do exemplo disponibilizado em: STACKOVERFLOW. Android Room One-to-Many Relationship. 2021. Disponível: <https://stackoverflow.com/questions/66897173/android-room-one-to-many-relationship>. Pergunta feita pelo usuário <https://stackoverflow.com/users/328518/adil-bhatty> e respondida pelo usuário <https://stackoverflow.com/users/4744514/miket>.
 
+Multiplicidade 1 para 1:
+
+- activity_main.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Hello World!"
+        android:id="@+id/textViewResultado"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+- Curso.java
+[source,java]
+import androidx.annotation.NonNull;
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.Ignore;
+import androidx.room.PrimaryKey;
+@Entity(tableName = "_curso")
+public class Curso {
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "curso_id")
+    public Long cursoId;
+    @NonNull
+    @ColumnInfo(name = "curso_nome")
+    public String cursoNome;
+    public Curso() {}
+    @Ignore
+    public Curso(String cursoNome) {
+        this.cursoNome = cursoNome;
+    }
+}
+
+- Disciplina.java
+[source,java]
+import androidx.annotation.NonNull;
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.Ignore;
+import androidx.room.PrimaryKey;
+@Entity(tableName = "_disciplina")
+public class Disciplina {
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "disciplina_id")
+    public Long disciplinaId;
+    @NonNull
+    @ColumnInfo(name = "disciplina_nome")
+    public String disciplinaNome;
+    public Disciplina() {}
+    @Ignore
+    public Disciplina(String disciplinaNome) {
+        this.disciplinaNome = disciplinaNome;
+    }
+}
+
+- Estudante.java
+[source,java]
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.ForeignKey;
+import androidx.room.Ignore;
+import androidx.room.PrimaryKey;
+@Entity(
+        tableName = "_estudante",
+        foreignKeys = {
+                @ForeignKey(
+                        entity = Curso.class,
+                        parentColumns = "curso_id",
+                        childColumns = "curso_id",
+                        onDelete = ForeignKey.CASCADE
+                ),
+                @ForeignKey(
+                        entity = Disciplina.class,
+                        parentColumns = "disciplina_id",
+                        childColumns = "disciplina_id",
+                        onDelete = ForeignKey.CASCADE
+                )
+        }
+)
+public class Estudante {
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "estudante_id")
+    public Long estudanteId;
+    @ColumnInfo(name = "estudante_nome")
+    public String estudanteNome;
+    @ColumnInfo(name = "curso_id", index = true)
+    public Long cursoId;
+    @ColumnInfo(name = "disciplina_id", index = true)
+    public Long disciplinaId;
+    public Estudante() {}
+    @Ignore
+    public Estudante(String estudanteNome, long cursoId, long disciplinaId) {
+        this.estudanteNome = estudanteNome;
+        this.cursoId = cursoId;
+        this.disciplinaId = disciplinaId;
+    }
+}
+
+- AppDao.java
+[source,java]
+import androidx.room.Dao;
+import androidx.room.Insert;
+import androidx.room.Query;
+import java.util.List;
+@Dao
+public interface AppDao {
+    @Insert
+    Long inserirCurso(Curso c);
+    @Insert
+    Long inserirDisciplina(Disciplina d);
+    @Insert
+    Long inserirEstudante(Estudante e);
+    @Query("SELECT * FROM _curso")
+    List<Curso> obterCursos();
+    @Query("SELECT * FROM _disciplina")
+    List<Disciplina> obterDisciplinas();
+    @Query("SELECT * FROM _estudante")
+    List<Estudante> obterEstudantes();
+}
+
+- AppDatabase.java
+[source,java]
+import androidx.room.Database;
+import androidx.room.RoomDatabase;
+@Database(
+        entities = {Curso.class, Disciplina.class, Estudante.class},
+        version = 1
+)
+public abstract class AppDatabase extends RoomDatabase {
+    public abstract AppDao appDao();
+}
+
+- MainActivity.java
+[source,java]
+import android.os.Bundle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.room.Room;
+import android.util.Log;
+import android.widget.TextView;
+import java.util.List;
+public class MainActivity extends AppCompatActivity {
+    private TextView textViewResultado;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        textViewResultado = findViewById(R.id.textViewResultado);
+        AppDatabase db = Room.databaseBuilder(
+                getApplicationContext(),
+                AppDatabase.class,
+                "escola.db"
+        ).allowMainThreadQueries().build();
+        AppDao dao = db.appDao();
+        long cursoId = dao.inserirCurso(new Curso("Ciência da Computação"));
+        long discId = dao.inserirDisciplina(new Disciplina("Banco de Dados"));
+        dao.inserirEstudante(new Estudante("Ana", cursoId, discId));
+        List<Estudante> estudantes = dao.obterEstudantes();
+        String msg = null;
+        for (Estudante e : estudantes) {
+            msg = "Estudante: " + e.estudanteNome +
+                    " | cursoId=" + e.cursoId +
+                    " | disciplinaId=" + e.disciplinaId;
+            Log.d("DB_TESTE", msg);
+        }
+        textViewResultado.setText(msg);
+    }
+}
+
+Multiplicidade N para N:
+
+- activity_main.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Hello World!"
+        android:id="@+id/textViewResultado"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+- Curso.java
+[source,java]
+import androidx.annotation.NonNull;
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.Ignore;
+import androidx.room.PrimaryKey;
+@Entity(tableName = "_curso")
+public class Curso {
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "curso_id")
+    public Long cursoId;
+    @NonNull
+    @ColumnInfo(name = "curso_nome")
+    public String cursoNome;
+    public Curso() {}
+    @Ignore
+    public Curso(String cursoNome) {
+        this.cursoNome = cursoNome;
+    }
+}
+
+- Disciplina.java
+[source,java]
+import androidx.annotation.NonNull;
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.Ignore;
+import androidx.room.PrimaryKey;
+@Entity(tableName = "_disciplina")
+public class Disciplina {
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "disciplina_id")
+    public Long disciplinaId;
+    @NonNull
+    @ColumnInfo(name = "disciplina_nome")
+    public String disciplinaNome;
+    public Disciplina() {}
+    @Ignore
+    public Disciplina(String disciplinaNome) {
+        this.disciplinaNome = disciplinaNome;
+    }
+}
+
+- Estudante.java
+[source,java]
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.ForeignKey;
+import androidx.room.Ignore;
+import androidx.room.PrimaryKey;
+@Entity(
+        tableName = "_estudante",
+        foreignKeys = @ForeignKey(
+                entity = Curso.class,
+                parentColumns = "curso_id",
+                childColumns = "curso_id",
+                onDelete = ForeignKey.CASCADE
+        )
+)
+public class Estudante {
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "estudante_id")
+    public Long estudanteId;
+    @ColumnInfo(name = "estudante_nome")
+    public String estudanteNome;
+    @ColumnInfo(name = "curso_id", index = true)
+    public Long cursoId;
+    public Estudante() {}
+    @Ignore
+    public Estudante(String estudanteNome, long cursoId) {
+        this.estudanteNome = estudanteNome;
+        this.cursoId = cursoId;
+    }
+}
+
+- EstudanteDisciplinaCrossRef.java
+[source,java]
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.ForeignKey;
+@Entity(
+        tableName = "_estudante_disciplina",
+        primaryKeys = {"estudante_id", "disciplina_id"},
+        foreignKeys = {
+                @ForeignKey(
+                        entity = Estudante.class,
+                        parentColumns = "estudante_id",
+                        childColumns = "estudante_id",
+                        onDelete = ForeignKey.CASCADE
+                ),
+                @ForeignKey(
+                        entity = Disciplina.class,
+                        parentColumns = "disciplina_id",
+                        childColumns = "disciplina_id",
+                        onDelete = ForeignKey.CASCADE
+                )
+        }
+)
+public class EstudanteDisciplinaCrossRef {
+    @ColumnInfo(name = "estudante_id")
+    public long estudanteId;
+    @ColumnInfo(name = "disciplina_id")
+    public long disciplinaId;
+    public EstudanteDisciplinaCrossRef(long estudanteId, long disciplinaId) {
+        this.estudanteId = estudanteId;
+        this.disciplinaId = disciplinaId;
+    }
+}
+
+- DisciplinaComEstudantes.java
+[source,java]
+import androidx.room.Embedded;
+import androidx.room.Junction;
+import androidx.room.Relation;
+import java.util.List;
+public class DisciplinaComEstudantes {
+    @Embedded
+    public Disciplina disciplina;
+    @Relation(
+            parentColumn = "disciplina_id",
+            entityColumn = "estudante_id",
+            associateBy = @Junction(EstudanteDisciplinaCrossRef.class)
+    )
+    public List<Estudante> estudantes;
+}
+
+- EstudanteComDisciplinas.java
+[source,java]
+import androidx.room.Embedded;
+import androidx.room.Junction;
+import androidx.room.Relation;
+import java.util.List;
+public class EstudanteComDisciplinas {
+    @Embedded
+    public Estudante estudante;
+    @Relation(
+            parentColumn = "estudante_id",
+            entityColumn = "disciplina_id",
+            associateBy = @Junction(EstudanteDisciplinaCrossRef.class)
+    )
+    public List<Disciplina> disciplinas;
+}
+
+- AppDatabase.java
+[source,java]
+import androidx.room.Database;
+import androidx.room.RoomDatabase;
+@Database(
+        entities = {
+                Curso.class,
+                Disciplina.class,
+                Estudante.class,
+                EstudanteDisciplinaCrossRef.class
+        },
+        version = 1
+)
+public abstract class AppDatabase extends RoomDatabase {
+    public abstract AppDao appDao();
+}
+
+- AppDao.java
+[source,java]
+import androidx.room.Dao;
+import androidx.room.Insert;
+import androidx.room.Query;
+import androidx.room.Transaction;
+import java.util.List;
+@Dao
+public interface AppDao {
+    @Insert
+    Long inserirCurso(Curso c);
+    @Insert
+    Long inserirDisciplina(Disciplina d);
+    @Insert
+    Long inserirEstudante(Estudante e);
+    @Insert
+    void inserirEstudanteDisciplina(EstudanteDisciplinaCrossRef crossRef);
+    @Query("SELECT * FROM _estudante")
+    List<Estudante> obterEstudantes();
+    @Query("SELECT * FROM _disciplina")
+    List<Disciplina> obterDisciplinas();
+    @Transaction
+    @Query("SELECT * FROM _estudante WHERE estudante_id = :id")
+    EstudanteComDisciplinas obterEstudanteComDisciplinas(long id);
+    @Transaction
+    @Query("SELECT * FROM _disciplina WHERE disciplina_id = :id")
+    DisciplinaComEstudantes obterDisciplinaComEstudantes(long id);
+}
+
+- MainActivity.java
+[source,java]
+import android.os.Bundle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.room.Room;
+import android.util.Log;
+import android.widget.TextView;
+public class MainActivity extends AppCompatActivity {
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        AppDatabase db = Room.databaseBuilder(
+                getApplicationContext(),
+                AppDatabase.class,
+                "escola_n_n.db"
+        ).allowMainThreadQueries().build();
+        AppDao dao = db.appDao();
+        long cursoId = dao.inserirCurso(new Curso("Engenharia de Software"));
+        long disc1Id = dao.inserirDisciplina(new Disciplina("Programação Mobile"));
+        long disc2Id = dao.inserirDisciplina(new Disciplina("Inteligência Artificial"));
+        long estId = dao.inserirEstudante(new Estudante("Ana", cursoId));
+        dao.inserirEstudanteDisciplina(new EstudanteDisciplinaCrossRef(estId, disc1Id));
+        dao.inserirEstudanteDisciplina(new EstudanteDisciplinaCrossRef(estId, disc2Id));
+        EstudanteComDisciplinas ec = dao.obterEstudanteComDisciplinas(estId);
+        Log.d("DB_TESTE", "Estudante: " + ec.estudante.estudanteNome);
+        for (Disciplina d : ec.disciplinas) {
+            Log.d("DB_TESTE", " - Disciplina: " + d.disciplinaNome);
+        }
+        DisciplinaComEstudantes dc = dao.obterDisciplinaComEstudantes(disc1Id);
+        Log.d("DB_TESTE", "Disciplina: " + dc.disciplina.disciplinaNome);
+        for (Estudante e : dc.estudantes) {
+            Log.d("DB_TESTE", " - Estudante: " + e.estudanteNome);
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
