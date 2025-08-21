@@ -354,7 +354,6 @@ class Disciplina {
     Disciplina(){}
     @Ignore
     Disciplina(String disciplinaNome) {
-
         this.disciplinaNome = disciplinaNome;
     }
 }
