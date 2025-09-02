@@ -145,7 +145,7 @@ Os componentes são os blocos de construção relevantes para o desenvolvimento 
 - Activity: ponto de entrada que permite a interação do usuário com o app. (Interface independente).
 - Service: componente cujo objetivo é manter aexecução em segundo plano (Sem interface).
 - Broadcast Receiver: componente que possibilita o sistema enviar eventos fora do fluxo normal de um app sendo manuseado por um usuário.
-- Content Provoder: componente que permite o compartilhamento de dados privados de um app com outros apps. 
+- Content Provider: componente que permite o compartilhamento de dados privados de um app com outros apps. 
 
 Referência: GOOGLE DEVELOPERS. Fundamentos  de aplicativos. Disponível em: https://developer.android.com/guide/components/fundamentals?hl=pt-br. Acesso em: 08 de jul. 2025.
 
