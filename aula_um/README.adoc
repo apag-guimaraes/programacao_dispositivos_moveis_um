@@ -140,7 +140,7 @@ Referência: WIKIPEDIA, Android version history. Disponível em: https://en.wiki
 
 == Componentes Relevantes Usados na Implementação de Aplicativos
 
-Os componentes são os blocos de construção relevantes para o desenvolvimento de um app. Os componentes são pontos de entrada sendo acessados pelos usuários, por outros apps e pelo próprio sistema. Cada componente tem um ciclo de vida e função definida. No Android tem-se 4 componentes: 
+Os componentes são os blocos de construção relevantes para o desenvolvimento de um app. Os componentes são pontos de entrada sendo acessados pelos usuários e por outros apps. Cada componente tem um ciclo de vida e função definida. No Android tem-se 4 componentes: 
 
 - Activity: ponto de entrada que permite a interação do usuário com o app. (Interface independente).
 - Service: componente cujo objetivo é manter aexecução em segundo plano (Sem interface).
