@@ -17,7 +17,8 @@ Materiais para mais detalhes:
 
 Para funcionar a troca de cores automática usando os temas claro e escuro. É necessário usar nomes temáticos para as cores no arquivo themes.xml. Segue abaixo alguns nomes temáticos:
 
-Nome do Atributo | Função / Uso no App                                                                
+Nome do Atributo | Função / Uso no App  
+
 - colorPrimary: Cor principal da interface: usada em botões principais, FABs, Toolbars, etc.
 - colorOnPrimary: Cor de texto/ícone sobre a colorPrimary
 - colorPrimaryContainer: Versão alternativa para containers (ex: fundo de botão preenchido)   
