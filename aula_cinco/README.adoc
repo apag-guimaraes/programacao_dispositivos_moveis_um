@@ -15,50 +15,84 @@ Materiais para mais detalhes:
 - GOOGLE DEVELOPERS. Configurar a barra de apps. Disponível em: https://developer.android.com/training/appbar/setting-up. Acessado em: 14 jul. 2025.
 - STACKOVERFLOW. Qual a diferença de uma toolbar para uma action bar? 2017. Disponível em: https://pt.stackoverflow.com/questions/178775/qual-a-diferen%C3%A7a-de-uma-toolbar-para-uma-action-bar. Pergunta feita pela usuário Aline (https://pt.stackoverflow.com/users/36515/aline) e respondida pelo usuário (https://pt.stackoverflow.com/users/2541/ramaral). Acessado em: 14 jul. 2025.
 
+Para funcionar a troca de cores automática usando os temas claro e escuro. É necessário usar nomes temáticos para as cores no arquivo themes.xml. Segue abaixo alguns nomes temáticos:
+
+| Nome do Atributo            | Função / Uso no App                                                                |
+| --------------------------- | ---------------------------------------------------------------------------------- |
+| `colorPrimary`              | Cor principal da interface: usada em botões principais, FABs, Toolbars, etc.       |
+| `colorOnPrimary`            | Cor de texto/ícone sobre a `colorPrimary`                                          |
+| `colorPrimaryContainer`     | Versão alternativa para containers (ex: fundo de botão preenchido)                 |
+| `colorOnPrimaryContainer`   | Texto/ícone sobre `colorPrimaryContainer`                                          |
+| `colorSecondary`            | Cor secundária: usada em chips, botões de menor destaque, etc.                     |
+| `colorOnSecondary`          | Cor de texto/ícone sobre `colorSecondary`                                          |
+| `colorSecondaryContainer`   | Container para `colorSecondary`                                                    |
+| `colorOnSecondaryContainer` | Texto/ícone sobre `colorSecondaryContainer`                                        |
+| `colorTertiary`             | Terceira cor opcional: geralmente usada para dar variedade na paleta               |
+| `colorOnTertiary`           | Texto/ícone sobre `colorTertiary`                                                  |                         |
+| `colorBackground`           | Cor de fundo geral da interface (ex: root layout)                                  |
+| `colorOnBackground`         | Cor do texto/ícone sobre o fundo (`colorBackground`)                               |
+| `colorSurface`              | Cor de superfície: usada como base para cards, bottom sheets, menus, etc.          |
+| `colorOnSurface`            | Texto/ícone sobre superfícies                                                      |                                                   |
+| `colorError`                | Cor para indicar erro (ex: campo inválido)                                         |
+| `colorOnError`              | Texto/ícone sobre `colorError`                                    
+
+REFERÊNCIA: GOOGLE.Color Theming. Disponível em: <https://m2.material.io/develop/android/theming/color>. Acessado em: 5 out. 2025.
+
 Exemplos práticos
 
 - Inicialmente deve-se verificar no arquivo themes.xml se a seguinte tag:  <style name="Base.Theme.ExemploMenu"
         parent="Theme.Material3.DayNight.NoActionBar"> está configurada como NOACTIONBAR, pois assim você poderá adicionar sua própria barra de ferramentas.
 
-- colors.xml
+- colors.xml (tema claro)
 [source,xml]
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Cores para o Tema Claro  -->
-    <color name="primary_light">#6200EE</color>
-    <color name="secondary_light">#03DAC6</color>
-    <color name="background_light">#FFFFFF</color>
-    <!-- Cores para o Tema Escuro  -->
-    <color name="primary_dark">#BB86FC</color>
-    <color name="secondary_dark">#03DAC6</color>
-    <color name="background_dark">#121212</color>
+        <color name="colorPrimary">#6200EE</color>
+        <color name="colorSecondary">#03DAC6</color>
+        <color name="colorBackground">#FFFFFF</color>
+        <color name="colorOnPrimary">#D04D4D</color>
+        <color name="colorOnBackground">#000000</color>
+</resources>
+
+- colors.xml (tema escuro)
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#A98BD5</color>
+    <color name="colorSecondary">#83CCC5</color>
+    <color name="colorBackground">#FFFFFF</color>
+    <color name="colorOnPrimary">#F3D2D2</color>
+    <color name="colorOnBackground">#000000</color>
 </resources>
 
 - themes.xml (tema claro)
 [source,xml]
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Base.Theme.ExemploMenu"
-        parent="Theme.Material3.DayNight.NoActionBar">
+    <style name="Base.Theme.ToolBar_Menu" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
-        <item name="colorPrimary">@color/primary_light</item>
-        <item name="colorSecondary">@color/secondary_light</item>
-        <item name="android:background">@color/background_light</item>
+        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorOnPrimary">@color/colorOnPrimary</item>
+        <item name="colorSecondary">@color/colorSecondary</item>
+        <item name="colorSurface">@color/colorBackground</item>
+        <item name="colorOnSurface">@color/colorOnBackground</item>
     </style>
-    <style name="Theme.ExemploMenu"
-        parent="Base.Theme.ExemploMenu" />
+    <style name="Theme.ToolBar_Menu" parent="Base.Theme.ToolBar_Menu" />
 </resources>
 
 - themes.xml (tema escuro)
 [source,xml]
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Base.Theme.ExemploMenu"
-        parent="Theme.Material3.DayNight.NoActionBar">
+    <style name="Base.Theme.ToolBar_Menu" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your dark theme here. -->
-        <item name="colorPrimary">@color/primary_dark</item>
-        <item name="colorSecondary">@color/secondary_dark</item>
-        <item name="android:background">@color/background_dark</item>
+        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorOnPrimary">@color/colorOnPrimary</item>
+        <item name="colorSecondary">@color/colorSecondary</item>
+        <item name="colorSurface">@color/colorBackground</item>
+        <item name="colorOnSurface">@color/colorOnBackground</item>
     </style>
 </resources>
 
@@ -144,6 +178,8 @@ public class MainActivity extends AppCompatActivity {
 <androidx.appcompat.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/meu_toolbar"
     android:elevation="10dp"
+    android:background="?attr/colorTertiary"
+    android:titleTextColor="?attr/colorOnPrimary"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
     <ImageView
