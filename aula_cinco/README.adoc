@@ -20,20 +20,35 @@ Para funcionar a troca de cores automática usando os temas claro e escuro. É n
 Nome do Atributo | Função / Uso no App  
 
 - colorPrimary: Cor principal da interface: usada em botões principais, FABs, Toolbars, etc.
+
 - colorOnPrimary: Cor de texto/ícone sobre a colorPrimary
-- colorPrimaryContainer: Versão alternativa para containers (ex: fundo de botão preenchido)   
+
+- colorPrimaryContainer: Versão alternativa para containers (ex: fundo de botão preenchido)  
+
 - colorOnPrimaryContainer: Texto/ícone sobre colorPrimaryContainer  
+
 - colorSecondary: Cor secundária: usada em chips, botões de menor destaque, etc.  
+
 - colorOnSecondary: Cor de texto/ícone sobre colorSecondary
+
 - colorSecondaryContainer: Container para colorSecondary
+
 - colorOnSecondaryContainer: Texto/ícone sobre colorSecondaryContainer
-- colorTertiary: geralmente usada para dar variedade na paleta               
+
+- colorTertiary: geralmente usada para dar variedade na paleta   
+
 - colorOnTertiary: Texto/ícone sobre colorTertiary  
-- colorBackground: Cor de fundo geral da interface (ex: root layout)                                  
-- colorOnBackground: Cor do texto/ícone sobre o fundo (`colorBackground`)                               
-- colorSurface: Cor de superfície: usada como base para cards, bottom sheets, menus, etc.          
-- colorOnSurface: Texto/ícone sobre superfícies                                                      |                                                   |
-- colorError: Cor para indicar erro (ex: campo inválido)                                         |
+
+- colorBackground: Cor de fundo geral da interface (ex: root layout)   
+
+- colorOnBackground: Cor do texto/ícone sobre o fundo (colorBackground) 
+
+- colorSurface: Cor de superfície: usada como base para cards, bottom sheets, menus, etc.
+
+- colorOnSurface: Texto/ícone sobre superfícies  
+|                                                   
+- colorError: Cor para indicar erro (ex: campo inválido) 
+
 - colorOnError: Texto/ícone sobre colorError  
                                  
 REFERÊNCIA: GOOGLE.Color Theming. Disponível em: <https://m2.material.io/develop/android/theming/color>. Acessado em: 5 out. 2025.
