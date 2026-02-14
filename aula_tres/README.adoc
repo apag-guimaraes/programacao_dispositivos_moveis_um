@@ -1,6 +1,6 @@
 == Densidades independentes de pixels
 
-[![Assista ao vídeo](https://img.youtube.com/vi/zhszwkcay2A/hqdefault.jpg)](https://www.youtube.com/watch?v=zhszwkcay2A)
+[Assista ao vídeo](https://www.youtube.com/watch?v=zhszwkcay2A)
 
 == Exemplos práticos (IMC - sem MVC)
 
@@ -251,6 +251,231 @@ public class Controle {
             double imc = pessoa.calcularIMC();
             return "Nome: " + pessoa.getNome() + "\nIMC: " + String.format("%.2f", imc);
     }
+}
+
+== Exemplos práticos (Calculadora - sem MVC)
+
+- activity_main.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:gravity="center">
+    <EditText
+        android:id="@+id/editTextNumero1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Número 1"
+        android:inputType="number" />
+    <EditText
+        android:id="@+id/editTextNumero2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Número 2"
+        android:inputType="number" />
+    <Button
+        android:id="@+id/buttonSomar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Somar" />
+    <Button
+        android:id="@+id/buttonSubtrair"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Subtrair" />
+    <TextView
+        android:id="@+id/textViewResultado"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Resultado: "
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:layout_marginTop="20dp" />
+</LinearLayout>
+
+- MainActivity.java
+[source,java]
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
+import androidx.appcompat.app.AppCompatActivity;
+public class MainActivity extends AppCompatActivity {
+    private EditText editTextNumero1, editTextNumero2;
+    private Button buttonSomar, buttonSubtrair;
+    private TextView textViewResultado;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        editTextNumero1 = findViewById(R.id.editTextNumero1);
+        editTextNumero2 = findViewById(R.id.editTextNumero2);
+        buttonSomar = findViewById(R.id.buttonSomar);
+        buttonSubtrair = findViewById(R.id.buttonSubtrair);
+        textViewResultado = findViewById(R.id.textViewResultado);
+        buttonSomar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String numero1 = editTextNumero1.getText().toString();
+                String numero2 = editTextNumero2.getText().toString();
+                int num1 = Integer.parseInt(numero1);
+                int num2 = Integer.parseInt(numero2);
+                int resultado = Calculadora.somar(num1, num2);
+                textViewResultado.setText("Resultado da soma: " + resultado);
+            }
+        });
+        buttonSubtrair.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String numero1Str = editTextNumero1.getText().toString();
+                String numero2Str = editTextNumero2.getText().toString();
+                int num1 = Integer.parseInt(numero1Str);
+                int num2 = Integer.parseInt(numero2Str);
+                int resultado = Calculadora.subtrair(num1, num2);
+                textViewResultado.setText("Resultado da subtração: " + resultado);
+            }
+        });
+    }
+}
+
+- Calculadora.java
+[source,java]
+public class Calculadora {
+    public static int somar(int num1, int num2) {
+        return num1 + num2;
+    }
+    public static int subtrair(int num1, int num2) {
+        return num1 - num2;
+    }
+}
+
+== Exemplos práticos (Calculadora - com MVC)
+
+-activity_main.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:gravity="center">
+    <EditText
+        android:id="@+id/editTextNumero1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Número 1"
+        android:inputType="number" />
+    <EditText
+        android:id="@+id/editTextNumero2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Número 2"
+        android:inputType="number" />
+    <Button
+        android:id="@+id/buttonSomar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Somar" />
+    <Button
+        android:id="@+id/buttonSubtrair"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Subtrair" />
+    <TextView
+        android:id="@+id/textViewResultado"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Resultado: "
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:layout_marginTop="20dp" />
+</LinearLayout>
+
+- MainActivity.java
+[source,java]
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
+import androidx.appcompat.app.AppCompatActivity;
+public class MainActivity extends AppCompatActivity {
+    private EditText editTextNumero1, editTextNumero2;
+    private Button buttonSomar, buttonSubtrair;
+    private TextView textViewResultado;
+    private CalculadoraController controller;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        editTextNumero1   = findViewById(R.id.editTextNumero1);
+        editTextNumero2   = findViewById(R.id.editTextNumero2);
+        buttonSomar       = findViewById(R.id.buttonSomar);
+        buttonSubtrair    = findViewById(R.id.buttonSubtrair);
+        textViewResultado = findViewById(R.id.textViewResultado);
+        controller = new CalculadoraController();
+        buttonSomar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String num1 = editTextNumero1.getText().toString();
+                String num2 = editTextNumero2.getText().toString();
+                String resultado = controller.realizarOperacao(num1, num2, Operacao.SOMAR);
+                textViewResultado.setText(resultado);
+            }
+        });
+        buttonSubtrair.setOnClickListener(v -> {
+            String num1 = editTextNumero1.getText().toString();
+            String num2 = editTextNumero2.getText().toString();
+            String resultado = controller.realizarOperacao(num1, num2, Operacao.SUBTRAIR);
+            textViewResultado.setText(resultado);
+        });
+    }
+}
+
+- CalculadoraController.java
+[source,java]
+public class CalculadoraController {
+    public String realizarOperacao(
+            String num1Str,
+            String num2Str,
+            Operacao operacao) {
+            int num1 = Integer.parseInt(num1Str.trim());
+            int num2 = Integer.parseInt(num2Str.trim());
+            int resultado;
+            switch (operacao) {
+                case SOMAR:
+                    resultado = Calculadora.somar(num1, num2);
+                    return "Resultado da soma: " + resultado;
+                case SUBTRAIR:
+                    resultado = Calculadora.subtrair(num1, num2);
+                    return "Resultado da subtração: " + resultado;
+                default:
+                    throw new IllegalArgumentException("erro!!");
+            }
+        }
+}
+
+- Calculadora.java
+[source,java]
+public class Calculadora {
+    public static int somar(int num1, int num2) {
+        return num1 + num2;
+    }
+    public static int subtrair(int num1, int num2) {
+        return num1 - num2;
+    }
+}
+
+- Operacao.java
+[source,java]
+public enum Operacao {
+    SOMAR,
+    SUBTRAIR
 }
 
 == Exemplos práticos (App Lanchonete)
@@ -540,105 +765,6 @@ public class BoloActivity extends AppCompatActivity implements View.OnClickListe
 
 
 
-== Exemplos práticos (Calculadora)
-
-- activity_main.xml
-[source,xml]
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp"
-    android:gravity="center">
-    <EditText
-        android:id="@+id/editTextNumero1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Número 1"
-        android:inputType="number" />
-    <EditText
-        android:id="@+id/editTextNumero2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Número 2"
-        android:inputType="number" />
-    <Button
-        android:id="@+id/buttonSomar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Somar" />
-    <Button
-        android:id="@+id/buttonSubtrair"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Subtrair" />
-    <TextView
-        android:id="@+id/textViewResultado"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Resultado: "
-        android:textAppearance="@style/TextAppearance.AppCompat.Large"
-        android:layout_marginTop="20dp" />
-</LinearLayout>
-
-- MainActivity.java
-[source,java]
-import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
-import android.widget.Toast;
-import androidx.appcompat.app.AppCompatActivity;
-public class MainActivity extends AppCompatActivity {
-    private EditText editTextNumero1, editTextNumero2;
-    private Button buttonSomar, buttonSubtrair;
-    private TextView textViewResultado;
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        editTextNumero1 = findViewById(R.id.editTextNumero1);
-        editTextNumero2 = findViewById(R.id.editTextNumero2);
-        buttonSomar = findViewById(R.id.buttonSomar);
-        buttonSubtrair = findViewById(R.id.buttonSubtrair);
-        textViewResultado = findViewById(R.id.textViewResultado);
-        buttonSomar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String numero1 = editTextNumero1.getText().toString();
-                String numero2 = editTextNumero2.getText().toString();
-                int num1 = Integer.parseInt(numero1);
-                int num2 = Integer.parseInt(numero2);
-                int resultado = Calculadora.somar(num1, num2);
-                textViewResultado.setText("Resultado da soma: " + resultado);
-            }
-        });
-        buttonSubtrair.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String numero1Str = editTextNumero1.getText().toString();
-                String numero2Str = editTextNumero2.getText().toString();
-                int num1 = Integer.parseInt(numero1Str);
-                int num2 = Integer.parseInt(numero2Str);
-                int resultado = Calculadora.subtrair(num1, num2);
-                textViewResultado.setText("Resultado da subtração: " + resultado);
-            }
-        });
-    }
-}
-
-- Calculadora.java
-[source,java]
-public class Calculadora {
-    public static int somar(int num1, int num2) {
-        return num1 + num2;
-    }
-    public static int subtrair(int num1, int num2) {
-        return num1 - num2;
-    }
-}
 
 
 
