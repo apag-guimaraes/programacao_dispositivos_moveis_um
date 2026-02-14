@@ -2,6 +2,257 @@
 
 [![Assista ao vídeo](https://img.youtube.com/vi/zhszwkcay2A/hqdefault.jpg)](https://www.youtube.com/watch?v=zhszwkcay2A)
 
+== Exemplos práticos (IMC - sem MVC)
+
+- activity_main.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:gravity="center">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Informe seus dados:"
+        android:layout_marginBottom="16dp" />
+    <EditText
+        android:id="@+id/editTextNome"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Nome"
+        android:inputType="textPersonName" />
+    <EditText
+        android:id="@+id/editTextIdade"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Idade"
+        android:inputType="number" />
+    <EditText
+        android:id="@+id/editTextAltura"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Altura (em metros)"
+        android:inputType="numberDecimal" />
+    <EditText
+        android:id="@+id/editTextPeso"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Peso (em kg)"
+        android:inputType="numberDecimal" />
+    <Button
+        android:id="@+id/buttonCalcular"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Calcular IMC"
+        android:layout_marginTop="16dp" />
+    <TextView
+        android:id="@+id/textViewResultado"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:layout_marginTop="16dp" />
+</LinearLayout>
+
+- MainActivity.java
+[source,java]
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+import androidx.appcompat.app.AppCompatActivity;
+public class MainActivity extends AppCompatActivity {
+    private EditText editTextNome, editTextIdade,
+            editTextAltura, editTextPeso;
+    private TextView textViewResultado;
+    private Button buttonCalcular;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        editTextNome = findViewById(R.id.editTextNome);
+        editTextIdade = findViewById(R.id.editTextIdade);
+        editTextAltura = findViewById(R.id.editTextAltura);
+        editTextPeso = findViewById(R.id.editTextPeso);
+        buttonCalcular = findViewById(R.id.buttonCalcular);
+        textViewResultado = findViewById(R.id.textViewResultado);
+        buttonCalcular.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String nome = editTextNome.getText().toString();
+                int idade = Integer.parseInt(editTextIdade.getText().toString());
+                double altura = Double.parseDouble(editTextAltura.getText().toString());
+                double peso = Double.parseDouble(editTextPeso.getText().toString());
+                Pessoa pessoa = new Pessoa(nome, idade, altura, peso);
+                double imc = pessoa.calcularIMC();
+                textViewResultado.setText("Nome: " + pessoa.getNome() + "\nIMC: " + String.format("%.2f", imc));
+            }
+        });
+    }
+}
+
+- Pessoa.java
+[source,java]
+public class Pessoa {
+    private String nome;
+    private int idade;
+    private double altura;
+    private double peso;
+    public Pessoa(String nome, int idade, double altura, double peso) {
+        this.nome = nome;
+        this.idade = idade;
+        this.altura = altura;
+        this.peso = peso;
+    }
+    public double calcularIMC() {
+        return peso / (altura * altura);
+    }
+    public String getNome() {
+        return nome;
+    }
+}
+
+== Exemplos práticos (IMC - com MVC)
+
+- activity_main.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:gravity="center">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Informe seus dados:"
+        android:layout_marginBottom="16dp" />
+    <EditText
+        android:id="@+id/editTextNome"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Nome"
+        android:inputType="textPersonName" />
+    <EditText
+        android:id="@+id/editTextIdade"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Idade"
+        android:inputType="number" />
+    <EditText
+        android:id="@+id/editTextAltura"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Altura (em metros)"
+        android:inputType="numberDecimal" />
+    <EditText
+        android:id="@+id/editTextPeso"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Peso (em kg)"
+        android:inputType="numberDecimal" />
+    <Button
+        android:id="@+id/buttonCalcular"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Calcular IMC"
+        android:layout_marginTop="16dp" />
+    <TextView
+        android:id="@+id/textViewResultado"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:layout_marginTop="16dp" />
+</LinearLayout>
+
+- MainActivity.java
+[source,java]
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+import androidx.appcompat.app.AppCompatActivity;
+public class MainActivity extends AppCompatActivity {
+    private EditText editTextNome, editTextIdade, editTextAltura, editTextPeso;
+    private TextView textViewResultado;
+    private Button buttonCalcular;
+    private Controle controle;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        editTextNome    = findViewById(R.id.editTextNome);
+        editTextIdade   = findViewById(R.id.editTextIdade);
+        editTextAltura  = findViewById(R.id.editTextAltura);
+        editTextPeso    = findViewById(R.id.editTextPeso);
+        buttonCalcular  = findViewById(R.id.buttonCalcular);
+        textViewResultado = findViewById(R.id.textViewResultado);
+        controle = new Controle();
+        buttonCalcular.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String nome   = editTextNome.getText().toString();
+                String idade  = editTextIdade.getText().toString();
+                String altura = editTextAltura.getText().toString();
+                String peso   = editTextPeso.getText().toString();
+                String resultado = controle.calcularIMC(nome, idade, altura, peso);
+                textViewResultado.setText(resultado);
+            }
+        });
+    }//
+}//class
+
+- Pessoa.java
+[source, java]
+public class Pessoa {
+    private String nome;
+    private int idade;
+    private double altura;
+    private double peso;
+    public Pessoa(String nome, int idade, double altura, double peso) {
+        this.nome = nome;
+        this.idade = idade;
+        this.altura = altura;
+        this.peso = peso;
+    }
+    public double calcularIMC() {
+        return peso / (altura * altura);
+    }
+    public String getNome() {
+        return nome;
+    }
+    public int getIdade() {
+        return idade;
+    }
+    public double getAltura() {
+        return altura;
+    }
+    public double getPeso() {
+        return peso;
+    }
+}
+
+- Controle.java
+[source,java]
+public class Controle {
+    public String calcularIMC(String nomeStr, String idadeStr, String alturaStr, String pesoStr) {
+            int idade = Integer.parseInt(idadeStr.trim());
+            double altura = Double.parseDouble(alturaStr.trim());
+            double peso = Double.parseDouble(pesoStr.trim());
+            String nome = nomeStr.trim();
+            Pessoa pessoa = new Pessoa(nome, idade, altura, peso);
+            double imc = pessoa.calcularIMC();
+            return "Nome: " + pessoa.getNome() + "\nIMC: " + String.format("%.2f", imc);
+    }
+}
+
 == Exemplos práticos (App Lanchonete)
 
 - activity_main.xml
@@ -287,119 +538,7 @@ public class BoloActivity extends AppCompatActivity implements View.OnClickListe
     }
 }
 
-== Exemplos práticos (IMC)
 
-- activity_main.xml
-[source,xml]
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp"
-    android:gravity="center">
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Informe seus dados:"
-        android:layout_marginBottom="16dp" />
-    <EditText
-        android:id="@+id/editTextNome"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Nome"
-        android:inputType="textPersonName" />
-    <EditText
-        android:id="@+id/editTextIdade"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Idade"
-        android:inputType="number" />
-    <EditText
-        android:id="@+id/editTextAltura"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Altura (em metros)"
-        android:inputType="numberDecimal" />
-    <EditText
-        android:id="@+id/editTextPeso"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Peso (em kg)"
-        android:inputType="numberDecimal" />
-    <Button
-        android:id="@+id/buttonCalcular"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Calcular IMC"
-        android:layout_marginTop="16dp" />
-    <TextView
-        android:id="@+id/textViewResultado"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text=""
-        android:textAppearance="@style/TextAppearance.AppCompat.Large"
-        android:layout_marginTop="16dp" />
-</LinearLayout>
-
-- MainActivity.java
-[source,java]
-import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
-import androidx.appcompat.app.AppCompatActivity;
-public class MainActivity extends AppCompatActivity {
-    private EditText editTextNome, editTextIdade,
-            editTextAltura, editTextPeso;
-    private TextView textViewResultado;
-    private Button buttonCalcular;
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        editTextNome = findViewById(R.id.editTextNome);
-        editTextIdade = findViewById(R.id.editTextIdade);
-        editTextAltura = findViewById(R.id.editTextAltura);
-        editTextPeso = findViewById(R.id.editTextPeso);
-        buttonCalcular = findViewById(R.id.buttonCalcular);
-        textViewResultado = findViewById(R.id.textViewResultado);
-        buttonCalcular.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String nome = editTextNome.getText().toString();
-                int idade = Integer.parseInt(editTextIdade.getText().toString());
-                double altura = Double.parseDouble(editTextAltura.getText().toString());
-                double peso = Double.parseDouble(editTextPeso.getText().toString());
-                Pessoa pessoa = new Pessoa(nome, idade, altura, peso);
-                double imc = pessoa.calcularIMC();
-                textViewResultado.setText("Nome: " + pessoa.getNome() + "\nIMC: " + String.format("%.2f", imc));
-            }
-        });
-    }
-}
-
-- Pessoa.java
-[source,java]
-public class Pessoa {
-    private String nome;
-    private int idade;
-    private double altura;
-    private double peso;
-    public Pessoa(String nome, int idade, double altura, double peso) {
-        this.nome = nome;
-        this.idade = idade;
-        this.altura = altura;
-        this.peso = peso;
-    }
-    public double calcularIMC() {
-        return peso / (altura * altura);
-    }
-    public String getNome() {
-        return nome;
-    }
-}
 
 == Exemplos práticos (Calculadora)
 
