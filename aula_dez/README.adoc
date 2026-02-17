@@ -1285,7 +1285,6 @@ public class EstrelaAdapter extends
                 public void onClick(View v) {
                     int position = getBindingAdapterPosition();
                     listener.onItemClick(estrelas.get(position));
-
                 }
             });
         }
