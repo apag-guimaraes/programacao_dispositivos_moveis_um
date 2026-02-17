@@ -1138,7 +1138,7 @@ Exemplos práticos (lista com 4 itens e cada item é mostrado usando fragmentos)
 - strings.xml
 [source,xml]
 <resources>
-    <string name="app_name">FragLista</string>
+    <string name="app_name">Fragmento_Lista</string>
     <!-- Nomes das Estrelas -->
     <string name="estrela_1_nome">Estrela 1</string>
     <string name="estrela_2_nome">Estrela 2</string>
@@ -1184,18 +1184,32 @@ public class MainActivity extends AppCompatActivity implements EstrelaAdapter.On
         setContentView(R.layout.activity_main);
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        EstrelaRepositorio estrelaRepositorio = new EstrelaRepositorio(this);
-        estrelas = estrelaRepositorio.getStars();
+        estrelas = RepositorioEstrelas.getStars(getApplicationContext().getResources());
         estrelaAdapter = new EstrelaAdapter(estrelas, this);
         recyclerView.setAdapter(estrelaAdapter);
     }
     @Override
     public void onItemClick(Estrela estrela) {
-        // Ao clicar em um item da lista, abrir a DetalheActivity
         Intent intent = new Intent(MainActivity.this, DetalheActivity.class);
         intent.putExtra("estrela_nome", estrela.getNome());
         intent.putExtra("estrela_descricao", estrela.getDescricao());
         startActivity(intent);
+    }
+}
+
+- RepositorioEstrelas.java
+[source,java]
+import android.content.Context;
+import android.content.res.Resources;
+import java.util.ArrayList;
+import java.util.List;
+public class RepositorioEstrelas {
+    public static List<Estrela> getStars(Resources res) {
+        List<Estrela> estrelas = new ArrayList<>();
+        estrelas.add(new Estrela(res.getString(R.string.estrela_1_nome), res.getString(R.string.estrela_1_descricao)));
+        estrelas.add(new Estrela(res.getString(R.string.estrela_2_nome), res.getString(R.string.estrela_2_descricao)));
+        estrelas.add(new Estrela(res.getString(R.string.estrela_3_nome), res.getString(R.string.estrela_3_descricao)));
+        return estrelas;
     }
 }
 
@@ -1225,27 +1239,6 @@ public class Estrela {
         return "Estrela{" +
                 "nome='" + nome + '\'' +
                 '}';
-    }
-}
-
-- EstrelaRepositorio.java
-[source,java]
-import android.content.Context;
-import android.content.res.Resources;
-import java.util.ArrayList;
-import java.util.List;
-public class EstrelaRepositorio {
-    private Context context;
-    public EstrelaRepositorio(Context context) {
-        this.context = context;
-    }
-    public List<Estrela> getStars() {
-        List<Estrela> estrelas = new ArrayList<>();
-        Resources res = context.getResources();
-        estrelas.add(new Estrela(res.getString(R.string.estrela_1_nome), res.getString(R.string.estrela_1_descricao)));
-        estrelas.add(new Estrela(res.getString(R.string.estrela_2_nome), res.getString(R.string.estrela_2_descricao)));
-        estrelas.add(new Estrela(res.getString(R.string.estrela_3_nome), res.getString(R.string.estrela_3_descricao)));
-        return estrelas;
     }
 }
 
@@ -1290,7 +1283,9 @@ public class EstrelaAdapter extends
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    listener.onItemClick(estrelas.get(getAdapterPosition()));
+                    int position = getBindingAdapterPosition();
+                    listener.onItemClick(estrelas.get(position));
+
                 }
             });
         }
