@@ -81,34 +81,6 @@ Para mais detalhes sobre este componente veja: GOOGLE DEVELOPERS. ListView. Disp
         android:layout_height="wrap_content" />
 </LinearLayout>
 
-- Linguagem.java
-[source,java]
-import java.util.ArrayList;
-public class Linguagem {
-    private final ArrayList<String> listaLinguagens;
-    public Linguagem() {
-        listaLinguagens = new ArrayList<>();
-        preencherLista();
-    }
-    private void preencherLista() {
-        listaLinguagens.add("C");
-        listaLinguagens.add("JAVA");
-        listaLinguagens.add("KOTLIN");
-        listaLinguagens.add("LUA");
-        listaLinguagens.add("PASCAL");
-        listaLinguagens.add("PYTHON");
-    }
-    public ArrayList<String> getListaLinguagens() {
-        return new ArrayList<>(listaLinguagens); // Return a copy to prevent external modification
-    }
-    public String getLinguagem(int position) {
-        if (position >= 0 && position < listaLinguagens.size()) {
-            return listaLinguagens.get(position);
-        }
-        throw new IndexOutOfBoundsException("Invalid position: " + position);
-    }
-}
-
 - MainActivity.java
 [source,java]
 import androidx.appcompat.app.AppCompatActivity;
@@ -122,22 +94,20 @@ import android.widget.Toast;
 import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener {
     private ListView listViewLinguagens;
-    private Linguagem linguagem;
     private ArrayAdapter<String> adapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         listViewLinguagens = findViewById(R.id.listViewLinguagens);
-        linguagem = new Linguagem();
         preencherAdapter();
         listViewLinguagens.setAdapter(adapter);
         listViewLinguagens.setOnItemClickListener(this);
         listViewLinguagens.setOnItemLongClickListener(this);
     }
     private void preencherAdapter() {
-        ArrayList<String> listaLinguagens = linguagem.getListaLinguagens();
-        adapter = new ArrayAdapter<>(getApplicationContext(),
+        ArrayList<String> listaLinguagens = (ArrayList<String>) RepositorioLinguagens.getChavesLinguagens();
+        adapter = new ArrayAdapter<>(MainActivity.this,
                 android.R.layout.simple_list_item_1, listaLinguagens);
     }
     @Override
@@ -160,7 +130,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 intent.putExtra("linguagem", "JAVA");
                 startActivity(intent);
                 break;
-            //adicionar os outros case
             default:
                 Toast.makeText(this, "opção inválida", Toast.LENGTH_SHORT).show();
                 break;
@@ -171,6 +140,44 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         String linguagem = adapterView.getItemAtPosition(i).toString();
         Toast.makeText(this, linguagem, Toast.LENGTH_SHORT).show();
         return true;
+    }
+}
+
+- RepositorioLinguagens.java
+[source,java]
+import android.content.res.Resources;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+public class RepositorioLinguagens {
+    private static final Map<String, Integer> linguagemCaracteristicas = new HashMap<>();
+    static {
+        linguagemCaracteristicas.put("C", R.array.c);
+        linguagemCaracteristicas.put("JAVA", R.array.java);
+        linguagemCaracteristicas.put("KOTLIN", R.array.kotlin);
+        linguagemCaracteristicas.put("LUA", R.array.lua);
+        linguagemCaracteristicas.put("PASCAL", R.array.pascal);
+        linguagemCaracteristicas.put("PYTHON", R.array.python);
+    }
+    public static Map<String,Integer> getMap(){
+        return linguagemCaracteristicas;
+    }
+    public static List<Integer> getValoresLinguagens() {
+        return new ArrayList<>(linguagemCaracteristicas.values());
+    }
+    public static List<String> getChavesLinguagens() {
+        return new ArrayList<>(linguagemCaracteristicas.keySet());
+    }
+    public static String getCaracteristicas(String linguagemSelecionada, Resources resources) {
+        String chave = linguagemSelecionada.toUpperCase();
+        Integer arrayResId = linguagemCaracteristicas.get(chave);
+        String[] caracteristicas = resources.getStringArray(arrayResId);
+        StringBuilder sb = new StringBuilder();
+        for (String caracteristica : caracteristicas) {
+            sb.append("--> ").append(caracteristica.trim()).append("\n");
+        }
+        return sb.toString();
     }
 }
 
@@ -199,36 +206,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import java.util.HashMap;
 import java.util.Map;
 public class SegundaActivity extends AppCompatActivity {
-    private static final Map<String, Integer> linguagemCaracteristicas = new HashMap<>();
-    static {
-        linguagemCaracteristicas.put("C", R.array.c);
-        linguagemCaracteristicas.put("JAVA", R.array.java);
-        linguagemCaracteristicas.put("KOTLIN", R.array.kotlin);
-        linguagemCaracteristicas.put("LUA", R.array.lua);
-        linguagemCaracteristicas.put("PASCAL", R.array.pascal);
-        linguagemCaracteristicas.put("PYTHON", R.array.python);
-    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_segunda);
         Intent intent = getIntent();
         String linguagemSelecionada = intent.getStringExtra("linguagem");
-        String texto = getCaracteristicas(linguagemSelecionada);
+        String texto = RepositorioLinguagens.getCaracteristicas(linguagemSelecionada,getApplicationContext().getResources());
         TextView textViewCaracteristicas = findViewById(R.id.textViewCaracteristicas);
         textViewCaracteristicas.setText(texto);
-    }
-    public String getCaracteristicas(String linguagemSelecionada) {
-        Integer arrayResId = linguagemCaracteristicas.get(linguagemSelecionada.toUpperCase());
-        if (arrayResId != null) {
-            String[] caracteristicas = getResources().getStringArray(arrayResId);
-            StringBuilder caracteristicasTexto = new StringBuilder();
-            for (String caracteristica : caracteristicas) {
-                caracteristicasTexto.append(caracteristica).append("\n");
-            }
-            return caracteristicasTexto.toString();
-        }
-        return "Características não disponíveis para essa linguagem.";
     }
 }
 
@@ -242,25 +228,6 @@ public class SegundaActivity extends AppCompatActivity {
     <color name="white">#FFFFFFFF</color>
     <color name="red">#DC3737</color>
 </resources>
-
-- activity_main.xml
-[source,xml]
-<?xml version="1.0" encoding="UTF-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="10dp"
-    >
-    <ListView
-        android:id="@+id/listViewItens"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:divider="@color/red"
-        android:dividerHeight="1dp"
-        />
-</LinearLayout>
 
 - item_lista.xml
 [source,xml]
@@ -286,6 +253,25 @@ public class SegundaActivity extends AppCompatActivity {
         android:gravity="center_vertical"
         android:textColor="@color/black"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+</LinearLayout>
+
+- activity_main.xml
+[source,xml]
+<?xml version="1.0" encoding="UTF-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="10dp"
+    >
+    <ListView
+        android:id="@+id/listViewItens"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:divider="@color/red"
+        android:dividerHeight="1dp"
+        />
 </LinearLayout>
 
 - ItemLista.java
@@ -316,7 +302,7 @@ public class ItemLista {
 import java.util.ArrayList;
 import java.util.List;
 public class RepositorioItens {
-    public List<ItemLista> obterItens() {
+    public static List<ItemLista> obterItens() {
         List<ItemLista> itens = new ArrayList<>();
         itens.add(new ItemLista("item 1", R.drawable.ic_launcher_foreground));
         itens.add(new ItemLista("item 2", R.drawable.ic_launcher_foreground));
@@ -371,6 +357,12 @@ public class MeuAdapter extends BaseAdapter {
 - MainActivity.java
 [source,java]
 import android.os.Bundle;
+import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -398,4 +390,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         Toast.makeText(this, "Você Clicou em: " + item.getNome(), Toast.LENGTH_LONG).show();
     }
 }
+
+
+
+
+
 
