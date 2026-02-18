@@ -1147,4 +1147,3 @@ public class MainActivity extends AppCompatActivity {
     }
 }
 
-Para visualizar as tabelas criadas no aplicativo é necessário exportar o arquivo .db e usar um aplicativo específico, por exemplo o SQLiteStudio, disponível em: https://sqlitestudio.pl/.
