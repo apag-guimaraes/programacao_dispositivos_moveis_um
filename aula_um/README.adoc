@@ -432,7 +432,7 @@ public class MainActivity extends AppCompatActivity {
         if (savedInstanceState != null) {
             String word = savedInstanceState.getString(KEY);
             editTextWord.setText(word);
-            Log.d(TAG, editTextWord.toString());
+            Log.d(TAG, word);
         }
         buttonClick.setOnClickListener(new View.OnClickListener() {
             @Override
