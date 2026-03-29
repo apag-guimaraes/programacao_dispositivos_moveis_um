@@ -52,4 +52,8 @@ IMPORTANT: Atenção, este material está sendo atualizado regularmente.
 
 13. link:aula_treze/[Armazenamento em Banco de Dados - ROOM]
 
-13. link:aula_quatorze[RecyclerView e CardView]
+14. link:aula_quatorze/[RecyclerView e CardView]
+
+15. link:aula_quinza/[Atividades resolvidas]
+
+
