@@ -1,7 +1,7 @@
 = Atividades resolvidas
 
 
-== Atividade: Cálculo do IMC
+== App IMC
 
 - string.xml
 [source,xml]
