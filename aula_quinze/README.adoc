@@ -1,1 +1,299 @@
+= Atividades resolvidas
+
+
+== Atividade: Cálculo do IMC
+
+- string.xml
+[source,xml]
+<resources>
+    <string name="app_name">Teste</string>
+    <string name="informe_os_dados">Informe os dados:</string>
+    <string name="nome">Nome</string>
+    <string name="idade">Idade</string>
+    <string name="altura_ex_1_60">Altura (ex: 1.60)</string>
+    <string name="peso_em_kg">Peso (em kg)</string>
+    <string name="calcular_imc">Calcular IMC</string>
+    <string name="pessoas_cadastradas_0_5">Pessoas cadastradas: 0/5</string>
+    <string name="resultado">Resultado</string>
+</resources>
+
+- activity_main.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:layout_margin="20dp"
+    android:gravity="center">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/informe_os_dados"
+        android:layout_marginBottom="16dp"/>
+    <EditText
+        android:id="@+id/editTextNome"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/nome"
+        android:inputType="textPersonName"/>
+    <EditText
+        android:id="@+id/editTextIdade"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/idade"
+        android:inputType="number"/>
+    <EditText
+        android:id="@+id/editTextAltura"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/altura_ex_1_60"
+        android:inputType="numberDecimal"/>
+    <EditText
+        android:id="@+id/editTextPeso"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/peso_em_kg"
+        android:inputType="numberDecimal"/>
+    <Button
+        android:id="@+id/buttonCalcular"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/calcular_imc"
+        android:layout_marginTop="16dp"/>
+    <TextView
+        android:id="@+id/textViewContador"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/pessoas_cadastradas_0_5"
+        android:layout_marginTop="16dp"/>
+    <ImageView
+        android:id="@+id/imageViewEstatistica"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@mipmap/ic_launcher"
+        android:layout_marginTop="16dp"/>
+</LinearLayout>
+
+- activity_resultado.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <TextView
+            android:id="@+id/textViewTitulo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/resultado"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="16dp"/>
+        <TextView
+            android:id="@+id/textViewResultado"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"/>
+    </LinearLayout>
+</LinearLayout>
+
+- Pessoa.java
+[source,java]
+public class Pessoa {
+    private String nome;
+    private int idade;
+    private double altura;
+    private double peso;
+    public Pessoa(String nome, int idade, double altura, double peso) {
+        this.nome = nome;
+        this.idade = idade;
+        this.altura = altura;
+        this.peso = peso;
+    }
+    public String getNome() {
+        return nome;
+    }
+    public int getIdade() {
+        return idade;
+    }
+    public double getAltura() {
+        return altura;
+    }
+    public double getPeso() {
+        return peso;
+    }
+    public double calcularIMC() {
+        return peso / (altura * altura);
+    }
+    public String categoriaIMC() {
+        double imc = calcularIMC();
+        if (imc < 18.5)
+            return "Abaixo do peso";
+        else if (imc < 25)
+            return "Peso normal";
+        else if (imc < 30)
+            return "Sobrepeso";
+        else if (imc < 35)
+            return "Obesidade grau 1";
+        else if (imc < 40)
+            return "Obesidade grau 2";
+        else
+            return "Obesidade grau 3";
+    }
+}
+
+- PessoaController.java
+[source,java]
+import java.util.ArrayList;
+public class PessoaController {
+    private ArrayList<Pessoa> pessoas;
+    public PessoaController() {
+        pessoas = new ArrayList<>();
+    }
+    public void adicionarPessoa(String nome, int idade, double altura, double peso) {
+        Pessoa p = new Pessoa(nome, idade, altura, peso);
+        pessoas.add(p);
+    }
+    public int quantidadePessoas() {
+        return pessoas.size();
+    }
+    public boolean limiteAtingido() {
+        return pessoas.size() == 5;
+    }
+    public String gerarResultados() {
+        String texto = "";
+        for (Pessoa p : pessoas) {
+            texto += "Nome: " + p.getNome() + "\n";
+            texto += "IMC: " + String.format("%.2f", p.calcularIMC()) + "\n";
+            texto += "Categoria: " + p.categoriaIMC() + "\n\n";
+        }
+        return texto;
+    }
+    public String gerarEstatisticas() {
+        double soma = 0;
+        Pessoa menor = pessoas.get(0);
+        Pessoa maior = pessoas.get(0);
+        for (Pessoa p : pessoas) {
+            double imc = p.calcularIMC();
+            soma += imc;
+            if (imc < menor.calcularIMC())
+                menor = p;
+            if (imc > maior.calcularIMC())
+                maior = p;
+        }
+        double media = soma / pessoas.size();
+        String texto = "";
+        texto += "Média IMC: " + String.format("%.2f", media) + "\n\n";
+        texto += "Menor IMC: " + menor.getNome() + "\n";
+        texto += "Maior IMC: " + maior.getNome();
+        return texto;
+    }
+}
+
+- MainActivity.java
+[source,java]
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.*;
+import androidx.appcompat.app.AppCompatActivity;
+public class MainActivity extends AppCompatActivity {
+    private EditText nome;
+    private EditText idade;
+    private EditText altura;
+    private EditText peso;
+    private TextView contador;
+    private Button cadastrar;
+    private ImageView estatistica;
+    private PessoaController controller;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        nome = findViewById(R.id.editTextNome);
+        idade = findViewById(R.id.editTextIdade);
+        altura = findViewById(R.id.editTextAltura);
+        peso = findViewById(R.id.editTextPeso);
+        contador = findViewById(R.id.textViewContador);
+        cadastrar = findViewById(R.id.buttonCalcular);
+        estatistica = findViewById(R.id.imageViewEstatistica);
+        controller = new PessoaController();
+        atualizarContador();
+        cadastrar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                cadastrarPessoa();
+            }
+        });
+        estatistica.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                abrirEstatisticas();
+            }
+        });
+    }
+    private void cadastrarPessoa() {
+        String n = nome.getText().toString();
+        int i = Integer.parseInt(idade.getText().toString());
+        double a = Double.parseDouble(altura.getText().toString());
+        double p = Double.parseDouble(peso.getText().toString());
+        controller.adicionarPessoa(n, i, a, p);
+        atualizarContador();
+        limparCampos();
+        if (controller.limiteAtingido()) {
+            abrirResultados();
+        } else {
+            Toast.makeText(MainActivity.this, "Pessoa cadastrada", Toast.LENGTH_SHORT).show();
+        }
+    }
+    private void abrirResultados() {
+        Intent intent = new Intent(MainActivity.this, ResultadoActivity.class);
+        intent.putExtra("titulo","Resultados IMC");
+        intent.putExtra("resultado", controller.gerarResultados());
+        startActivity(intent);
+    }
+    private void abrirEstatisticas() {
+        if (!controller.limiteAtingido()) {
+            Toast.makeText(MainActivity.this,"Cadastre 5 pessoas",Toast.LENGTH_SHORT).show();
+            return;
+        }
+        Intent intent = new Intent(MainActivity.this, ResultadoActivity.class);
+        intent.putExtra("titulo","Estatísticas");
+        intent.putExtra("resultado", controller.gerarEstatisticas());
+        startActivity(intent);
+    }
+    private void limparCampos() {
+        nome.setText("");
+        idade.setText("");
+        altura.setText("");
+        peso.setText("");
+    }
+    private void atualizarContador() {
+        contador.setText("Pessoas cadastradas: " +
+                controller.quantidadePessoas() + "/5");
+    }
+}
+
+- ResultadoActivity.java
+[source,java]
+import android.os.Bundle;
+import android.widget.TextView;
+import androidx.appcompat.app.AppCompatActivity;
+public class ResultadoActivity extends AppCompatActivity {
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_resultado);
+        TextView titulo = findViewById(R.id.textViewTitulo);
+        TextView resultado = findViewById(R.id.textViewResultado);
+        titulo.setText(getIntent().getStringExtra("titulo"));
+        resultado.setText(getIntent().getStringExtra("resultado"));
+    }
+}
 
