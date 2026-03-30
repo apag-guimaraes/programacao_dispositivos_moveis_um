@@ -819,7 +819,6 @@ public class ResultadoActivity extends AppCompatActivity {
 public class Calculo {
     private static final double PRECO_CAFE = 2.50;
     private static final double PRECO_BOLO = 5.00;
-
     public Calculo() {
     }
     public double adicionarCafe(int qtd) {
@@ -1018,5 +1017,364 @@ public class MainActivity extends AppCompatActivity {
 
 - string.xml
 [source,xml]
+<resources>
+    <string name="app_name">ListaPersonalizada13032026</string>
+    <string name="teste">teste</string>
+    <string name="nome_do_planeta">Nome do Planeta</string>
+    <string name="caracteristicas">Caracteristicas</string>
+    <string-array name="caracteristicas_mercurio">
+        <item>É o planeta mais próximo do Sol</item>
+        <item>Possui temperaturas muito extremas</item>
+        <item>Não possui luas</item>
+    </string-array>
+    <string-array name="caracteristicas_venus">
+        <item>É o planeta mais quente do Sistema Solar</item>
+        <item>Possui atmosfera densa rica em dióxido de carbono</item>
+        <item>Gira em rotação retrógrada</item>
+    </string-array>
+    <string-array name="caracteristicas_terra">
+        <item>Único planeta conhecido com vida</item>
+        <item>Possui água líquida em abundância</item>
+        <item>Tem um satélite natural chamado Lua</item>
+    </string-array>
+    <string-array name="caracteristicas_marte">
+        <item>Conhecido como planeta vermelho</item>
+        <item>Possui o maior vulcão do Sistema Solar (Monte Olimpo)</item>
+        <item>Possui duas luas: Fobos e Deimos</item>
+    </string-array>
+    <string-array name="caracteristicas_jupiter">
+        <item>É o maior planeta do Sistema Solar</item>
+        <item>Possui a Grande Mancha Vermelha</item>
+        <item>Possui dezenas de luas</item>
+    </string-array>
+    <string-array name="caracteristicas_saturno">
+        <item>Conhecido por seus grandes anéis</item>
+        <item>É um gigante gasoso</item>
+        <item>Possui muitas luas, como Titã</item>
+    </string-array>
+    <string-array name="caracteristicas_urano">
+        <item>Gira inclinado em relação ao plano orbital</item>
+        <item>Tem cor azul-esverdeada por causa do metano</item>
+        <item>Possui anéis e várias luas</item>
+    </string-array>
+    <string-array name="caracteristicas_netuno">
+        <item>É o planeta mais distante do Sol</item>
+        <item>Possui ventos extremamente fortes</item>
+        <item>Possui uma grande lua chamada Tritão</item>
+    </string-array>
+</resources>
+
+- item_lista.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="10dp"
+    >
+    <ImageView
+        android:id="@+id/imagemViewItem"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@mipmap/ic_launcher"
+        />
+    <TextView
+        android:id="@+id/textoViewItens"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/teste"
+        android:gravity="center"
+        android:textColor="@color/black"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+</LinearLayout>
+
+- activity_generic_planet.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".GenericPlanet">
+    <TextView
+        android:id="@+id/textViewGenericPlanet"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="80dp"
+        android:text="@string/nome_do_planeta"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+    <ImageView
+        android:id="@+id/imageViewGenericPlanet"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="444dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@drawable/ic_launcher_background" />
+    <TextView
+        android:id="@+id/textViewCaracteristicasGenericPlanet"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="236dp"
+        android:text="@string/caracteristicas"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+- activity_main.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="20dp"
+    tools:context=".MainActivity">
+    <ListView
+        android:id="@+id/listViewItens"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:divider="@color/red"
+        android:dividerHeight="1dp"
+        />
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+- Repositorio.java
+[source,java]
+import android.media.Image;
+import java.util.ArrayList;
+import java.util.List;
+public class Repositorio {
+    public static List<Planeta> obterItemPlaneta () {
+        List<Planeta> dados = new ArrayList<>();
+        dados.add(new Planeta("Terra", R.drawable.planeta_terra, R.array.caracteristicas_terra));
+        dados.add(new Planeta("Marte", R.drawable.marte, R.array.caracteristicas_marte));
+        dados.add(new Planeta("Saturno", R.drawable.saturno, R.array.caracteristicas_saturno));
+        dados.add(new Planeta("Urano", R.drawable.urano, R.array.caracteristicas_urano));
+        dados.add(new Planeta("Venus", R.drawable.venus, R.array.caracteristicas_venus));
+        dados.add(new Planeta("Mercurio", R.drawable.mercurio, R.array.caracteristicas_mercurio));
+        dados.add(new Planeta("Jupiter", R.drawable.jupiter, R.array.caracteristicas_jupiter));
+        dados.add(new Planeta("Netuno", R.drawable.netuno, R.array.caracteristicas_netuno));
+        return dados  ;
+    }
+}
+
+- Planeta.java
+[source,java]
+import java.io.Serializable;
+public class Planeta implements Serializable {
+    private String nome;
+    private int imagem;
+    private int caracteristicas;
+    public int getCaracteristicas() {
+        return caracteristicas;
+    }
+    public void setCaracteristicas(int caracteristicas) {
+        this.caracteristicas = caracteristicas;
+    }
+    public Planeta() {
+    }
+    public Planeta(String nome, int imagem) {
+        this.nome = nome;
+        this.imagem = imagem;
+    }
+    public Planeta(String nome, int imagem, int caracteristicas) {
+        this.nome = nome;
+        this.imagem = imagem;
+        this.caracteristicas = caracteristicas;
+    }
+    public String getNome() {
+        return nome;
+    }
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+    public int getImagem() {
+        return imagem;
+    }
+    public void setImagem(int imagem) {
+        this.imagem = imagem;
+    }
+    @Override
+    public String toString() {
+        return "Planeta{" +
+                "nome='" + nome + '\'' +
+                ", imagem=" + imagem +
+                '}';
+    }
+}
+
+- MyAdapter.java
+[source,java]
+import android.content.Context;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.ImageView;
+import android.widget.TextView;
+import java.util.List;
+public class MyAdapter extends BaseAdapter {
+    private LayoutInflater inflater;
+    private List<Planeta> dados;
+    public MyAdapter(Context context, List<Planeta> dados) {
+        inflater = LayoutInflater.from(context);
+        this.dados = dados;
+    }
+    @Override
+    public int getCount() {
+        return dados.size();
+    }
+    @Override
+    public Planeta getItem(int position) {
+        return dados.get(position);
+    }
+    @Override
+    public long getItemId(int position) {
+        return position;
+    }
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+        if (convertView == null) {
+            convertView = inflater.inflate(R.layout.item_lista, parent, false);
+        }
+        Planeta item = getItem(position);
+        TextView textView = convertView.findViewById(R.id.textoViewItens);
+        textView.setText(item.getNome());
+        ImageView imageView = convertView.findViewById(R.id.imagemViewItem);
+        imageView.setImageResource(item.getImagem());
+        return convertView;
+    }
+}
+
+- ItemLista.java
+[source,java]
+public class ItemLista {
+    private String nome;
+    private int imagem;
+    public ItemLista (){
+    }
+    public ItemLista(String nome, int imagem) {
+        this.nome = nome;
+        this.imagem = imagem;
+    }
+    public String getNome() {
+        return nome;
+    }
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+    public int getImagem() {
+        return imagem;
+    }
+    public void setImagem(int imagem) {
+        this.imagem = imagem;
+    }
+    @Override
+    public String toString() {
+        return "ItemLista{" +
+                "nome='" + nome + '\'' +
+                ", imagem=" + imagem +
+                '}';
+    }
+}
+
+- GenericPlanet.java
+[source,java]
+import android.content.Intent;
+import android.os.Bundle;
+import android.widget.ImageView;
+import android.widget.TextView;
+import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+public class GenericPlanet extends AppCompatActivity {
+    private TextView textViewGenericPlanet, textViewCaracteristicasGenericPlanet;
+    private ImageView imageViewGenericPlanet;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
+        setContentView(R.layout.activity_generic_planet);
+        Intent intent = getIntent();
+        Planeta planeta = (Planeta) intent.getSerializableExtra("planet");
+        textViewGenericPlanet = findViewById(R.id.textViewGenericPlanet);
+        imageViewGenericPlanet = findViewById(R.id.imageViewGenericPlanet);
+        textViewCaracteristicasGenericPlanet = findViewById(R.id.textViewCaracteristicasGenericPlanet);
+        textViewGenericPlanet.setText(planeta.getNome());
+        imageViewGenericPlanet.setImageResource(planeta.getImagem());
+        String textoCaracteristicas = Controller.formatTextPlanets(this,planeta.getCaracteristicas());
+        textViewCaracteristicasGenericPlanet.setText(textoCaracteristicas);
+    }
+}
+
+- Controller.java
+[source,java]
+import android.content.Context;
+public class Controller {
+    public static String formatTextPlanets(Context contex, int caracteristicasId) {
+        String[] caracteristicas = contex.getResources().getStringArray(caracteristicasId);
+        StringBuilder textoCaracteristicas = new StringBuilder();
+        for (String c : caracteristicas) {
+            textoCaracteristicas.append("-").append(c).append("\n");
+        }
+        return textoCaracteristicas.toString();
+    }
+}
+
+- MainActivity.java
+[source,java]
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ListView;
+import android.widget.Toast;
+import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
+    private ListView listView;
+    private MyAdapter myAdapter;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
+        setContentView(R.layout.activity_main);
+        listView = findViewById(R.id.listViewItens);
+        myAdapter = new MyAdapter(this, Repositorio.obterItemPlaneta());
+        listView.setAdapter(myAdapter);
+        listView.setOnItemClickListener(this);
+    }
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        Planeta item = (Planeta) parent.getItemAtPosition(position);
+        Intent intent = new Intent(MainActivity.this, GenericPlanet.class);
+        intent.putExtra("planet", item);
+        startActivity(intent);
+        Toast.makeText(this, item.toString(), Toast.LENGTH_SHORT).show();
+    }
+}
+
+
+
+
 
 
