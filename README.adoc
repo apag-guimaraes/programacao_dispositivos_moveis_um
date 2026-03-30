@@ -54,6 +54,6 @@ IMPORTANT: Atenção, este material está sendo atualizado regularmente.
 
 14. link:aula_quatorze/[RecyclerView e CardView]
 
-15. link:aula_quinza/[Atividades resolvidas]
+15. link:aula_quinze/[Atividades resolvidas]
 
 
