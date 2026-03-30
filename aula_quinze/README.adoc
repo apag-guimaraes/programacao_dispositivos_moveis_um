@@ -297,3 +297,283 @@ public class ResultadoActivity extends AppCompatActivity {
     }
 }
 
+== App Calculadora
+
+- colors.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="cinza_claro">#EEEEEE</color>
+    <color name="cinza_medio">#808080</color>
+</resources>
+
+- activity_main.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:background="@color/cinza_claro"
+    android:padding="24dp">
+    <LinearLayout
+        android:layout_width="300dp"
+        android:layout_height="417dp"
+        android:background="@color/cinza_medio"
+        android:orientation="vertical"
+        android:padding="16dp">
+        <EditText
+            android:id="@+id/edtValor1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:background="@color/cinza_claro"
+            android:hint="Digite o primeiro valor"
+            android:gravity="center"
+            android:textColorHint="@color/cinza_medio"
+            android:textColor="@color/black"
+            android:padding="12dp"
+            android:inputType="number"/>
+
+        <EditText
+            android:id="@+id/edtValor2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:background="@color/cinza_claro"
+            android:hint="Digite o segundo valor"
+            android:gravity="center"
+            android:textColorHint="@color/cinza_medio"
+            android:textColor="@color/black"
+            android:padding="12dp"
+            android:inputType="number"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="259dp"
+            android:layout_marginBottom="80dp"
+            android:background="@color/cinza_claro"
+            android:orientation="vertical"
+            android:padding="16dp">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <Button
+                    android:id="@+id/btnSoma"
+                    android:layout_width="0dp"
+                    android:layout_height="70dp"
+                    android:layout_weight="1"
+                    android:backgroundTint="@color/cinza_claro"
+                    android:text="+"
+                    android:textColor="@color/cinza_medio" />
+                <Button
+                    android:id="@+id/btnSubtracao"
+                    android:layout_width="0dp"
+                    android:layout_height="70dp"
+                    android:layout_weight="1"
+                    android:backgroundTint="@color/cinza_claro"
+                    android:text="-"
+                    android:textColor="@color/black"
+                    android:textStyle="bold" />
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <Button
+                    android:id="@+id/btnMultiplicacao"
+                    android:layout_width="0dp"
+                    android:layout_height="70dp"
+                    android:layout_weight="1"
+                    android:backgroundTint="@color/cinza_claro"
+                    android:text="*"
+                    android:textColor="@color/black"
+                    android:textStyle="bold" />
+                <Button
+                    android:id="@+id/btnDivisao"
+                    android:layout_width="0dp"
+                    android:layout_height="70dp"
+                    android:layout_weight="1"
+                    android:backgroundTint="@color/cinza_claro"
+                    android:text="/"
+                    android:textColor="@color/black"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>
+
+- activity_resultado.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layoutResultado"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:padding="24dp"
+    android:background="@color/white">
+    <TextView
+        android:id="@+id/txtResultado"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Resultado"
+        android:textSize="28sp"
+        android:textStyle="bold"
+        android:textColor="@color/white"
+        android:padding="16dp" />
+</LinearLayout>
+
+- CalculadoraModel.java
+[source,java]
+public class CalculadoraModel {
+    public double somar(double valor1, double valor2) {
+        return valor1 + valor2;
+    }
+    public double subtrair(double valor1, double valor2) {
+        return valor1 - valor2;
+    }
+    public double multiplicar(double valor1, double valor2) {
+        return valor1 * valor2;
+    }
+    public double dividir(double valor1, double valor2) {
+        return valor1 / valor2;
+    }
+}
+
+- CalculadoraController.java
+[source,java]
+import com.example.correcaocalculadora.model.CalculadoraModel;
+public class CalculadoraController {
+    private CalculadoraModel model;
+    public CalculadoraController() {
+        model = new CalculadoraModel();
+    }
+    public String calcular(String texto1, String texto2, String operacao) {
+        if (texto1.isEmpty()) {
+            return "Digite o primeiro valor";
+        }
+        if (texto2.isEmpty()) {
+            return "Digite o segundo valor";
+        }
+        double valor1 = Double.parseDouble(texto1);
+        double valor2 = Double.parseDouble(texto2);
+        double resultado;
+        String texto;
+        if (operacao.equals("+")) {
+            resultado = model.somar(valor1, valor2);
+            texto = valor1 + " + " + valor2 + " = " + resultado;
+        } else if (operacao.equals("-")) {
+            resultado = model.subtrair(valor1, valor2);
+            texto = valor1 + " - " + valor2 + " = " + resultado;
+        } else if (operacao.equals("*")) {
+            resultado = model.multiplicar(valor1, valor2);
+            texto = valor1 + " * " + valor2 + " = " + resultado;
+        } else if (operacao.equals("/")) {
+            if (valor2 == 0) {
+                return "Não pode dividir por zero";
+            }
+            resultado = model.dividir(valor1, valor2);
+            texto = valor1 + " / " + valor2 + " = " + resultado;
+        } else {
+            return "Operação inválida";
+        }
+        return texto;
+    }
+}
+
+- MainActivity.java
+[source,java]
+import android.content.Intent;
+import android.graphics.Color;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import androidx.appcompat.app.AppCompatActivity;
+import com.example.correcaocalculadora.R;
+public class MainActivity extends AppCompatActivity {
+    private EditText edtValor1;
+    private EditText edtValor2;
+    private Button btnSoma;
+    private Button btnSubtracao;
+    private Button btnMultiplicacao;
+    private Button btnDivisao;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        edtValor1 = findViewById(R.id.edtValor1);
+        edtValor2 = findViewById(R.id.edtValor2);
+        btnSoma = findViewById(R.id.btnSoma);
+        btnSubtracao = findViewById(R.id.btnSubtracao);
+        btnMultiplicacao = findViewById(R.id.btnMultiplicacao);
+        btnDivisao = findViewById(R.id.btnDivisao);
+        btnSoma.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                abrirResultado("+", Color.RED, btnSoma);
+            }
+        });
+        btnSubtracao.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                abrirResultado("-", Color.GREEN, btnSubtracao);
+            }
+        });
+        btnMultiplicacao.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                abrirResultado("*", Color.BLUE, btnMultiplicacao);
+            }
+        });
+        btnDivisao.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                abrirResultado("/", Color.YELLOW, btnDivisao);
+            }
+        });
+    }
+    private void abrirResultado(String operacao, int cor, Button botao) {
+        String texto1 = edtValor1.getText().toString();
+        String texto2 = edtValor2.getText().toString();
+        botao.setBackgroundColor(cor);
+        Intent intent = new Intent(MainActivity.this, ResultadoActivity.class);
+        intent.putExtra("valor1", texto1);
+        intent.putExtra("valor2", texto2);
+        intent.putExtra("operacao", operacao);
+        intent.putExtra("corFundo", cor);
+        startActivity(intent);
+    }
+}
+
+- ResultadoActivity.java
+[source,java]
+import android.graphics.Color;
+import android.os.Bundle;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import androidx.appcompat.app.AppCompatActivity;
+import com.example.correcaocalculadora.R;
+import com.example.correcaocalculadora.controller.CalculadoraController;
+public class ResultadoActivity extends AppCompatActivity {
+    private LinearLayout layoutResultado;
+    private TextView txtResultado;
+    private CalculadoraController controller;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_resultado);
+        controller = new CalculadoraController();
+        layoutResultado = findViewById(R.id.layoutResultado);
+        txtResultado = findViewById(R.id.txtResultado);
+        String valor1 = getIntent().getStringExtra("valor1");
+        String valor2 = getIntent().getStringExtra("valor2");
+        String operacao = getIntent().getStringExtra("operacao");
+        int corFundo = getIntent().getIntExtra("corFundo", Color.WHITE);
+        layoutResultado.setBackgroundColor(corFundo);
+        String resultado = controller.calcular(valor1, valor2, operacao);
+        txtResultado.setText(resultado);
+    }
+}
+
+== 
+
