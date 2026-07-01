@@ -338,7 +338,7 @@ public class Activity2 extends AppCompatActivity {
         app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
 
-- MainActivity.klt
+- MainActivity.kt
 [source,kotlin]
 import android.content.Intent
 import android.os.Bundle
@@ -379,8 +379,8 @@ class MainActivity : AppCompatActivity() {
     }
 }
 
-- Activity2.klt
-[source,klt]
+- Activity2.kt
+[source,kt]
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 class Activity2 : AppCompatActivity() {
@@ -548,8 +548,8 @@ public class SecondActivity extends AppCompatActivity {
     }
 }
 
-- MainActivity.klt
-[source,klt]
+- MainActivity.kt
+[source,kt]
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -587,8 +587,8 @@ class MainActivity : AppCompatActivity() {
     }
 }
 
-- SecondActivity.klt
-[source,klt]
+- SecondActivity.kt
+[source,kt]
 import android.os.Bundle
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
