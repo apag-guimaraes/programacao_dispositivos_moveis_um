@@ -54,7 +54,7 @@ Figura
 
 image::combinacao_layouts.png[width=100,height=100]
 
-Exemplos práticos (linear layout, view, activity e intent)
+=== EXEMPLOS PRATICOS (linear layout, view, activity e intent)
 
 - MainActivity.java
 [source,java]
@@ -160,6 +160,52 @@ public class SegundaActivity extends AppCompatActivity {
         />
 </LinearLayout>
 
+- MainActivity.klt
+[source,klt]
+import android.content.Intent
+import android.os.Bundle
+import android.widget.Button
+import android.widget.EditText
+import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
+class MainActivity : AppCompatActivity() {
+    private lateinit var editTextPalavra: EditText
+    private lateinit var buttonClicar: Button
+    private lateinit var textViewResultado: TextView
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+        editTextPalavra = findViewById(R.id.editTextPalavra)
+        buttonClicar = findViewById(R.id.buttonClicar)
+        textViewResultado = findViewById(R.id.textViewResultado)
+        buttonClicar.setOnClickListener {
+            val msg = editTextPalavra.text.toString()
+            textViewResultado.text = msg
+            val it = Intent(this, SegundaActivity::class.java).apply {
+                putExtra("dados", msg)
+            }
+            startActivity(it)
+        }
+    }
+}
+
+- SegundaActivity.klt
+[source,klt]
+import android.content.Intent
+import android.os.Bundle
+import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
+class SegundaActivity : AppCompatActivity() {
+    private lateinit var textViewResultado2: TextView
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_segunda)
+        textViewResultado2 = findViewById(R.id.textViewResultado2)
+        val palavra = intent.getStringExtra("dados")
+        textViewResultado2.text = palavra
+    }
+}
+
 == Algumas Ferramentas para Cores / Imagens / Ícones
 
 O Material Theme Builder é a ferramenta oficial do Google para criar esquemas de cores baseados no Material Design 3, segue o link para acesso: https://material-foundation.github.io/material-theme-builder/. Para saber mais informações sobre cores, segue o link: https://m3.material.io/styles/color/system/how-the-system-works.
@@ -168,7 +214,7 @@ A ferramenta App Icon Generator pode ser usada para criar as imagens com diferen
 
 Para saber mais detalhes sobre os estilos e tamanhos referentes ao texto, acesse o material disponibilizado pela Google, Material Design. Disponível em: https://material.io/develop/android/theming/typography.
 
-== Exemplo prático
+=== EXEMPLO PRATICO
 
 - activity_main.xml
 [source,xml]
@@ -280,6 +326,31 @@ public class MainActivity extends AppCompatActivity {
     <color name="onSurface">#212121</color>
 </resources>
 
+- MainActivity.klt
+[source,klt]
+import android.os.Bundle
+import android.widget.Button
+import android.widget.EditText
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+class MainActivity : AppCompatActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+        val editTextName = findViewById<EditText>(R.id.editTextName)
+        val buttonClick = findViewById<Button>(R.id.buttonSubmit)
+        buttonClick.setOnClickListener {
+            val name = editTextName.text.toString()
+            if (name.isEmpty()) {
+                Toast.makeText(this, "Please enter a name", Toast.LENGTH_SHORT).show()
+            } else {
+                // Utilizando interpolação de string para construir a mensagem
+                val message = "Hello World, $name!"
+                Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+}
 OBS: acrescentar no projeto:
 
      - adicionar as imagens depois de gerá-las no App Icon Generator no projeto;
