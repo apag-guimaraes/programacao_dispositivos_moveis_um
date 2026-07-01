@@ -224,7 +224,7 @@ Métodos dos ciclos de vida:
     }
 
 
-=== Exemplo prático:
+=== EXEMPLO PRATICO:
 
 - MainActivity.java
 [source,java]
@@ -338,6 +338,58 @@ public class Activity2 extends AppCompatActivity {
         app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
 
+- MainActivity.klt
+[source,kotlin]
+import android.content.Intent
+import android.os.Bundle
+import android.util.Log
+import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
+class MainActivity : AppCompatActivity() {
+    private lateinit var textView1: TextView
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+        Log.i("onCreate", "atividade criada")
+        textView1 = findViewById(R.id.textView1)
+        textView1.setOnClickListener {
+            val intent = Intent(this, Activity2::class.java)
+            startActivity(intent)
+        }
+    }
+    override fun onStart() {
+        super.onStart()
+        Log.i("onStart", "atividade iniciada ")
+    }
+    override fun onResume() {
+        super.onResume()
+        Log.i("onResume", "atividade pronta ")
+    }
+    override fun onPause() {
+        super.onPause()
+        Log.i("onPause", "atividade pausada ")
+    }
+    override fun onStop() {
+        super.onStop()
+        Log.i("onStop", "atividade paralizada ")
+    }
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.i("onDestroy", "atividade destruída ")
+    }
+}
+
+- Activity2.klt
+[source,klt]
+import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
+class Activity2 : AppCompatActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_2)
+    }
+}
+
 == Bundle
 
 Bundle funciona como um Map no Java. Trata-se de uma estrutura de dados usada para passar informações entre componentes, como Activities, Fragments e Services. Serve também para armazenar o estado de uma Activity quando ocorre mudanças de configuração (por exemplo, rotação de tela). Quando ocorre a rotação de tela, a atividade é destruída e construída novamente. Dessa forma, o Bundle pode ser usado para salvar e recuperar alguma informação importante.
@@ -368,7 +420,7 @@ bundle.putString("key", "value");
 intent.putExtras(bundle);
 startActivity(intent);
 
-=== Exemplo prático
+=== EXEMPLO PRATICO
 
 - activity_main.xml
 [source,xml]
@@ -492,6 +544,65 @@ public class SecondActivity extends AppCompatActivity {
             textViewPalavra.setText("word: " + word);
         } else {
             textViewPalavra.setText("nothing");
+        }
+    }
+}
+
+- MainActivity.klt
+[source,klt]
+import android.content.Intent
+import android.os.Bundle
+import android.util.Log
+import android.widget.Button
+import android.widget.EditText
+import androidx.appcompat.app.AppCompatActivity
+class MainActivity : AppCompatActivity() {
+    private lateinit var editTextWord: EditText
+    private lateinit var buttonClick: Button
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+        editTextWord = findViewById(R.id.editTextWord)
+        buttonClick = findViewById(R.id.buttonClick)
+        savedInstanceState?.let { bundle ->
+            val word = bundle.getString(KEY)
+            editTextWord.setText(word)
+            Log.d(TAG, word ?: "")
+        }
+        buttonClick.setOnClickListener {
+            val word = editTextWord.text.toString()
+            val intent = Intent(this, SecondActivity::class.java).apply {
+                putExtra("data", word)
+            }
+            startActivity(intent)
+        }
+    }
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString(KEY, editTextWord.text.toString())
+    }
+    companion object {
+        private const val TAG = "MainActivity"
+        private const val KEY = "key_word"
+    }
+}
+
+- SecondActivity.klt
+[source,klt]
+import android.os.Bundle
+import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
+class SecondActivity : AppCompatActivity() {
+    private lateinit var textViewPalavra: TextView
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_second)
+        textViewPalavra = findViewById(R.id.textViewWord)
+        val word = intent.getStringExtra("data")
+        textViewPalavra.text = if (word != null) {
+            "word: $word"
+        } else {
+            "nothing"
         }
     }
 }
