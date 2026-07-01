@@ -960,10 +960,6 @@ public class CafeActivity extends AppCompatActivity  {
 
 - BoloActivity.java
 [source,java]
-import androidx.appcompat.app.AppCompatActivity;
-public class BoloActivity extends AppCompatActivity {
-    /....../
-}
 
 - Calculo.java
 [source,java]
@@ -994,7 +990,6 @@ public class Calculo {
 
 - Controller.java
 [source,java]
-import com.example.lanchonete_mvc.model.Calculo;
 public class Controller {
     private Calculo model;
     public Controller() {
