@@ -2,7 +2,7 @@
 
 [Assista ao vídeo](https://www.youtube.com/watch?v=zhszwkcay2A)
 
-== Exemplos práticos (IMC - sem MVC)
+=== EXEMPLOS PRATICOS (IMC - sem MVC)
 
 - activity_main.xml
 [source,xml]
@@ -116,7 +116,7 @@ public class Pessoa {
     }
 }
 
-== Exemplos práticos (IMC - com MVC)
+=== EXEMPLOS PRATICOS (IMC - com MVC)
 
 - activity_main.xml
 [source,xml]
@@ -253,7 +253,71 @@ public class Controle {
     }
 }
 
-== Exemplos práticos (Calculadora - sem MVC)
+- MainActivity.kt
+[source,kt]
+import android.os.Bundle
+import android.widget.Button
+import android.widget.EditText
+import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
+class MainActivity : AppCompatActivity() {
+    private lateinit var editTextNome: EditText
+    private lateinit var editTextIdade: EditText
+    private lateinit var editTextAltura: EditText
+    private lateinit var editTextPeso: EditText
+    private lateinit var textViewResultado: TextView
+    private lateinit var buttonCalcular: Button
+    private lateinit var controle: Controle
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+        editTextNome = findViewById(R.id.editTextNome)
+        editTextIdade = findViewById(R.id.editTextIdade)
+        editTextAltura = findViewById(R.id.editTextAltura)
+        editTextPeso = findViewById(R.id.editTextPeso)
+        buttonCalcular = findViewById(R.id.buttonCalcular)
+        textViewResultado = findViewById(R.id.textViewResultado)
+        controle = Controle()
+        buttonCalcular.setOnClickListener {
+            val nome = editTextNome.text.toString()
+            val idade = editTextIdade.text.toString()
+            val altura = editTextAltura.text.toString()
+            val peso = editTextPeso.text.toString()
+            val resultado = controle.calcularIMC(nome, idade, altura, peso)
+            textViewResultado.text = resultado
+        }
+    }
+}
+
+- Pessoa.kt
+[source,kt]
+data class Pessoa(
+    val nome: String,
+    val idade: Int,
+    val altura: Double,
+    val peso: Double
+) {
+    fun calcularIMC(): Double {
+        return peso / (altura * altura)
+    }
+}
+
+- Controle.kt
+[source,kt]
+import java.util.Locale
+class Controle {
+    fun calcularIMC(nomeStr: String, idadeStr: String, alturaStr: String, pesoStr: String): String {
+        val idade = idadeStr.trim().toInt()
+        val altura = alturaStr.trim().toDouble()
+        val peso = pesoStr.trim().toDouble()
+        val nome = nomeStr.trim()
+        val pessoa = Pessoa(nome, idade, altura, peso)
+        val imc = pessoa.calcularIMC()
+        return "Nome: ${pessoa.nome}\nIMC: %.2f".format(Locale.US, imc)
+    }
+}
+
+=== EXEMPLOS PRATICOS (Calculadora - sem MVC)
 
 - activity_main.xml
 [source,xml]
@@ -353,7 +417,7 @@ public class Calculadora {
     }
 }
 
-== Exemplos práticos (Calculadora - com MVC)
+=== EXEMPLOS PRATICOS (Calculadora - com MVC)
 
 - activity_main.xml
 [source,xml]
@@ -435,9 +499,10 @@ public class MainActivity extends AppCompatActivity {
                 String num2 = editTextNumero2.getText().toString();
                 String resultado = controller.realizarOperacao(num1, num2, Operacao.SUBTRAIR);
                 textViewResultado.setText(resultado);
-        });
+            }
+            });
+        }
     }
-}
 
 - CalculadoraController.java
 [source,java]
@@ -480,7 +545,84 @@ public enum Operacao {
     SUBTRAIR
 }
 
-== Exemplos práticos (App Lanchonete)
+- MainActivity.kt
+[source,kt]
+import android.os.Bundle
+import android.widget.Button
+import android.widget.EditText
+import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
+class MainActivity : AppCompatActivity() {
+    private lateinit var editTextNumero1: EditText
+    private lateinit var editTextNumero2: EditText
+    private lateinit var buttonSomar: Button
+    private lateinit var buttonSubtrair: Button
+    private lateinit var textViewResultado: TextView
+    private lateinit var controller: CalculadoraController
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+        editTextNumero1 = findViewById(R.id.editTextNumero1)
+        editTextNumero2 = findViewById(R.id.editTextNumero2)
+        buttonSomar = findViewById(R.id.buttonSomar)
+        buttonSubtrair = findViewById(R.id.buttonSubtrair)
+        textViewResultado = findViewById(R.id.textViewResultado)
+        controller = CalculadoraController()
+        buttonSomar.setOnClickListener {
+            processarOperacao(Operacao.SOMAR)
+        }
+        buttonSubtrair.setOnClickListener {
+            processarOperacao(Operacao.SUBTRAIR)
+        }
+    }
+    private fun processarOperacao(operacao: Operacao) {
+        val num1 = editTextNumero1.text.toString()
+        val num2 = editTextNumero2.text.toString()
+    
+        val resultado = controller.realizarOperacao(num1, num2, operacao)
+        textViewResultado.text = resultado
+    }
+}
+
+- CalculadoraController.kt
+[source,kt]
+class CalculadoraController {
+    fun realizarOperacao(num1Str: String, num2Str: String, operacao: Operacao): String {
+        val num1 = num1Str.trim().toInt()
+        val num2 = num2Str.trim().toInt()
+        return when (operacao) {
+            Operacao.SOMAR -> {
+                val resultado = Calculadora.somar(num1, num2)
+                "Resultado da soma: $resultado"
+            }
+            Operacao.SUBTRAIR -> {
+                val resultado = Calculadora.subtrair(num1, num2)
+                "Resultado da subtração: $resultado"
+            }
+            else -> throw IllegalArgumentException("erro!!")
+        }
+    }
+}
+
+- Calculadora.kt
+[source,kt]
+object Calculadora {
+    fun somar(num1: Int, num2: Int): Int {
+        return num1 + num2
+    }
+    fun subtrair(num1: Int, num2: Int): Int {
+        return num1 - num2
+    }
+}
+
+- Operacao.kt
+[source,kt]
+enum class Operacao {
+    SOMAR,
+    SUBTRAIR
+}
+
+=== EXEMPLOS PRATICOS (App Lanchonete)
 
 - colors.xml
 [source,xml]
