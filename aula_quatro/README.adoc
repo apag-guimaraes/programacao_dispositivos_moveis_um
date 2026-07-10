@@ -218,6 +218,100 @@ public class SegundaActivity extends AppCompatActivity {
     }
 }
 
+- MainActivity.kt
+[source,kotlin]
+import android.content.Intent
+import android.os.Bundle
+import android.widget.ArrayAdapter
+import android.widget.ListView
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+class MainActivity : AppCompatActivity() {
+    private lateinit var listViewLinguagens: ListView
+    private lateinit var adapter: ArrayAdapter<String>
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+        listViewLinguagens = findViewById(R.id.listViewLinguagens)
+        preencherAdapter()
+        listViewLinguagens.adapter = adapter
+        listViewLinguagens.setOnItemClickListener { adapterView, _, position, _ ->
+            val item = adapterView.getItemAtPosition(position).toString()
+            abrirTela(item)
+        }
+        listViewLinguagens.setOnItemLongClickListener { adapterView, _, position, _ ->
+            val linguagem = adapterView.getItemAtPosition(position).toString()
+            Toast.makeText(this, linguagem, Toast.LENGTH_SHORT).show()
+            true // Retorna true indicando que o clique longo foi consumido
+        }
+    }
+    private fun preencherAdapter() {
+        val listaLinguagens = RepositorioLinguagens.getChavesLinguagens() as ArrayList<String>
+        adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, listaLinguagens)
+    }
+    fun abrirTela(item: String) {
+        when (item) {
+            "C", "JAVA" -> {
+                val intent = Intent(this, SegundaActivity::class.java).apply {
+                    putExtra("linguagem", item)
+                }
+                startActivity(intent)
+            }
+            else -> {
+                Toast.makeText(this, "opção inválida", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+}
+
+- RepositorioLinguagens.kt
+[source,kotlin]
+import android.content.res.Resources
+class RepositorioLinguagens {
+    companion object {
+        // Inicialização limpa e direta do Map estático
+        private val linguagemCaracteristicas: Map<String, Int> = mapOf(
+            "C" to R.array.c,
+            "JAVA" to R.array.java,
+            "KOTLIN" to R.array.kotlin,
+            "LUA" to R.array.lua,
+            "PASCAL" to R.array.pascal,
+            "PYTHON" to R.array.python
+        )
+        fun getMap(): Map<String, Int> = linguagemCaracteristicas
+        fun getValoresLinguagens(): List<Int> {
+            return ArrayList(linguagemCaracteristicas.values)
+        }
+        fun getChavesLinguagens(): List<String> {
+            return ArrayList(linguagemCaracteristicas.keys)
+        }
+        fun getCaracteristicas(linguagemSelecionada: String, resources: Resources): String {
+            val chave = linguagemSelecionada.uppercase()
+            val arrayResId = linguagemCaracteristicas[chave] ?: return "Linguagem não encontrada"
+            val caracteristicas = resources.getStringArray(arrayResId)
+            return caracteristicas.joinToString(separator = "") { caracteristica ->
+                "--> ${caracteristica.trim()}\n"
+            }
+        }
+    }
+}
+
+- SegundaActivity.kt
+[source,kotlin]
+import android.os.Bundle
+import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
+class SegundaActivity : AppCompatActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_segunda)
+        val linguagemSelecionada = intent.getStringExtra("linguagem") ?: ""
+        val texto = RepositorioLinguagens.getCaracteristicas(linguagemSelecionada, resources)
+        val textViewCaracteristicas = findViewById<TextView>(R.id.textViewCaracteristicas)
+        textViewCaracteristicas.text = texto
+    }
+}
+
 === Exemplos práticos (lista personalizada)
 
 - colors.xml
@@ -391,8 +485,71 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 }
 
+- ItemLista.kt
+[source,kotlin]
+data class ItemLista(var nome: String, var imagem: Int)
 
+- RepositorioItens.kt
+[source,kotlin]
+class RepositorioItens {
+    companion object {
+        fun obterItens(): List<ItemLista> {
+            return listOf(
+                ItemLista("item 1", R.drawable.ic_launcher_foreground),
+                ItemLista("item 2", R.drawable.ic_launcher_foreground),
+                ItemLista("item 3", R.drawable.ic_launcher_foreground)
+            )
+        }
+    }
+}
 
+- MeuAdapter.kt
+[source,kotlin]
+import android.content.Context
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.BaseAdapter
+import android.widget.ImageView
+import android.widget.TextView
+class MeuAdapter(
+    context: Context, 
+    private val itens: List<ItemLista>
+) : BaseAdapter() {
+    private val inflater: LayoutInflater = LayoutInflater.from(context)
+    override fun getCount(): Int = itens.size
+    override fun getItem(position: Int): ItemLista = itens[position]
+    override fun getItemId(position: Int): Long = position.toLong()
+    override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
+        val view = convertView ?: inflater.inflate(R.layout.item_lista, parent, false)
+        val item = getItem(position)
+        val texto = view.findViewById<TextView>(R.id.textoViewItens)
+        val imagem = view.findViewById<ImageView>(R.id.imagemViewItens)
+        texto.text = item.nome
+        imagem.setImageResource(item.imagem)
+        return view
+    }
+}
 
-
-
+- MainActivity.kt
+[sorce,kotlin]
+import android.os.Bundle
+import android.widget.ListView
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+class MainActivity : AppCompatActivity() {
+    private lateinit var listView: ListView
+    private lateinit var meuAdapter: MeuAdapter
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+        listView = findViewById(R.id.listViewItens)
+        val itens = RepositorioItens.obterItens()
+        meuAdapter = MeuAdapter(this, itens)
+        listView.adapter = meuAdapter
+        listView.setOnItemClickListener { parent, _, position, _ ->
+            val item = parent.getItemAtPosition(position) as ItemLista
+            Toast.makeText(this, "Você Clicou em: ${item.nome}", Toast.LENGTH_LONG).show()
+        }
+    }
+}
