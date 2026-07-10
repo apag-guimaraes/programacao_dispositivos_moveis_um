@@ -578,7 +578,6 @@ class MainActivity : AppCompatActivity() {
     private fun processarOperacao(operacao: Operacao) {
         val num1 = editTextNumero1.text.toString()
         val num2 = editTextNumero2.text.toString()
-    
         val resultado = controller.realizarOperacao(num1, num2, operacao)
         textViewResultado.text = resultado
     }
@@ -858,56 +857,55 @@ enum class Operacao {
 [source,java]
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import com.example.lanchonete_mvc.R;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 public class MainActivity extends AppCompatActivity {
-    private ImageView imageViewCafe;
-    private ImageView imageViewBolo;
-    private TextView textViewTotal;
-    private Double resultado;
+   private ImageView imageViewCafe, imageViewBolo;
+   private TextView textViewTotal;
+   private Double resultado = 0.0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
         imageViewCafe = findViewById(R.id.imageViewCafe);
         imageViewBolo = findViewById(R.id.imageViewBolo);
         textViewTotal = findViewById(R.id.textViewTotal);
-        imageViewCafe.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this,CafeActivity.class);
-                if(resultado!=null){
-                    intent.putExtra("totalAtual",resultado);
-                }
-                startActivity(intent);
-                finish();
-            }
-        });
         imageViewBolo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, BoloActivity.class);
+                intent.putExtra("total", resultado); //envia o valor atual na MainActivity
+                startActivity(intent);
+            }
+        });
+        imageViewCafe.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, CafeActivity.class);
+                intent.putExtra("total", resultado); //envia o valor atual na MainActivity
                 startActivity(intent);
             }
         });
     }//onCreate
     @Override
-    protected void onStart() {
-        super.onStart();
+    protected void onResume() {
+        super.onResume();
         atualizarTela();
     }
-    private void atualizarTela() {
+    private void atualizarTela(){
         Intent intent = getIntent();
-        if (intent != null && intent.hasExtra("totalAtual")) {
-            resultado = intent.getDoubleExtra("totalAtual",0);
-            Log.e("main",resultado.toString());
+        if(intent!=null && intent.hasExtra("total")){
+            resultado = intent.getDoubleExtra("total",0);
             textViewTotal.setText(resultado.toString());
         }
-    }
+    }//
 }//class
 
 - CafeActivity.java
@@ -918,87 +916,297 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import com.example.lanchonete_mvc.R;
-import com.example.lanchonete_mvc.controller.Controller;
-public class CafeActivity extends AppCompatActivity  {
-    private EditText editQuantidade;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+public class CafeActivity extends AppCompatActivity {
+    private EditText editTextQuantidade;
     private TextView textViewCafe;
-    private Button btnAdicionar;
+    private Button buttonAdd;
     private Controller controller;
+    private Double resultado = 0.0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_cafe);
         controller = new Controller();
-        editQuantidade = findViewById(R.id.editTextCafe);
-        btnAdicionar = findViewById(R.id.buttonCafe);
+        Intent intent = getIntent();
+        if(intent != null && intent.hasExtra("total")){
+            resultado = intent.getDoubleExtra("total",0);
+        }
+        editTextQuantidade = findViewById(R.id.editTextCafe);
         textViewCafe = findViewById(R.id.textViewCafe);
+        buttonAdd = findViewById(R.id.buttonCafe);
+        buttonAdd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String texto = editTextQuantidade.getText().toString();
+                Double parcial = controller.adicionar(getResources().getString(R.string.cafe),texto);
+                resultado = resultado + parcial;
+                textViewCafe.setText(parcial.toString());
+            }
+        });
         textViewCafe.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(CafeActivity.this, MainActivity.class);
-                intent.putExtra("totalAtual",Double.parseDouble(textViewCafe.getText().toString()));
+                intent.putExtra("total",resultado);
                 startActivity(intent);
             }
         });
-        btnAdicionar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = getIntent();
-                Double resultado = 0.0;
-                if (intent != null && intent.hasExtra("totalAtual")) {
-                   resultado  = intent.getDoubleExtra("totalAtual",0);
-                }
-                String texto = editQuantidade.getText().toString().trim();
-                resultado += controller.adicionarCafe(texto);
-                textViewCafe.setText(resultado.toString());
-            }
-        });
-    }//
-}//class
+    }
+}
 
 - BoloActivity.java
 [source,java]
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+public class BoloActivity extends AppCompatActivity {
+    private EditText editTextQuantidade;
+    private TextView textViewBolo;
+    private Button buttonAdd;
+    private Controller controller;
+    private Double resultado = 0.0;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
+        setContentView(R.layout.activity_bolo);
+        controller = new Controller();
+        //recebe o total do BoloActivity
+        Intent intent = getIntent();
+        if(intent != null && intent.hasExtra("total")){
+            resultado = intent.getDoubleExtra("total",0);
+        }
+        editTextQuantidade = findViewById(R.id.editTextBolo);
+        textViewBolo = findViewById(R.id.textViewBolo);
+        buttonAdd = findViewById(R.id.buttonBolo);
+        buttonAdd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String texto = editTextQuantidade.getText().toString();
+                Double parcial = controller.adicionar(getResources().getString(R.string.bolo),texto);
+                resultado = resultado + parcial;
+                textViewBolo.setText(parcial.toString());
+            }
+        });
+        textViewBolo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(BoloActivity.this, MainActivity.class);
+                intent.putExtra("total",resultado);
+                startActivity(intent);
+            }
+        });
+    }
+}
 
 - Calculo.java
 [source,java]
 public class Calculo {
-    private double total;
     private static final double PRECO_CAFE = 2.50;
     private static final double PRECO_BOLO = 5.00;
     public Calculo() {
-        this.total = 0.0;
     }
-    public double getTotal() {
-        return total;
-    }
-    public void adicionarCafe(int qtd) {
+    public double adicionarCafe(int qtd) {
         if (qtd > 0) {
-            this.total += qtd * PRECO_CAFE;
+            return qtd * PRECO_CAFE;
         }
+        return 0;
     }
-    public void adicionarBolo(int qtd) {
+    public double adicionarBolo(int qtd) {
         if (qtd > 0) {
-            this.total += qtd * PRECO_BOLO;
+            return qtd * PRECO_BOLO;
         }
+        return 0;
     }
-    public void limpar() {
-        total = 0.0;
-    }
-}
+}//class
 
 - Controller.java
 [source,java]
 public class Controller {
-    private Calculo model;
+    private  Calculo model;
     public Controller() {
         this.model = new Calculo();
     }
-    public double adicionarCafe(String textoQuantidade) {
-            int qtd = Integer.parseInt(textoQuantidade);
-            model.adicionarCafe(qtd);
-            return model.getTotal();
+    public Double adicionar(String texto, String textoQuantidade) {
+        int qtd = Integer.parseInt(textoQuantidade);
+        if(texto.equals("Café")){
+            return model.adicionarCafe(qtd);
+        }
+        if(texto.equals("Bolo")){
+            return model.adicionarBolo(qtd);
+        }
+        return 0.0;
+    }
+}//class
+
+- MainActivity.kt
+[source,kotlin]
+import android.content.Intent
+import android.os.Bundle
+import android.widget.ImageView
+import android.widget.TextView
+import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+class MainActivity : AppCompatActivity() {
+    private lateinit var imageViewCafe: ImageView
+    private lateinit var imageViewBolo: ImageView
+    private lateinit var textViewTotal: TextView
+    private var resultado: Double = 0.0
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
+        setContentView(R.layout.activity_main)
+        imageViewCafe = findViewById(R.id.imageViewCafe)
+        imageViewBolo = findViewById(R.id.imageViewBolo)
+        textViewTotal = findViewById(R.id.textViewTotal)
+        imageViewBolo.setOnClickListener {
+            val intent = Intent(this, BoloActivity::class.java).apply {
+                putExtra("total", resultado)
+            }
+            startActivity(intent)
+        }
+        imageViewCafe.setOnClickListener {
+            val intent = Intent(this, CafeActivity::class.java).apply {
+                putExtra("total", resultado)
+            }
+            startActivity(intent)
+        }
+    }
+    override fun onResume() {
+        super.onResume()
+        atualizarTela()
+    }
+    private fun atualizarTela() {
+        if (intent.hasExtra("total")) {
+            resultado = intent.getDoubleExtra("total", 0.0)
+            textViewTotal.text = resultado.toString()
+        }
     }
 }
 
+- CafeActivity.kt
+[source,kotlin]
+import android.content.Intent
+import android.os.Bundle
+import android.widget.Button
+import android.widget.EditText
+import android.widget.TextView
+import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AppCompatActivity
+class CafeActivity : AppCompatActivity() {
+    private lateinit var editTextQuantidade: EditText
+    private lateinit var textViewCafe: TextView
+    private lateinit var buttonAdd: Button
+    private lateinit var controller: Controller
+    private var resultado: Double = 0.0
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
+        setContentView(R.layout.activity_cafe)
+        controller = Controller()
+        if (intent.hasExtra("total")) {
+            resultado = intent.getDoubleExtra("total", 0.0)
+        }
+        editTextQuantidade = findViewById(R.id.editTextCafe)
+        textViewCafe = findViewById(R.id.textViewCafe)
+        buttonAdd = findViewById(R.id.buttonCafe)
+        buttonAdd.setOnClickListener {
+            val texto = editTextQuantidade.text.toString()
+            val parcial = controller.adicionar(getString(R.string.cafe), texto)
+            resultado += parcial 
+            textViewCafe.text = parcial.toString()
+        }
+        textViewCafe.setOnClickListener {
+            val intent = Intent(this, MainActivity::class.java).apply {
+                putExtra("total", resultado)
+            }
+            startActivity(intent)
+        }
+    }
+}
+
+- BoloActivity.kt
+[source,kotlin]
+import android.content.Intent
+import android.os.Bundle
+import android.widget.Button
+import android.widget.EditText
+import android.widget.TextView
+import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AppCompatActivity
+class BoloActivity : AppCompatActivity() {
+    private lateinit var editTextQuantidade: EditText
+    private lateinit var textViewBolo: TextView
+    private lateinit var buttonAdd: Button
+    private lateinit var controller: Controller
+    private var resultado: Double = 0.0
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
+        setContentView(R.layout.activity_bolo)
+        controller = Controller()
+        if (intent.hasExtra("total")) {
+            resultado = intent.getDoubleExtra("total", 0.0)
+        }
+        editTextQuantidade = findViewById(R.id.editTextBolo)
+        textViewBolo = findViewById(R.id.textViewBolo)
+        buttonAdd = findViewById(R.id.buttonBolo)
+        buttonAdd.setOnClickListener {
+            val texto = editTextQuantidade.text.toString()
+            val parcial = controller.adicionar(getString(R.string.bolo), texto)
+            resultado += parcial
+            textViewBolo.text = parcial.toString()
+        }
+        textViewBolo.setOnClickListener {
+            val intent = Intent(this, MainActivity::class.java).apply {
+                putExtra("total", resultado)
+            }
+            startActivity(intent)
+        }
+    }
+}
+
+- Calculo.kt
+[source,kotlin]
+class Calculo {
+    companion object {
+        private const val PRECO_CAFE = 2.50
+        private const val PRECO_BOLO = 5.00
+    }
+    fun adicionarCafe(qtd: Int): Double {
+        return if (qtd > 0) qtd * PRECO_CAFE else 0.0
+    }
+    fun adicionarBolo(qtd: Int): Double {
+        return if (qtd > 0) qtd * PRECO_BOLO else 0.0
+    }
+}
+
+- Controller.kt
+[source,kotlin]
+class Controller {
+    private val model: Calculo = Calculo()
+    fun adicionar(texto: String, textoQuantidade: String): Double {
+        val qtd = textoQuantidade.toIntOrNull() ?: 0
+        return when (texto) {
+            "Café" -> model.adicionarCafe(qtd)
+            "Bolo" -> model.adicionarBolo(qtd)
+            else -> 0.0
+        }
+    }
+}
