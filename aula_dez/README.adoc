@@ -210,6 +210,83 @@ public class Tela2 extends Fragment {
         });
     }
 }
+
+- MainActivity.kt
+[source,kotlin]
+import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
+class MainActivity : AppCompatActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+    }
+}
+
+- Tela1.kt
+[source,kotlin]
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.Button
+import android.widget.EditText
+import android.widget.TextView
+import androidx.fragment.app.Fragment
+class Tela1 : Fragment() {
+    private lateinit var editText: EditText
+    private lateinit var button: Button
+    private lateinit var textView: TextView
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        return inflater.inflate(R.layout.tela1, container, false)
+    }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        // Inicialização das Views usando a view inflada recebida por parâmetro
+        editText = view.findViewById(R.id.editTextNome)
+        button = view.findViewById(R.id.buttonNome)
+        textView = view.findViewById(R.id.textViewNome)
+        // Lambda para o evento de clique
+        button.setOnClickListener {
+            textView.text = editText.text.toString()
+        }
+    }
+}
+
+- tela2.kt
+[source,kotlin]
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.Button
+import android.widget.EditText
+import android.widget.TextView
+import androidx.fragment.app.Fragment
+class Tela2 : Fragment() {
+    private lateinit var editText: EditText
+    private lateinit var button: Button
+    private lateinit var textView: TextView
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        return inflater.inflate(R.layout.tela2, container, false)
+    }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        editText = view.findViewById(R.id.editTextCurso)
+        button = view.findViewById(R.id.buttonCurso)
+        textView = view.findViewById(R.id.textViewCurso)
+        button.setOnClickListener {
+            textView.text = editText.text.toString()
+        }
+    }
+}
     
 Exemplos práticos (dinâmico):
 
@@ -426,6 +503,107 @@ public class Tela2 extends Fragment {
     }
 }
 
+- MainActivity.kt
+[source,kotlin]
+import android.os.Bundle
+import android.widget.Button
+import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.FragmentManager
+class MainActivity : AppCompatActivity() {
+    private lateinit var buttonTela1: Button
+    private lateinit var buttonTela2: Button
+    private val fm: FragmentManager by lazy { supportFragmentManager }
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+        buttonTela1 = findViewById(R.id.buttonTela1)
+        buttonTela2 = findViewById(R.id.buttonTela2)
+        if (savedInstanceState == null) {
+            fm.beginTransaction()
+                .replace(R.id.telaPrincipal, Tela1())
+                .commit()
+        }
+        buttonTela1.setOnClickListener { trocarTela(it.id) }
+        buttonTela2.setOnClickListener { trocarTela(it.id) }
+    }
+    private fun trocarTela(viewId: Int) {
+        val novoFragment = when (viewId) {
+            R.id.buttonTela1 -> Tela1()
+            R.id.buttonTela2 -> Tela2()
+            else -> null
+        }
+        novoFragment?.let { fragment ->
+            fm.beginTransaction()
+                .replace(R.id.telaPrincipal, fragment)
+                .commit()
+        }
+    }
+}
+
+- Tela1.kt
+[source,kotlin]
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.Button
+import android.widget.EditText
+import android.widget.TextView
+import androidx.fragment.app.Fragment
+class Tela1 : Fragment() {
+    private lateinit var editText: EditText
+    private lateinit var button: Button
+    private lateinit var textView: TextView
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        return inflater.inflate(R.layout.tela1, container, false)
+    }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        editText = view.findViewById(R.id.editTextNome)
+        button = view.findViewById(R.id.buttonNome)
+        textView = view.findViewById(R.id.textViewNome)
+        button.setOnClickListener {
+            textView.text = editText.text.toString()
+        }
+    }
+}
+
+- Tela2.kt
+[source,kotlin]
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.Button
+import android.widget.EditText
+import android.widget.TextView
+import androidx.fragment.app.Fragment
+class Tela2 : Fragment() {
+    private lateinit var editText: EditText
+    private lateinit var button: Button
+    private lateinit var textView: TextView
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        return inflater.inflate(R.layout.tela2, container, false)
+    }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        editText = view.findViewById(R.id.editTextCurso)
+        button = view.findViewById(R.id.buttonCurso)
+        textView = view.findViewById(R.id.textViewCurso)
+        button.setOnClickListener {
+            textView.text = editText.text.toString()
+        }
+    }
+}
+
 Veja que na documentação oficial(https://developer.android.com/guide/fragments/create?hl=pt-br), que a tag para adicionar o fragmento foi atualizada para <androidx.fragment.app.FragmentContainerView>. A mesma tag pode ser usada tanto para adicionar o fragmento via XML como programaticamente. A diferença é que para adicionar via XML, deve ser usado o atributo name, passando o nome da classe java que estende a classe Fragment. Caso deseje adicionar de forma dinâmica use o atributo id. 
 
 Por exemplo: no arquivo activity_main.xml a nova tag  adicionada ficaria assim:
@@ -446,6 +624,20 @@ protected void onCreate(Bundle savedInstanceState) {
            .setReorderingAllowed(true) 
            .add(R.id.tela, FragmentActivity.class,null)
            .commit();
+}
+
+override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    setContentView(R.layout.activity_main)
+    // Executa a transação apenas se a Activity não estiver sendo recriada 
+    // (evita sobreposição de fragmentos na rotação de tela)
+    if (savedInstanceState == null) {
+        supportFragmentManager.beginTransaction()
+            .setReorderingAllowed(true)
+            // Em Kotlin, usamos '::class.java' para referenciar a classe Java do Fragment
+            .add(R.id.tela, FragmentActivity::class.java, null)
+            .commit()
+    }
 }
 
 Exemplos práticos (FragContentView):
@@ -556,6 +748,51 @@ public class MainActivity extends AppCompatActivity {
         FragmentTransaction ft = fm.beginTransaction();
         ft.replace(R.id.telaPrincipal, new Tela1());
         ft.commit();
+    }
+}
+
+- Tela1.kt
+[source,kotlin]
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.Button
+import android.widget.TextView
+import androidx.fragment.app.Fragment
+class Tela1 : Fragment() {
+    private lateinit var textView: TextView
+    private lateinit var button: Button
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        return inflater.inflate(R.layout.tela1, container, false)
+    }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        textView = view.findViewById(R.id.textViewMensagem)
+        button = view.findViewById(R.id.buttonMensagem)
+        button.setOnClickListener {
+            textView.text = "Você clicou no botão da Tela 1!"
+        }
+    }
+}
+
+- MainActivity.kt
+[source,kotlin]
+import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
+class MainActivity : AppCompatActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+        if (savedInstanceState == null) {
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.telaPrincipal, Tela1())
+                .commit()
+        }
     }
 }
 
@@ -802,6 +1039,164 @@ public class ListaFragment extends Fragment {
     }
 }
 
+- MainActivity.kt
+[source,kotlin]
+import android.os.Bundle
+import android.util.Log
+import android.widget.Button
+import androidx.activity.EdgeToEdge
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.fragment.app.Fragment
+class MainActivity : AppCompatActivity() {
+    private var controleFragment = true
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        // Ativa a exibição atrás das barras do sistema
+        EdgeToEdge.enable(this)
+        setContentView(R.layout.activity_main)
+        // Configuração dos insets das system bars de forma limpa em Kotlin
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
+        Log.i("Activity", "Criada")
+        // CORREÇÃO: Recupera o estado do controle de fragmento caso a tela tenha sido rotacionada
+        if (savedInstanceState != null) {
+            controleFragment = savedInstanceState.getBoolean("controle_fragment", true)
+        } else {
+            // Se for a primeira inicialização, mostra o fragmento inicial
+            mostrar(ImagemFragment())
+        }
+        val button = findViewById<Button>(R.id.button)
+        button.setOnClickListener {
+            if (controleFragment) {
+                mostrar(ListaFragment())
+            } else {
+                mostrar(ImagemFragment())
+            }
+            controleFragment = !controleFragment
+        }
+    }
+    private fun mostrar(fragment: Fragment) {
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, fragment)
+            .commit()
+    }
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putBoolean("controle_fragment", controleFragment)
+    }
+    override fun onStart() {
+        super.onStart()
+        Log.i("Activity", "Inicializada")
+    }
+    override fun onResume() {
+        super.onResume()
+        Log.i("Activity", "Pronta")
+    }
+    override fun onPause() {
+        super.onPause()
+        Log.i("Activity", "Pausada")
+    }
+    override fun onStop() {
+        super.onStop()
+        Log.i("Activity", "Parada")
+    }
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.i("Activity", "Destruída")
+    }
+}
+
+- ImagemFragment.kt
+[source,kotlin]
+import android.content.Context
+import android.os.Bundle
+import android.util.Log
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+class ImagemFragment : Fragment() {
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        Log.e("Fragment", "anexado")
+    }
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        Log.e("Fragment", "criado")
+    }
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        Log.e("Fragment", "criando a view")
+        return inflater.inflate(R.layout.fragment_imagem, container, false)
+    }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        Log.e("Fragment", "view já criada")
+    }
+    override fun onStart() {
+        super.onStart()
+        Log.e("Fragment", "inicializado")
+    }
+    override fun onResume() {
+        super.onResume()
+        Log.e("Fragment", "pronto")
+    }
+    override fun onPause() {
+        super.onPause()
+        Log.e("Fragment", "pausado")
+    }
+    override fun onStop() {
+        super.onStop()
+        Log.e("Fragment", "parado")
+    }
+    override fun onDestroyView() {
+        super.onDestroyView()
+        Log.e("Fragment", "destroi a view do fragmento")
+    }
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.e("Fragment", "destroi o fragmento")
+    }
+    override fun onDetach() {
+        super.onDetach()
+        Log.e("Fragment", "desassocia o fragmento à actividade")
+    }
+}
+
+- ListaFragment.kt
+[source,kotlin]
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ArrayAdapter
+import android.widget.ListView
+import androidx.fragment.app.Fragment
+class ListaFragment : Fragment() {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        return inflater.inflate(R.layout.fragment_lista, container, false)
+    }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        val listView = view.findViewById<ListView>(R.id.list_view)
+        val items = arrayOf("Java", "Python", "Kotlin")
+        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, items)
+        listView.adapter = adapter
+    }
+}
+
 Exemplos práticos (Passando valor da activity para o fragmento):
 
 - activity_main.xml
@@ -882,6 +1277,53 @@ public class ExampleFragment extends Fragment {
             Integer msg = bundle.getInt("number");
             TextView textViewHello = view.findViewById(R.id.textViewHello);
             textViewHello.setText(msg.toString());
+        }
+    }
+}
+
+- MainActivity.kt
+[source,kotlin]
+import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
+class MainActivity : AppCompatActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+        if (savedInstanceState == null) {
+            val bundle = Bundle().apply {
+                putInt("number", 10)
+            }
+            supportFragmentManager.beginTransaction()
+                .setReorderingAllowed(true)
+                .add(R.id.fragment_container_view, ExampleFragment::class.java, bundle)
+                .commit()
+        }
+    }
+}
+
+- ExampleFragment.kt
+[source,kotlin]
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.TextView
+import androidx.fragment.app.Fragment
+class ExampleFragment : Fragment() {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        return inflater.inflate(R.layout.example_fragment, container, false)
+    }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        arguments?.let { bundle ->
+            val msg = bundle.getInt("number", 0)
+        
+            val textViewHello = view.findViewById<TextView>(R.id.textViewHello)
+            textViewHello.text = msg.toString()
         }
     }
 }
@@ -985,6 +1427,74 @@ public class MainActivity extends AppCompatActivity
     public void onMensagemEnviada(String texto) {
         Toast.makeText(this, "Recebido do Fragmento: "
                 + texto, Toast.LENGTH_SHORT).show();
+    }
+}
+
+- FragmentMensagem.kt
+[source,kotlin]
+import android.content.Context
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.Button
+import android.widget.EditText
+import androidx.fragment.app.Fragment
+class FragmentMensagem : Fragment() {
+    private lateinit var editText: EditText
+    private lateinit var button: Button
+    private var listener: EnviarMensagemListener? = null
+    interface EnviarMensagemListener {
+        fun onMensagemEnviada(texto: String)
+    }
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        if (context is EnviarMensagemListener) {
+            listener = context
+        } else {
+            throw ClassCastException("$context deve implementar EnviarMensagemListener")
+        }
+    }
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        // Apenas infla o layout aqui
+        return inflater.inflate(R.layout.fragment_mensagem, container, false)
+    }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        editText = view.findViewById(R.id.editTextMensagem)
+        button = view.findViewById(R.id.buttonEnviar)
+        button.setOnClickListener {
+            val texto = editText.text.toString()
+            listener?.onMensagemEnviada(texto)
+        }
+    }
+    override fun onDetach() {
+        super.onDetach()
+        listener = null
+    }
+}
+
+- MainActivity.kt
+[source,kotlin]
+import android.os.Bundle
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+class MainActivity : AppCompatActivity(), FragmentMensagem.EnviarMensagemListener {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+        if (savedInstanceState == null) {
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.containerFragment, FragmentMensagem())
+                .commit()
+        }
+    }
+    override fun onMensagemEnviada(texto: String) {
+        Toast.makeText(this, "Recebido do Fragmento: $texto", Toast.LENGTH_SHORT).show()
     }
 }
 
@@ -1130,6 +1640,90 @@ public class MainActivity extends AppCompatActivity {
                 transaction.commit();
             }
         });                                                    
+    }
+}
+
+- FragmentOne.kt
+[source,kotlin]
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+class FragmentOne : Fragment() {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        return inflater.inflate(R.layout.fragment_one, container, false)
+    }
+}
+
+- FragmentTwo.kt
+[source,kotlin]
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+class FragmentTwo : Fragment() {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        return inflater.inflate(R.layout.fragment_two, container, false)
+    }
+}
+
+- MainActivity,kt
+[source,kotlin]
+import android.os.Bundle
+import android.widget.Button
+import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.FragmentManager
+class MainActivity : AppCompatActivity() {
+    private val fragmentManager: FragmentManager by lazy { supportFragmentManager }
+    private var adicionado = false
+    private val fragmentOne = FragmentOne()
+    private val fragmentTwo = FragmentTwo()
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+        if (savedInstanceState == null) {
+            fragmentManager.beginTransaction()
+                .add(R.id.container, fragmentOne)
+                .commit()
+        }
+        findViewById<Button>(R.id.buttonTrocar).setOnClickListener {
+            fragmentManager.beginTransaction()
+                .replace(R.id.container, fragmentTwo)
+                .commit()
+        }
+        findViewById<Button>(R.id.buttonRetornar).setOnClickListener {
+            fragmentManager.beginTransaction()
+                .replace(R.id.container, fragmentTwo)
+                .addToBackStack(null) // Adiciona a transação à pilha do sistema
+                .commit()
+        }
+        findViewById<Button>(R.id.buttonOcultar).setOnClickListener {
+            val transaction = fragmentManager.beginTransaction()
+            if (!adicionado) {
+                transaction.hide(fragmentOne)
+                transaction.add(R.id.container, fragmentTwo)
+                adicionado = true
+            } else {
+                if (fragmentTwo.isHidden) {
+                    transaction.hide(fragmentOne)
+                    transaction.show(fragmentTwo)
+                } else {
+                    transaction.hide(fragmentTwo)
+                    transaction.show(fragmentOne)
+                }
+            }
+            transaction.commit()
+        }
     }
 }
 
@@ -1385,6 +1979,158 @@ public class EstrelaFragment extends Fragment {
     }
 }
 
+- Estrela.kt
+[source,kotlin]
+data class Estrela(
+    var nome: String,
+    var descricao: String
+)
+
+- RepositorioEstrelas.kt
+[source,kotlin]
+import android.content.res.Resources
+object RepositorioEstrelas {
+    fun getStars(res: Resources): List<Estrela> {
+        // Uso de listOf para criar e popular a coleção de forma direta e concisa
+        return listOf(
+            Estrela(res.getString(R.string.estrela_1_nome), res.getString(R.string.estrela_1_descricao)),
+            Estrela(res.getString(R.string.estrela_2_nome), res.getString(R.string.estrela_2_descricao)),
+            Estrela(res.getString(R.string.estrela_3_nome), res.getString(R.string.estrela_3_descricao))
+        )
+    }
+}
+
+- EstrelaAdapter.kt
+[source,kotlin]
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
+class EstrelaAdapter(
+    private val estrelas: List<Estrela>,
+    private val listener: OnItemClickListener
+) : RecyclerView.Adapter<EstrelaAdapter.StarViewHolder>() {
+    interface OnItemClickListener {
+        fun onItemClick(estrela: Estrela)
+    }
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StarViewHolder {
+        val view = LayoutInflater.from(parent.context)
+            .inflate(android.R.layout.simple_list_item_1, parent, false)
+        return StarViewHolder(view)
+    }
+    override fun onBindViewHolder(holder: StarViewHolder, position: Int) {
+        val estrela = estrelas[position]
+        holder.textView.text = estrela.nome
+    }
+    override fun getItemCount(): Int = estrelas.size
+    inner class StarViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val textView: TextView = itemView.findViewById(android.R.id.text1)
+        init {
+            itemView.setOnClickListener {
+                val position = bindingAdapterPosition
+                // CORREÇÃO: Evita crash de IndexOutOfBounds caso o item seja clicado durante animações de remoção (-1)
+                if (position != RecyclerView.NO_POSITION) {
+                    listener.onItemClick(estrelas[position])
+                }
+            }
+        }
+    }
+}
+
+- MainActivity.kt
+[source,kotlin]
+import android.content.Intent
+import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+class MainActivity : AppCompatActivity(), EstrelaAdapter.OnItemClickListener {
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var estrelaAdapter: EstrelaAdapter
+    private lateinit var estrelas: List<Estrela>
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+        recyclerView = findViewById(R.id.recyclerView)
+        recyclerView.layoutManager = LinearLayoutManager(this)
+        estrelas = RepositorioEstrelas.getStars(resources)
+        estrelaAdapter = EstrelaAdapter(estrelas, this)
+        recyclerView.setAdapter(estrelaAdapter)
+    }
+    override fun onItemClick(estrela: Estrela) {
+        val intent = Intent(this, DetalheActivity::class.java).apply {
+            putExtra("estrela_nome", estrela.nome)
+            putExtra("estrela_descricao", estrela.descricao)
+        }
+        startActivity(intent)
+    }
+}
+
+- DetalheActivity.kt
+[source,kotlin]
+import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
+class DetalheActivity : AppCompatActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_detalhe)
+        if (savedInstanceState == null) {
+            val estrelaNome = intent.getStringExtra("estrela_nome")
+            val estrelaDescricao = intent.getStringExtra("estrela_descricao")
+            val fragmento = EstrelaFragment.newInstance(estrelaNome, estrelaDescricao)
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, fragmento)
+                .commit()
+        }
+    }
+}
+
+- EstrelaFragment.kt
+[source,kotlin]
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.TextView
+import androidx.fragment.app.Fragment
+class EstrelaFragment : Fragment() {
+    private var estrelaNome: String? = null
+    private var estrelaDescricao: String? = null
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        arguments?.let { bundle ->
+            estrelaNome = bundle.getString(ARG_NOME)
+            estrelaDescricao = bundle.getString(ARG_DESCRICAO)
+        }
+    }
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        return inflater.inflate(R.layout.fragment_estrela, container, false)
+    }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        val textViewNome = view.findViewById<TextView>(R.id.textviewNomeEstrela)
+        val textViewDescricao = view.findViewById<TextView>(R.id.textViewDescricao)
+        textViewNome.text = estrelaNome
+        textViewDescricao.text = estrelaDescricao
+    }
+    companion object {
+        private const val ARG_NOME = "nome"
+        private const val ARG_DESCRICAO = "descricao"
+        fun newInstance(nome: String?, listDescricao: String?): EstrelaFragment {
+            return EstrelaFragment().apply {
+                arguments = Bundle().apply {
+                    putString(ARG_NOME, nome)
+                    putString(ARG_DESCRICAO, listDescricao)
+                }
+            }
+        }
+    }
+}
 
 
 
