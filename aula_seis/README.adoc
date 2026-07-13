@@ -52,46 +52,47 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 public class MyDialogFragment extends DialogFragment {
-// O uso do fragmento ajuda a evitar problemas com as caixas de diálogos, como a perda do estado do diálogo durante rotações de tela.
+    // O uso do fragmento ajuda a evitar problemas com as caixas de diálogos, 
+    // como a perda do estado do diálogo durante rotações de tela.
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
         builder.setMessage("Como está o clima hoje?")
                 .setTitle("Responda a pergunta")
                 .setIcon(R.mipmap.ic_launcher)
                 .setPositiveButton("Quente", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        Toast.makeText(getActivity().getApplicationContext(),
-                                "Beba muita água", Toast.LENGTH_SHORT).show();
+                        showToast("Beba muita água");
                     }
                 })
                 .setNegativeButton("Frio", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        Toast.makeText(getActivity().getApplicationContext(),
-                                "Coloque um casaco", Toast.LENGTH_SHORT).show();
+                        showToast("Coloque um casaco");
                     }
                 })
                 .setNeutralButton("Ameno", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        Toast.makeText(getActivity().getApplicationContext(),
-                                "Aproveite o dia!!", Toast.LENGTH_SHORT).show();
+                        showToast("Aproveite o dia!!");
                     }
                 });
-        AlertDialog dialog = builder.create();
-//onDismiss não pertence ao ciclo de vida do DialogFragment, mas pode ser usado quando o diálogo for fechado pelo usuário.
-        dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-            @Override
-            public void onDismiss(DialogInterface dialog) {
-                Toast.makeText(getActivity().getApplicationContext(), "Encerrando o diálogo", Toast.LENGTH_SHORT).show();
-            }
-        });
-        return dialog;
-    }//onCreateDialog
-}//class
+
+        return builder.create();
+    }
+    @Override
+    public void onDismiss(@NonNull DialogInterface dialog) {
+        super.onDismiss(dialog);
+        showToast("Encerrando o diálogo");
+    }
+    private void showToast(String message) {
+        if (getContext() != null) {
+            Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show();
+        }
+    }
+}
 
 - MainActivity.java
 [source,java]
@@ -118,6 +119,67 @@ public class MainActivity extends AppCompatActivity {
         mdf.show(getSupportFragmentManager(),"clima");
     }//private
 }//class
+
+- MyDialogFragment.kt
+[source,kotlin]
+import android.app.Dialog
+import android.content.DialogInterface
+import android.os.Bundle
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
+import androidx.fragment.app.DialogFragment
+class MyDialogFragment : DialogFragment() {
+    // O uso do fragmento ajuda a evitar problemas com as caixas de diálogos, 
+    // como a perda do estado do diálogo durante rotações de tela.
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        val builder = AlertDialog.Builder(requireActivity())
+        builder.setMessage("Como está o clima hoje?")
+            .setTitle("Responda a pergunta")
+            .setIcon(R.mipmap.ic_launcher)
+            // Kotlin substitui interfaces de um único método por Lambdas { }
+            .setPositiveButton("Quente") { _, _ ->
+                showToast("Beba muita água")
+            }
+            .setNegativeButton("Frio") { _, _ ->
+                showToast("Coloque um casaco")
+            }
+            .setNeutralButton("Ameno") { _, _ ->
+                showToast("Aproveite o dia!!")
+            }
+        return builder.create()
+    }
+    override fun onDismiss(dialog: DialogInterface) {
+        super.onDismiss(dialog)
+        showToast("Encerrando o diálogo")
+    }
+    private fun showToast(message: String) {
+        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+    }
+}
+
+- MainActivity.kt
+[source,kotlin]
+import androidx.appcompat.app.AppCompatActivity
+import android.os.Bundle
+import android.widget.TextView
+class MainActivity : AppCompatActivity() {
+    private lateinit var textViewHello: TextView
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+        textViewHello = findViewById(R.id.textViewHello)
+        textViewHello.setOnClickListener {
+            openAlertDialog()
+        }
+    }
+    private fun openAlertDialog() {
+        val tag = "clima"
+        if (supportFragmentManager.findFragmentByTag(tag) == null) {
+            val mdf = MyDialogFragment()
+            mdf.show(supportFragmentManager, tag)
+        }
+    }
+}
 
 === Exemplos práticos (AlertDialog Personalizado)
 
@@ -262,6 +324,63 @@ public class MainActivity extends AppCompatActivity {
     </LinearLayout>
 </LinearLayout>
 
+- MyDialogFragment.kt
+[source,kotlin]
+import android.app.Dialog
+import android.os.Bundle
+import android.widget.EditText
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
+import androidx.fragment.app.DialogFragment
+class MyDialogFragment : DialogFragment() {
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        val builder = AlertDialog.Builder(requireActivity())
+        val inflater = requireActivity().layoutInflater
+        val view = inflater.inflate(R.layout.dialog, null)
+        val editTextNome = view.findViewById<EditText>(R.id.editTextNome)
+        builder.setView(view)
+            .setTitle("Personalizado")
+            // Uso de Expressões Lambda eliminando o boilerplate do Java
+            .setPositiveButton("Sim") { _, _ ->
+                val nome = editTextNome.text.toString()
+                showToast("Você clicou em sim $nome")
+            }
+            .setNeutralButton("Não") { _, _ ->
+                val nome = editTextNome.text.toString()
+                showToast("Você clicou em não $nome")
+            }
+        return builder.create()
+    }
+    // Função utilitária para evitar repetição de código
+    private fun showToast(message: String) {
+        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+    }
+}
+
+- MainActivity.kt
+[source,kotlin]
+import androidx.appcompat.app.AppCompatActivity
+import android.os.Bundle
+import android.widget.Button
+class MainActivity : AppCompatActivity() {
+    private lateinit var buttonClicar: Button
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+        buttonClicar = findViewById(R.id.btnClicar)
+        buttonClicar.setOnClickListener {
+            openAlertDialog()
+        }
+    }
+    private fun openAlertDialog() {
+        val tag = "personalizado"
+        if (supportFragmentManager.findFragmentByTag(tag) == null) {
+            val mdf = MyDialogFragment()
+            mdf.show(supportFragmentManager, tag)
+        }
+    }
+}
+
 === Exemplos práticos (AlertDialog List)
 
 - activity_main.xml
@@ -360,6 +479,59 @@ public class MainActivity extends AppCompatActivity {
         mdf.show(getSupportFragmentManager(),"lista_semana");
     }
 }//class
+
+- MyDialogFragment.kt
+[source,kotlin]
+import android.app.Dialog
+import android.os.Bundle
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
+import androidx.fragment.app.DialogFragment
+class MyDialogFragment : DialogFragment() {
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        val builder = AlertDialog.Builder(requireActivity())
+        builder.setTitle("Escolha o dia da semana")
+            .setIcon(R.mipmap.ic_launcher)
+            .setItems(R.array.array_semana) { _, which ->
+                // O primeiro parâmetro (dialogInterface) não é usado, por isso o '_'
+                showToast("Você clicou em: $which")
+                showToast(recuperarItem(which))
+            }
+
+        return builder.create()
+    }
+    private fun recuperarItem(i: Int): String {
+        val diasSemana = resources.getStringArray(R.array.array_semana)
+        return diasSemana[i]
+    }
+    private fun showToast(message: String) {
+        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+    }
+}
+
+- MainActivity.kt
+[source,kotlin]
+import androidx.appcompat.app.AppCompatActivity
+import android.os.Bundle
+import android.widget.TextView
+class MainActivity : AppCompatActivity() {
+    private lateinit var textViewHello: TextView
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+        textViewHello = findViewById(R.id.textViewHello)
+        textViewHello.setOnClickListener {
+            openAlertDialogList()
+        }
+    }
+    private fun openAlertDialogList() {
+        val tag = "lista_semana"
+        if (supportFragmentManager.findFragmentByTag(tag) == null) {
+            val mdf = MyDialogFragment()
+            mdf.show(supportFragmentManager, tag)
+        }
+    }
+}
 
 === Exemplos práticos (AlertDialog with multiple choice)
 
@@ -460,6 +632,61 @@ public class MainActivity extends AppCompatActivity {
    }//open
 }//class
 
+- MyDialogFragment.kt
+[source,kotlin]
+import android.app.Dialog
+import android.os.Bundle
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
+import androidx.fragment.app.DialogFragment
+class MyDialogFragment : DialogFragment() {
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        val builder = AlertDialog.Builder(requireActivity())
+        builder.setTitle("Escolha o dia da semana: ")
+            .setIcon(R.mipmap.ic_launcher)
+            // Adiciona a lista de múltipla escolha usando Lambdas do Kotlin
+            .setMultiChoiceItems(R.array.array_semana, null) { _, which, isChecked ->
+                if (isChecked) { // Verifica se o item foi marcado (true)
+                    showToast(recuperarItem(which))
+                }
+            }
+        return builder.create()
+    }
+    private fun recuperarItem(i: Int): String {
+        // Acesso direto aos recursos do App sem verbosidade
+        val diasSemana = resources.getStringArray(R.array.array_semana)
+        return diasSemana[i]
+    }
+    private fun showToast(message: String) {
+        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+    }
+}
+
+- MainActivity.kt
+[source,kotlin]
+import androidx.appcompat.app.AppCompatActivity
+import android.os.Bundle
+import android.widget.TextView
+class MainActivity : AppCompatActivity() {
+    private lateinit var textViewHello: TextView
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+        textViewHello = findViewById(R.id.textViewHello)
+        // Expressão Lambda limpa para o click listener
+        textViewHello.setOnClickListener {
+            openAlertDialog()
+        }
+    }
+    private fun openAlertDialog() {
+        val tag = "semana"
+        if (supportFragmentManager.findFragmentByTag(tag) == null) {
+            val mdf = MyDialogFragment()
+            mdf.show(supportFragmentManager, tag)
+        }
+    }
+}
+
 Para ter uma lista com única escolha basta trocar o método setMultiChoiceItems pelo método setSingleChoiceItems.
 
 Veja o exemplo:
@@ -472,4 +699,10 @@ Veja o exemplo:
                    }
                });
                
-
+.setSingleChoiceItems(R.array.array_semana, 0) { _, i ->
+    Toast.makeText(
+        requireContext(),
+        recuperarItem(i),
+        Toast.LENGTH_SHORT
+    ).show()
+}
