@@ -272,6 +272,150 @@ public class TerceiraActivity extends AppCompatActivity {
     }
 }
 
+- CorUtil.kt
+[source,kotlin]
+import android.content.Context
+import android.view.View
+import androidx.core.content.ContextCompat
+object CorUtil {
+    fun setarCor(layout: View, cor: String, context: Context) {
+        // O 'when' pode retornar um valor diretamente
+        val corFundo = when (cor) {
+            "Verde" -> ContextCompat.getColor(context, android.R.color.holo_green_light)
+            "Azul" -> ContextCompat.getColor(context, android.R.color.holo_blue_light)
+            "Vermelha" -> ContextCompat.getColor(context, android.R.color.holo_red_light)
+            else -> ContextCompat.getColor(context, android.R.color.white)
+        }
+        layout.setBackgroundColor(corFundo)
+    }
+}
 
+- SharedPreferencesUtil.kt
+[source,kotlin]
+import android.content.Context
+object SharedPreferencesUtil {
+    private const val NOME_PREFERENCES = "dados"
+    private const val NOME_USUARIO_KEY = "nomeUsuario"
+    private const val COR_USUARIO_KEY = "corUsuario"
+    fun salvarDados(context: Context, nomeUsuario: String, corUsuario: String) {
+        val sharedPreferences = context.getSharedPreferences(NOME_PREFERENCES, Context.MODE_PRIVATE)
+        // Uso da função de escopo 'edit' nativa do Android KTX
+        sharedPreferences.edit().apply {
+            putString(NOME_USUARIO_KEY, nomeUsuario)
+            putString(COR_USUARIO_KEY, corUsuario)
+            apply() // CORREÇÃO: Salva de forma assíncrona sem bloquear a UI Thread
+        }
+    }
+    fun obterNomeUsuario(context: Context): String {
+        val sharedPreferences = context.getSharedPreferences(NOME_PREFERENCES, Context.MODE_PRIVATE)
+        return sharedPreferences.getString(NOME_USUARIO_KEY, "Nenhum") ?: "Nenhum"
+    }
+    fun obterCorUsuario(context: Context): String {
+        val sharedPreferences = context.getSharedPreferences(NOME_PREFERENCES, Context.MODE_PRIVATE)
+        return sharedPreferences.getString(COR_USUARIO_KEY, "Branca") ?: "Branca"
+    }
+    fun containsDados(context: Context): Boolean {
+        val sharedPreferences = context.getSharedPreferences(NOME_PREFERENCES, Context.MODE_PRIVATE)
+        return sharedPreferences.contains(NOME_USUARIO_KEY) && sharedPreferences.contains(COR_USUARIO_KEY)
+    }
+}
 
+- MainActivity.kt
+[source,kotlin]
+import android.content.Intent
+import android.os.Bundle
+import android.view.View
+import android.widget.Button
+import android.widget.EditText
+import androidx.appcompat.app.AppCompatActivity
+class MainActivity : AppCompatActivity() {
+    private lateinit var editTextNome: EditText
+    private lateinit var buttonNext: Button
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+        editTextNome = findViewById(R.id.editTextNome)
+        buttonNext = findViewById(R.id.buttonNext)
+        buttonNext.setOnClickListener { clicar() }
+    }
+    private fun clicar() {
+        val nomeUsuario = editTextNome.text.toString().trim()
+        ler(nomeUsuario)
+    }
+    private fun ler(nome: String) {
+        if (SharedPreferencesUtil.containsDados(this)) {
+            val nomeSalvo = SharedPreferencesUtil.obterNomeUsuario(this)
+            if (nomeSalvo == nome) {
+                val intent = Intent(this, TerceiraActivity::class.java)
+                startActivity(intent)
+                return
+            }
+        }
+        val intent = Intent(this, SegundaActivity::class.java).apply {
+            putExtra("nomeUsuario", nome)
+        }
+        startActivity(intent)
+    }
+}
+
+- SegundaActivity.kt
+[source,kotlin]
+import android.content.Intent
+import android.os.Bundle
+import android.widget.ArrayAdapter
+import android.widget.ListView
+import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
+class SegundaActivity : AppCompatActivity() {
+    private lateinit var textViewNome: TextView
+    private lateinit var listViewCores: ListView
+    private lateinit var adapter: ArrayAdapter<String>
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_segunda)
+        textViewNome = findViewById(R.id.textViewNome)
+        listViewCores = findViewById(R.id.listViewCores)
+        val nomeUsuario = intent.getStringExtra("nomeUsuario")
+        textViewNome.text = nomeUsuario
+        val cores = resources.getStringArray(R.array.cores_array)
+        adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, cores)
+        listViewCores.adapter = adapter
+        listViewCores.setOnItemClickListener { parentView, _, position, _ ->
+            val escolhido = parentView.getItemAtPosition(position) as String
+            gravar(escolhido)
+        }
+    }
+    private fun gravar(escolhido: String) {
+        val nome = textViewNome.text.toString()
+        SharedPreferencesUtil.salvarDados(applicationContext, nome, escolhido)
+        val intent = Intent(this, TerceiraActivity::class.java)
+        startActivity(intent)
+    }
+}
+
+- TerceiraActivity.kt
+[source,kotlin]
+import android.os.Bundle
+import android.view.View
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+class TerceiraActivity : AppCompatActivity() {
+    private lateinit var layout: View
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_terceira)
+        layout = findViewById(R.id.layout)
+        ler()
+    }
+    private fun ler() {
+        if (SharedPreferencesUtil.containsDados(this)) {
+            val nomeUsuario = SharedPreferencesUtil.obterNomeUsuario(this)
+            Toast.makeText(this, nomeUsuario, Toast.LENGTH_SHORT).show()
+            val cor = SharedPreferencesUtil.obterCorUsuario(this)
+            CorUtil.setarCor(layout, cor, this)
+        } else {
+            Toast.makeText(this, "Erro no arquivo", Toast.LENGTH_SHORT).show()
+        }
+    }
+}
 
