@@ -258,5 +258,105 @@ public class Estudante {
     }
 }
 
+- Estudante.kt
+[source,kotlin]
+// Todo o código Java foi reduzido a isto, mantendo a flexibilidade de um construtor vazio
+data class Estudante(
+    var nome: String = "",
+    var situacao: String = "",
+    var idade: Int = 0
+)
 
+- MainActivity.kt
+[source,kotlin]
+import androidx.appcompat.app.AppCompatActivity
+import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.view.View
+import android.widget.*
+import kotlin.concurrent.thread
+class MainActivity : AppCompatActivity() {
+    private lateinit var editTextNome: EditText
+    private lateinit var radioButtonR: RadioButton
+    private lateinit var radioButtonI: RadioButton
+    private lateinit var button: Button
+    private lateinit var spinner: Spinner
+    private lateinit var progressBar: ProgressBar
+    private lateinit var textViewResultado: TextView
+    private var estudante: Estudante? = null
+    private var progress = 0
+    private var idadeSelecionada = 0
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+        editTextNome = findViewById(R.id.editTextNome)
+        radioButtonR = findViewById(R.id.radioButtonR)
+        radioButtonI = findViewById(R.id.radioButtonI)
+        button = findViewById(R.id.button)
+        spinner = findViewById(R.id.spinner)
+        progressBar = findViewById(R.id.progressBar)
+        textViewResultado = findViewById(R.id.textViewResultado)
+        val adapter = ArrayAdapter.createFromResource(
+            this, R.array.idades_array,
+            android.R.layout.simple_spinner_item
+        )
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinner.adapter = adapter
+        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parentView: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                parentView?.getItemAtPosition(position)?.toString()?.toIntOrNull()?.let {
+                    idadeSelecionada = it
+                }
+            }
+            override fun onNothingSelected(parentView: AdapterView<*>?) {}
+        }
+        button.setOnClickListener { clicar() }
+    }
+    private fun executarProgressBar() {
+        progress = 0
+        progressBar.progress = progress
+        progressBar.visibility = View.VISIBLE
+        textViewResultado.text = ""
+        val handler = Handler(Looper.getMainLooper())
+        // Kotlin simplifica a criação de Threads com a função thread {}
+        thread {
+            while (progress < 100) {
+                try {
+                    Thread.sleep(1000) // Simula o atraso
+                } catch (e: InterruptedException) {
+                    e.printStackTrace()
+                }
+                handler.post {
+                    progress += 10
+                    progressBar.progress = progress
+                    if (progress >= 100) {
+                        textViewResultado.text = estudante.toString()
+                    }
+                }
+            }
+        }
+    }
+    private fun obterSituacao(): String {
+        return when {
+            radioButtonR.isChecked -> "regular"
+            radioButtonI.isChecked -> "irregular"
+            else -> ""
+        }
+    }
+    private fun clicar() {
+        val nome = editTextNome.text.toString().trim()
+        val situacao = obterSituacao()
+        if (nome.isEmpty()) {
+            textViewResultado.text = "Por favor, insira o nome."
+            return
+        }
+        if (situacao.isEmpty()) {
+            textViewResultado.text = "Por favor, selecione a situação."
+            return
+        }
+        estudante = Estudante(nome, situacao, idadeSelecionada)
+        executarProgressBar()
+    }
+}
 
