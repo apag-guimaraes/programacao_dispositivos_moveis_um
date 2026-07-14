@@ -403,6 +403,250 @@ public class SegundaActivity extends AppCompatActivity implements AdapterView.On
     }
 }
 
+- Pessoa.kt
+[source,kotlin]
+import android.os.Parcelable
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+import kotlinx.parcelize.Parcelize
+@Parcelize
+@Entity
+data class Pessoa(
+    @PrimaryKey(autoGenerate = true)
+    var id: Int = 0,
+    @ColumnInfo(name = "nome")
+    var nome: String = "",
+    @ColumnInfo(name = "telefone")
+    var telefone: String = ""
+) : Parcelable {
+    override fun toString(): String {
+        return "$nome - $telefone"
+    }
+}
+
+- PessoaDao.kt
+[source,kotlin]
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.Query
+import androidx.room.Update
+@Dao
+interface PessoaDao {
+    @Insert
+    suspend fun adicionar(p: Pessoa): Long 
+    @Query("SELECT * FROM pessoa")
+    suspend fun listar(): List<Pessoa>
+    @Update
+    suspend fun atualizar(p: Pessoa): Int
+    @Delete
+    suspend fun excluir(p: Pessoa): Int
+}
+
+- Banco.kt
+[source,kotlin]
+import androidx.room.Database
+import androidx.room.RoomDatabase
+@Database(entities = [Pessoa::class], version = 1)
+abstract class Banco : RoomDatabase() {
+    abstract fun pessoaDao(): PessoaDao
+}
+
+- BancoProvider.kt
+[source,kotlin]
+import android.content.Context
+import androidx.room.Room
+object BancoProvider {
+    @Volatile
+    private var INSTANCE: Banco? = null
+    fun getDatabase(context: Context): Banco {
+        return INSTANCE ?: synchronized(this) {
+            val instance = Room.databaseBuilder(
+                context.applicationContext,
+                Banco::class.java,
+                "meu_banco"
+            ).build()
+            INSTANCE = instance
+            instance
+        }
+    }
+}
+
+- MainActivity.kt
+[source,kotlin]
+import android.content.Intent
+import android.os.Build
+import android.os.Bundle
+import android.view.View
+import android.widget.Button
+import android.widget.EditText
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+class MainActivity : AppCompatActivity() {
+    private lateinit var editTextNome: EditText
+    private lateinit var editTextTelefone: EditText
+    private lateinit var buttonS: Button
+    private lateinit var buttonL: Button
+    private lateinit var buttonD: Button
+    private var p: Pessoa? = null
+    private lateinit var dao: PessoaDao
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+        editTextNome = findViewById(R.id.editTextNome)
+        editTextTelefone = findViewById(R.id.editTextTelefone)
+        buttonS = findViewById(R.id.buttonS)
+        buttonD = findViewById(R.id.buttonD)
+        buttonL = findViewById(R.id.buttonL)
+        p = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            intent.getParcelableExtra("dado", Pessoa::class.java)
+        } else {
+            @Suppress("DEPRECATION")
+            intent.getParcelableExtra("dado")
+        }
+        p?.let {
+            editTextNome.setText(it.nome)
+            editTextTelefone.setText(it.telefone)
+            buttonD.isEnabled = true
+        } ?: run {
+            buttonD.isEnabled = false
+        }
+        dao = BancoProvider.getDatabase(this).pessoaDao()
+    }
+    fun clicar(view: View) {
+        when (view.id) {
+            R.id.buttonS -> salvarOuAtualizar()
+            R.id.buttonL -> listarPessoas()
+            R.id.buttonD -> excluirPessoa()
+        }
+    }
+    private fun salvarOuAtualizar() {
+        val nome = editTextNome.text.toString().trim()
+        val telefone = editTextTelefone.text.toString().trim()
+        // Executa a tarefa de banco de dados em uma coroutine gerenciada pelo ciclo de vida
+        lifecycleScope.launch {
+            try {
+                if (p == null) {
+                    val nova = Pessoa(nome = nome, telefone = telefone)
+                    val resultado = withContext(Dispatchers.IO) { dao.adicionar(nova) }
+                    if (resultado != -1L) {
+                        Toast.makeText(this@MainActivity, "Salvo com sucesso", Toast.LENGTH_SHORT).show()
+                        limparCampos()
+                    } else {
+                        Toast.makeText(this@MainActivity, "Erro ao salvar", Toast.LENGTH_SHORT).show()
+                    }
+                } else {
+                    p?.apply {
+                        this.nome = nome
+                        this.telefone = telefone
+                    }
+                    val resultado = withContext(Dispatchers.IO) { dao.atualizar(p!!) }
+                    if (resultado > 0) {
+                        Toast.makeText(this@MainActivity, "Atualizado com sucesso", Toast.LENGTH_SHORT).show()
+                        limparCampos()
+                        p = null
+                        buttonD.isEnabled = false
+                    } else {
+                        Toast.makeText(this@MainActivity, "Erro ao atualizar", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            } catch (e: Exception) {
+                Toast.makeText(this@MainActivity, "Erro: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+    private fun listarPessoas() {
+        lifecycleScope.launch {
+            try {
+                val lista = withContext(Dispatchers.IO) { dao.listar() }
+                val dados = ArrayList(lista)
+                if (dados.isNotEmpty()) {
+                    val intent = Intent(this@MainActivity, SegundaActivity::class.java).apply {
+                        putParcelableArrayListExtra("dados", dados)
+                    }
+                    startActivity(intent)
+                    finish()
+                } else {
+                    Toast.makeText(this@MainActivity, "Nenhum registro cadastrado", Toast.LENGTH_SHORT).show()
+                }
+            } catch (e: Exception) {
+                Toast.makeText(this@MainActivity, "Erro ao listar: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+    private fun excluirPessoa() {
+        val pessoaParaExcluir = p ?: run {
+            Toast.makeText(this, "Selecione um registro para excluir", Toast.LENGTH_SHORT).show()
+            return
+        }
+        lifecycleScope.launch {
+            try {
+                val resultado = withContext(Dispatchers.IO) { dao.excluir(pessoaParaExcluir) }
+                if (resultado > 0) {
+                    Toast.makeText(this@MainActivity, "Excluído com sucesso", Toast.LENGTH_SHORT).show()
+                    limparCampos()
+                    p = null
+                    buttonD.isEnabled = false
+                } else {
+                    Toast.makeText(this@MainActivity, "Erro ao excluir", Toast.LENGTH_SHORT).show()
+                }
+            } catch (e: Exception) {
+                Toast.makeText(this@MainActivity, "Erro: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+    private fun limparCampos() {
+        editTextNome.setText("")
+        editTextTelefone.setText("")
+    }
+}
+
+- SegundaActivity.kt
+[source,kotlin]
+import android.content.Intent
+import android.os.Build
+import android.os.Bundle
+import android.view.View
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.ListView
+import androidx.appcompat.app.AppCompatActivity
+class SegundaActivity : AppCompatActivity(), AdapterView.OnItemClickListener {
+    private lateinit var listView: ListView
+    private lateinit var adapter: ArrayAdapter<Pessoa>
+    private var dados: ArrayList<Pessoa>? = null
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_segunda)
+        listView = findViewById(R.id.lista)
+        dados = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            intent.getParcelableArrayListExtra("dados", Pessoa::class.java)
+        } else {
+            @Suppress("DEPRECATION")
+            intent.getParcelableArrayListExtra("dados")
+        }
+        val listaSegura = dados ?: arrayListOf()
+        adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, listaSegura)
+        listView.adapter = adapter
+        listView.onItemClickListener = this
+    }
+    override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+        val pessoaSelecionada = parent?.getItemAtPosition(position) as? Pessoa
+        pessoaSelecionada?.let {
+            val intent = Intent(this, MainActivity::class.java).apply {
+                putExtra("dado", it)
+            }
+            startActivity(intent)
+            finish()
+        }
+    }
+}
+
 Versão 2: Esse exemplo é uma adaptação do exemplo disponibilizado em: STACKOVERFLOW. Android Room One-to-Many Relationship. 2021. Disponível: <https://stackoverflow.com/questions/66897173/android-room-one-to-many-relationship>. Pergunta feita pelo usuário <https://stackoverflow.com/users/328518/adil-bhatty> e respondida pelo usuário <https://stackoverflow.com/users/4744514/miket>.
 
 - activity_main.xml
@@ -657,6 +901,239 @@ public class MainActivity extends AppCompatActivity {
     }//onCreate
 }//class
 
+- Curso.kt
+[source,kotlin]
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+@Entity(tableName = "_curso")
+data class Curso(
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "curso_id")
+    var cursoid: Long? = null,
+    @ColumnInfo(name = "curso_nome")
+    var cursoNome: String
+) {
+    // Construtor secundário para permitir a criação rápida passando apenas o nome
+    constructor(cursoNome: String) : this(null, cursoNome)
+}
+
+- Disciplina.kt
+[source,kotlin]
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+@Entity(tableName = "_disciplina")
+data class Disciplina(
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "disciplina_id")
+    var disciplinaId: Long? = null,
+    @ColumnInfo(name = "disciplina_nome")
+    var disciplinaNome: String
+) {
+    // Construtor secundário para permitir a criação rápida passando apenas o nome
+    constructor(disciplinaNome: String) : this(null, disciplinaNome)
+}
+
+- Estudante.kt
+[source,kotlin]
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.PrimaryKey
+@Entity(
+    tableName = "_estudante",
+    foreignKeys = [
+        ForeignKey(
+            entity = Curso::class,
+            parentColumns = ["curso_id"],
+            childColumns = ["curso_id"],
+            onDelete = ForeignKey.CASCADE,
+            onUpdate = ForeignKey.CASCADE
+        ),
+        ForeignKey(
+            entity = Disciplina::class,
+            parentColumns = ["disciplina_id"],
+            childColumns = ["disciplina_id"],
+            onDelete = ForeignKey.CASCADE,
+            onUpdate = ForeignKey.CASCADE
+        )
+    ]
+)
+data class Estudante(
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "estudante_id")
+    var estudanteId: Long? = null,
+    @ColumnInfo(name = "estudante_nome")
+    var estudanteNome: String?,
+    @ColumnInfo(name = "curso_id", index = true)
+    var cursoId: Long?,
+    @ColumnInfo(name = "disciplina_id", index = true)
+    var disciplinaId: Long?
+) {
+    constructor(estudanteNome: String, cursoId: Long, disciplinaId: Long) : 
+            this(null, estudanteNome, cursoId, disciplinaId)
+}
+
+- EstudanteECursoEDisciplina.kt
+[source,kotlin]
+import androidx.room.Embedded
+data class EstudanteECursoEDisciplina(
+    @Embedded 
+    var estudante: Estudante,
+    @ColumnInfo(name = "curso_nome")
+    var curso_nome: String?,
+    @ColumnInfo(name = "disciplina_nome")
+    var disciplina_nome: String?
+)
+
+- EstudanteComCursoComDisciplina.kt
+[source,kotlin]
+import androidx.room.Embedded
+import androidx.room.Relation
+data class EstudanteComCursoComDisciplina(
+    @Embedded 
+    var estudante: Estudante,
+    @Relation(
+        entity = Curso::class,
+        parentColumn = "curso_id",
+        entityColumn = "curso_id"
+    )
+    var cursoList: List<Curso> = emptyList(),
+    @Relation(
+        entity = Disciplina::class,
+        parentColumn = "disciplina_id",
+        entityColumn = "disciplina_id"
+    )
+    var disciplinaList: List<Disciplina> = emptyList()
+)
+
+- AllDao.kt
+[source,kotlin]
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.Query
+@Dao
+interface AllDao {
+    @Insert
+    fun inserirCurso(s: Curso): Long
+    @Insert
+    fun inserirDisciplina(c: Disciplina): Long
+    @Insert
+    fun inserirEstudante(s: Estudante): Long
+    @Query("SELECT * FROM _curso")
+    fun obterTodosCursos(): List<Curso>
+    @Query("SELECT * FROM _curso WHERE curso_id = :curso_id")
+    fun obterUmCurso(curso_id: Long): Curso?
+    @Query("SELECT * FROM _disciplina")
+    fun obterTodasDisciplinas(): List<Disciplina>
+    @Query("SELECT * FROM _disciplina WHERE disciplina_id = :disciplina_id")
+    fun obterUmaDisciplina(disciplina_id: Long): Disciplina?
+    @Query(
+        """
+        SELECT _estudante.*, _curso.curso_nome, _disciplina.disciplina_nome 
+        FROM _estudante 
+        JOIN _curso ON _curso.curso_id = _estudante.curso_id 
+        JOIN _disciplina ON _disciplina.disciplina_id = _estudante.disciplina_id
+        """
+    )
+    fun obterEstudanteECursoEDisciplina(): List<EstudanteECursoEDisciplina>
+    @Query("SELECT * FROM _estudante")
+    fun obterEstudanteComCursoComDisciplina(): List<EstudanteComCursoComDisciplina>
+}
+
+- MyDatabase.kt
+[source,kotlin]
+import androidx.room.Database
+import androidx.room.RoomDatabase
+@Database(
+    entities = [Curso::class, Disciplina::class, Estudante::class], 
+    version = 1
+)
+abstract class MyDatabase : RoomDatabase() {
+    abstract fun allDao(): AllDao
+}
+
+- MainActivity.kt
+[source,kotlin]
+import android.os.Bundle
+import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
+import androidx.room.Room
+class MainActivity : AppCompatActivity() {
+    private lateinit var db: MyDatabase
+    private lateinit var allDao: AllDao
+    private lateinit var textViewUm: TextView
+    private lateinit var textViewDois: TextView
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+        textViewUm = findViewById(R.id.textViewUm)
+        textViewDois = findViewById(R.id.textViewDois)
+        db = Room.databaseBuilder(this, MyDatabase::class.java, "mydb")
+            .allowMainThreadQueries()
+            .build()
+        allDao = db.allDao()
+        // Inserção de Cursos
+        val cursos = arrayOf(
+            Curso("Curso1"),
+            Curso("Curso2"),
+            Curso("Curso3")
+        )
+        for (curso in cursos) {
+            allDao.inserirCurso(curso)
+        }
+        // Inserção de Disciplinas
+        val disciplinas = arrayOf(
+            Disciplina("Disciplina1"),
+            Disciplina("Disciplina2"),
+            Disciplina("Disciplina3")
+        )
+        for (disciplina in disciplinas) {
+            allDao.inserirDisciplina(disciplina)
+        }
+        // Inserção de Estudantes
+        val estudantes = arrayOf(
+            Estudante("João", 3, 3),
+            Estudante("Maria", 1, 2)
+        )
+        for (estudante in estudantes) {
+            allDao.inserirEstudante(estudante)
+        }
+        // Método 1: Usando POJO com Joins tradicionais no SQL
+        val estudantesComJoins = allDao.obterEstudanteECursoEDisciplina()
+        val dadosUm = StringBuilder()
+        for (item in estudantesComJoins) {
+            dadosUm.append(
+                """
+                ESTUDENTEINFO1: Estudante Nome = ${item.estudante.estudanteNome}
+                     ID=${item.estudante.estudanteId} CursoID=${item.estudante.cursoId} DisciplinaID=${item.estudante.disciplinaId}
+                     Curso Nome = ${item.curso_nome}
+                     Disciplina Nome = ${item.disciplina_nome}      
+                """.trimIndent()
+            )
+        }
+        textViewUm.text = dadosUm.toString()
+        // Método 2: Usando POJO com relações automáticas do Room (@Relation)
+        val estudantesComRelacoes = allDao.obterEstudanteComCursoComDisciplina()
+        val dadosDois = StringBuilder()
+        for (item in estudantesComRelacoes) {
+            // Evita IndexOutOfBounds obtendo o valor de forma segura com .firstOrNull() ou fallback padrão
+            val nomeCurso = item.cursoList.firstOrNull()?.cursoNome ?: "Nenhum"
+            val nomeDisciplina = item.disciplinaList.firstOrNull()?.disciplinaNome ?: "Nenhuma"
+            dadosDois.append(
+                """
+                ESTUDENTEINFO2: Estudante Nome = ${item.estudante.estudanteNome}
+                     ID=${item.estudante.estudanteId} CursoID=${item.estudante.cursoId} DisciplinaID=${item.estudante.disciplinaId}
+                     Curso Nome = $nomeCurso
+                     Disciplina Nome = $nomeDisciplina
+                """.trimIndent()
+            )
+        }
+        textViewDois.text = dadosDois.toString()
+    }
+}
+
 Versão 3: variações do exemplo anterior (versão 2)
 
 Multiplicidade 1 para 1:
@@ -842,6 +1319,154 @@ public class MainActivity extends AppCompatActivity {
             Log.d("DB_TESTE", msg);
         }
         textViewResultado.setText(msg);
+    }
+}
+
+- Curso.kt
+[source,kotlin]
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+@Entity(tableName = "_curso")
+data class Curso(
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "curso_id")
+    var cursoId: Long? = null,
+    @ColumnInfo(name = "curso_nome")
+    var cursoNome: String
+) {
+    // Construtor de conveniência para instanciar passando apenas o nome
+    constructor(cursoNome: String) : this(null, cursoNome)
+}
+
+- Disciplina.kt
+[source,kotlin]
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+@Entity(tableName = "_disciplina")
+data class Disciplina(
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "disciplina_id")
+    var disciplinaId: Long? = null,
+    @ColumnInfo(name = "disciplina_nome")
+    var disciplinaNome: String
+) {
+    // Construtor de conveniência para instanciar passando apenas o nome
+    constructor(disciplinaNome: String) : this(null, disciplinaNome)
+}
+
+- Estudante.kt
+[source,kotlin]
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.Index
+import androidx.room.PrimaryKey
+@Entity(
+    tableName = "_estudante",
+    foreignKeys = [
+        ForeignKey(
+            entity = Curso::class,
+            parentColumns = ["curso_id"],
+            childColumns = ["curso_id"],
+            onDelete = ForeignKey.CASCADE
+        ),
+        ForeignKey(
+            entity = Disciplina::class,
+            parentColumns = ["disciplina_id"],
+            childColumns = ["disciplina_id"],
+            onDelete = ForeignKey.CASCADE
+        )
+    ],
+    indices = [
+        Index(value = ["estudante_nome", "curso_id", "disciplina_id"], unique = true)
+    ]
+)
+data class Estudante(
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "estudante_id")
+    var estudanteId: Long? = null,
+    @ColumnInfo(name = "estudante_nome")
+    var estudanteNome: String?,
+    @ColumnInfo(name = "curso_id", index = true)
+    var cursoId: Long?,
+    @ColumnInfo(name = "disciplina_id", index = true)
+    var disciplinaId: Long?
+) {
+    // Construtor de conveniência para a inserção rápida de registros
+    constructor(estudanteNome: String, cursoId: Long, disciplinaId: Long) :
+            this(null, estudanteNome, cursoId, disciplinaId)
+}
+
+- AppDao.kt
+[source,kotlin]
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+@Dao
+interface AppDao {
+    @Insert
+    fun inserirCurso(c: Curso): Long
+    @Insert
+    fun inserirDisciplina(d: Disciplina): Long
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    fun inserirEstudante(e: Estudante): Long
+    @Query("SELECT * FROM _curso")
+    fun obterCursos(): List<Curso>
+    @Query("SELECT * FROM _disciplina")
+    fun obterDisciplinas(): List<Disciplina>
+    @Query("SELECT * FROM _estudante")
+    fun obterEstudantes(): List<Estudante>
+}
+
+- AppDatabase.kt
+[source,kotlin]
+import androidx.room.Database
+import androidx.room.RoomDatabase
+@Database(
+    entities = [Curso::class, Disciplina::class, Estudante::class],
+    version = 1
+)
+abstract class AppDatabase : RoomDatabase() {
+    abstract fun appDao(): AppDao
+}
+
+- MainActivity.kt
+[source,kotlin]
+import android.os.Bundle
+import android.util.Log
+import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
+import androidx.room.Room
+class MainActivity : AppCompatActivity() {
+    private lateinit var textViewResultado: TextView
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+        textViewResultado = findViewById(R.id.textViewResultado)
+        // Instanciação do banco de dados (Mantendo consultas na Thread principal)
+        val db = Room.databaseBuilder(
+            applicationContext,
+            AppDatabase::class.java,
+            "escola.db"
+        ).allowMainThreadQueries().build()
+        val dao = db.appDao()
+        // Inserção e captura de IDs gerados
+        val cursoId = dao.inserirCurso(Curso("Ciência da Computação"))
+        val discId = dao.inserirDisciplina(Disciplina("Banco de Dados"))
+    
+        dao.inserirEstudante(Estudante("Ana", cursoId, discId))
+        // Consulta e listagem dos dados no Logcat
+        val estudantes = dao.obterEstudantes()
+        var msg: String? = null
+        for (e in estudantes) {
+            msg = "Estudante: ${e.estudanteNome} | cursoId=${e.cursoId} | disciplinaId=${e.disciplinaId}"
+            Log.d("DB_TESTE", msg)
+        }
+        // Exibe o último estudante registrado ou uma mensagem padrão se a lista estiver vazia
+        textViewResultado.text = msg ?: "Nenhum estudante cadastrado"
     }
 }
 
@@ -1095,29 +1720,222 @@ public class MainActivity extends AppCompatActivity {
     }
 }
 
+- Curso.kt
+[source,kotlin]
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+@Entity(tableName = "_curso")
+data class Curso(
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "curso_id")
+    var cursoId: Long? = null,
+    @ColumnInfo(name = "curso_nome")
+    var cursoNome: String
+) {
+    // Permite instanciar apenas passando o nome
+    constructor(cursoNome: String) : this(null, cursoNome)
+}
 
+- Disciplina.kt
+[source,kotlin]
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+@Entity(tableName = "_disciplina")
+data class Disciplina(
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "disciplina_id")
+    var disciplinaId: Long? = null,
 
+    @ColumnInfo(name = "disciplina_nome")
+    var disciplinaNome: String
+) {
+    // Permite instanciar apenas passando o nome
+    constructor(disciplinaNome: String) : this(null, disciplinaNome)
+}
 
+- Estudante.kt
+[source,kotlin]
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.PrimaryKey
+@Entity(
+    tableName = "_estudante",
+    foreignKeys = [
+        ForeignKey(
+            entity = Curso::class,
+            parentColumns = ["curso_id"],
+            childColumns = ["curso_id"],
+            onDelete = ForeignKey.CASCADE
+        )
+    ]
+)
+data class Estudante(
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "estudante_id")
+    var estudanteId: Long? = null,
+    @ColumnInfo(name = "estudante_nome")
+    var estudanteNome: String?,
+    @ColumnInfo(name = "curso_id", index = true)
+    var cursoId: Long?
+) {
+    // Permite instanciar passando apenas o nome e o ID do curso
+    constructor(estudanteNome: String, cursoId: Long) : this(null, estudanteNome, cursoId)
+}
 
+- EstudanteDisciplinaCrossRef.kt
+[source,kotlin]
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.ForeignKey
+@Entity(
+    tableName = "_estudante_disciplina",
+    primaryKeys = ["estudante_id", "disciplina_id"],
+    foreignKeys = [
+        ForeignKey(
+            entity = Estudante::class,
+            parentColumns = ["estudante_id"],
+            childColumns = ["estudante_id"],
+            onDelete = ForeignKey.CASCADE
+        ),
+        ForeignKey(
+            entity = Disciplina::class,
+            parentColumns = ["disciplina_id"],
+            childColumns = ["disciplina_id"],
+            onDelete = ForeignKey.CASCADE
+        )
+    ]
+)
+data class EstudanteDisciplinaCrossRef(
+    @ColumnInfo(name = "estudante_id")
+    var estudanteId: Long,
 
+    @ColumnInfo(name = "disciplina_id")
+    var disciplinaId: Long
+)
 
+- DisciplinaComEstudantes.kt
+[source,kotlin]
+import androidx.room.Embedded
+import androidx.room.Junction
+import androidx.room.Relation
+data class DisciplinaComEstudantes(
+    @Embedded 
+    var disciplina: Disciplina,
+    @Relation(
+        parentColumn = "disciplina_id",
+        entityColumn = "estudante_id",
+        associateBy = Junction(EstudanteDisciplinaCrossRef::class)
+    )
+    var estudantes: List<Estudante> = emptyList()
+)
 
+- EstudanteComDisciplinas.kt
+[source,kotlin]
+import androidx.room.Embedded
+import androidx.room.Junction
+import androidx.room.Relation
+data class EstudanteComDisciplinas(
+    @Embedded 
+    var estudante: Estudante,
+    @Relation(
+        parentColumn = "estudante_id",
+        entityColumn = "disciplina_id",
+        associateBy = Junction(EstudanteDisciplinaCrossRef::class)
+    )
+    var disciplinas: List<Disciplina> = emptyList()
+)
 
+- AppDao.kt
+[source,kotlin]
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.Query
+import androidx.room.Transaction
+@Dao
+interface AppDao {
+    @Insert
+    fun inserirCurso(c: Curso): Long
+    @Insert
+    fun inserirDisciplina(d: Disciplina): Long
+    @Insert
+    fun inserirEstudante(e: Estudante): Long
+    @Insert
+    fun inserirEstudanteDisciplina(crossRef: EstudanteDisciplinaCrossRef)
+    @Query("SELECT * FROM _estudante")
+    fun obterEstudantes(): List<Estudante>
+    @Query("SELECT * FROM _disciplina")
+    fun obterDisciplinas(): List<Disciplina>
+    @Transaction
+    @Query("SELECT * FROM _estudante WHERE estudante_id = :id")
+    fun obterEstudanteComDisciplinas(id: Long): EstudanteComDisciplinas?
+    @Transaction
+    @Query("SELECT * FROM _disciplina WHERE disciplina_id = :id")
+    fun obterDisciplinaComEstudantes(id: Long): DisciplinaComEstudantes?
+}
 
+- AppDatabase.kt
+[source,kotlin]
+import androidx.room.Database
+import androidx.room.RoomDatabase
+@Database(
+    entities = [
+        Curso::class,
+        Disciplina::class,
+        Estudante::class,
+        EstudanteDisciplinaCrossRef::class
+    ],
+    version = 1
+)
+abstract class AppDatabase : RoomDatabase() {
+    abstract fun appDao(): AppDao
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+- MainActivity.kt
+[source,kotlin]
+import android.os.Bundle
+import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
+import androidx.room.Room
+class MainActivity : AppCompatActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+        val db = Room.databaseBuilder(
+            applicationContext,
+            AppDatabase::class.java,
+            "escola_n_n.db"
+        ).allowMainThreadQueries().build()
+        val dao = db.appDao()
+        // 1. Inserir Curso e Disciplinas
+        val cursoId = dao.inserirCurso(Curso("Engenharia de Software"))
+        val disc1Id = dao.inserirDisciplina(Disciplina("Programação Mobile"))
+        val disc2Id = dao.inserirDisciplina(Disciplina("Inteligência Artificial"))
+        // 2. Inserir Estudante
+        val estId = dao.inserirEstudante(Estudante("Ana", cursoId))
+        // 3. Associar estudante às disciplinas (Tabela de Junção N:N)
+        dao.inserirEstudanteDisciplina(EstudanteDisciplinaCrossRef(estId, disc1Id))
+        dao.inserirEstudanteDisciplina(EstudanteDisciplinaCrossRef(estId, disc2Id))
+        // 4. Buscar e registrar Estudante com suas Disciplinas
+        val ec = dao.obterEstudanteComDisciplinas(estId)
+        ec?.let {
+            Log.d("DB_TESTE", "Estudante: ${it.estudante.estudanteNome}")
+            for (d in it.disciplinas) {
+                Log.d("DB_TESTE", " - Disciplina: ${d.disciplinaNome}")
+            }
+        }
+        // 5. Buscar e registrar Disciplina com seus Estudantes matriculados
+        val dc = dao.obterDisciplinaComEstudantes(disc1Id)
+        dc?.let {
+            Log.d("DB_TESTE", "Disciplina: ${it.disciplina.disciplinaNome}")
+            for (e in it.estudantes) {
+                Log.d("DB_TESTE", " - Estudante: ${e.estudanteNome}")
+            }
+        }
+    }
+}
 
 
 
