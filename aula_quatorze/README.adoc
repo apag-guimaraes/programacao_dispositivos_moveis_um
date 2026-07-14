@@ -93,6 +93,17 @@ public class MainActivity extends AppCompatActivity {
    }
 }
 
+- MainActivity.kt
+[source,kotlin]
+import androidx.appcompat.app.AppCompatActivity
+import android.os.Bundle
+class MainActivity : AppCompatActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+    }
+}
+
 = Recycler View
 
 Recurso que permite criar listas dinâmicas com mais eficiência e economia de recursos. Para mais detalhes sobre Recycler View: GOOGLE DEVELOPERS. Criar listas dinâmicas com o Recycler View. Disponível em: https://developer.android.com/guide/topics/ui/layout/recyclerview?hl=pt-br. Acesso: 14 de jul. 2025.
@@ -293,5 +304,89 @@ public class MainActivity extends AppCompatActivity {
     }
 }
 
+- ItemModel.kt
+[source,kotlin]
+data class ItemModel(
+    var imagem: Int,
+    var texto: String
+)
 
+- ItemAdapter.kt
+[source,kotlin]
+import android.content.Context
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
+class ItemAdapter(
+    private val context: Context,
+    private val itemModelArrayList: ArrayList<ItemModel>,
+    private val listener: OnItemClickListener
+) : RecyclerView.Adapter<ItemAdapter.ViewHolder>() {
+    interface OnItemClickListener {
+        fun onItemClick(item: ItemModel)
+    }
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val view = LayoutInflater.from(context).inflate(R.layout.item_layout, parent, false)
+        return ViewHolder(view)
+    }
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        val item = itemModelArrayList[position]
+        holder.imageView.setImageResource(item.imagem)
+        holder.textView.text = item.texto
 
+        holder.itemView.setOnClickListener {
+            listener.onItemClick(item)
+        }
+    }
+    override fun getItemCount(): Int {
+        return itemModelArrayList.size
+    }
+    class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val imageView: ImageView = itemView.findViewById(R.id.imageView)
+        val textView: TextView = itemView.findViewById(R.id.textView)
+    }
+}
+
+- ItemData.kt
+[source,kotlin]
+class ItemData {
+    companion object {
+        fun getItems(): ArrayList<ItemModel> {
+            val itemList = ArrayList<ItemModel>()
+            itemList.add(ItemModel(R.mipmap.ic_launcher, "Item 1"))
+            itemList.add(ItemModel(R.mipmap.ic_launcher, "Item 2"))
+            itemList.add(ItemModel(R.mipmap.ic_launcher, "Item 3"))
+            return itemList
+        }
+    }
+}
+
+- MainActivity.kt
+[source,kotlin]
+import android.os.Bundle
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+class MainActivity : AppCompatActivity() {
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var adapter: ItemAdapter
+    private lateinit var itemList: ArrayList<ItemModel>
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+        recyclerView = findViewById(R.id.recycleView)
+        recyclerView.layoutManager = LinearLayoutManager(this)
+        itemList = ItemData.getItems()
+        // Implementação simplificada da interface utilizando SAM Conversion (Lambda do Kotlin)
+        adapter = ItemAdapter(this, itemList, object : ItemAdapter.OnItemClickListener {
+            override fun onItemClick(item: ItemModel) {
+                Toast.makeText(this@MainActivity, "Clicou em: ${item.texto}", Toast.LENGTH_SHORT).show()
+            }
+        })
+        recyclerView.adapter = adapter
+    }
+}
