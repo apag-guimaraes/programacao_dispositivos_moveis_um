@@ -196,6 +196,127 @@ public class SegundaActivity extends AppCompatActivity {
     }
 }//class
 
+- ManipulaArquivo.kt
+[source,kotlin]
+import android.content.Context
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
+class ManipulaArquivo(private val context: Context) {
+    @Throws(IOException::class)
+    fun salvarArquivo(nome: String, conteudo: String, append: Boolean) {
+        val arquivo = File(context.filesDir, nome)
+        FileOutputStream(arquivo, append).use { fos ->
+            fos.write(conteudo.toByteArray())
+        }
+    }
+    @Throws(IOException::class)
+    fun lerArquivo(nome: String): String {
+        return context.openFileInput(nome).bufferedReader().use { reader ->
+            reader.readText()
+        }
+    }
+    fun deletarArquivo(nome: String): Boolean {
+        return context.deleteFile(nome)
+    }
+}
+
+- MainActivity.kt
+[source,kotlin]
+import android.content.Intent
+import android.os.Bundle
+import android.widget.Button
+import android.widget.EditText
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import java.io.IOException
+class MainActivity : AppCompatActivity() {
+    private lateinit var editTextTexto: EditText
+    private lateinit var buttonSalvar: Button
+    private lateinit var buttonExcluir: Button
+    private lateinit var arquivo: ManipulaArquivo
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+        editTextTexto = findViewById(R.id.editTextTexto)
+        buttonSalvar = findViewById(R.id.buttonSalvar)
+        buttonExcluir = findViewById(R.id.buttonExcluir)
+        arquivo = ManipulaArquivo(this)
+        intent?.getStringExtra("texto")?.let { texto ->
+            editTextTexto.setText(texto)
+        }
+        buttonSalvar.setOnClickListener {
+            salvarTexto()
+        }
+        buttonExcluir.setOnClickListener {
+            excluirArquivo()
+        }
+    }
+    private fun salvarTexto() {
+        val conteudo = editTextTexto.text.toString()
+        try {
+            arquivo.salvarArquivo("meuArq.txt", conteudo, true)
+            Toast.makeText(this, "Texto salvo com sucesso", Toast.LENGTH_SHORT).show()
+            editTextTexto.setText("")
+            val intent = Intent(this, SegundaActivity::class.java)
+            startActivity(intent)
+        } catch (e: IOException) {
+            e.printStackTrace()
+            Toast.makeText(this, "Erro ao salvar o arquivo", Toast.LENGTH_SHORT).show()
+        }
+    }
+    private fun excluirArquivo() {
+        try {
+            arquivo.deletarArquivo("meuArq.txt")
+            editTextTexto.setText("")
+            Toast.makeText(this, "Arquivo excluído", Toast.LENGTH_SHORT).show()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Toast.makeText(this, "Erro ao excluir o arquivo", Toast.LENGTH_SHORT).show()
+        }
+    }
+}
+
+- SegundaActivity.kt
+[source,kotlin]
+import android.content.Intent
+import android.os.Bundle
+import android.widget.Button
+import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import java.io.IOException
+class SegundaActivity : AppCompatActivity() {
+    private lateinit var textViewTexto: TextView
+    private lateinit var buttonVoltar: Button
+    private lateinit var arquivo: ManipulaArquivo
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_segunda)
+        textViewTexto = findViewById(R.id.textViewTexto)
+        buttonVoltar = findViewById(R.id.buttonVoltar)
+        arquivo = ManipulaArquivo(this)
+        try {
+            val texto = arquivo.lerArquivo("meuArq.txt")
+            textViewTexto.text = texto
+        } catch (e: IOException) {
+            e.printStackTrace()
+            textViewTexto.text = "Erro ao carregar conteúdo"
+            Toast.makeText(this, "Erro ao ler o arquivo", Toast.LENGTH_SHORT).show()
+        }
+        buttonVoltar.setOnClickListener {
+            voltarTela()
+        }
+    }
+    private fun voltarTela() {
+        val intent = Intent(this, MainActivity::class.java).apply {
+            putExtra("texto", textViewTexto.text.toString())
+        }
+        startActivity(intent)
+        finish()
+    }
+}
+
 Exemplos práticos (Armazenamento no External Storage):
 
 - ManipulaArquivo.java
@@ -397,6 +518,138 @@ public class SegundaActivity extends AppCompatActivity {
     }
 }
 
+- ManipulaArquivo.kt
+[source,kotlin]
+import android.content.Context
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
+import java.io.IOException
+class ManipulaArquivo(private val context: Context) {
+    private fun getArquivo(nome: String): File {
+        val dir = context.getExternalFilesDir(null)
+        return File(dir, nome)
+    }
+    @Throws(IOException::class)
+    fun salvarArquivo(nome: String, conteudo: String) {
+        val arquivo = getArquivo(nome)
+        FileOutputStream(arquivo, true).use { fos ->
+            fos.write(conteudo.toByteArray())
+        }
+    }
+    @Throws(IOException::class)
+    fun lerArquivo(nome: String): String {
+        val arquivo = getArquivo(nome)
+        return FileInputStream(arquivo).bufferedReader().use { reader ->
+            reader.readText()
+        }
+    }
+    fun deletarArquivo(nome: String): Boolean {
+        val arquivo = getArquivo(nome)
+        return if (arquivo.exists()) {
+            arquivo.delete()
+        } else {
+            false
+        }
+    }
+}
+
+- MainActivity.kt
+[source,kotlin]
+import android.content.Intent
+import android.os.Bundle
+import android.widget.Button
+import android.widget.EditText
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import java.io.IOException
+class MainActivity : AppCompatActivity() {
+    private lateinit var editTextTexto: EditText
+    private lateinit var buttonSalvar: Button
+    private lateinit var buttonExcluir: Button
+    private lateinit var arquivo: ManipulaArquivo
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+        editTextTexto = findViewById(R.id.editTextNome)
+        buttonSalvar = findViewById(R.id.buttonS)
+        buttonExcluir = findViewById(R.id.buttonE)
+        arquivo = ManipulaArquivo(this)
+        intent?.getStringExtra("texto")?.let { texto ->
+            editTextTexto.setText(texto)
+        }
+        buttonSalvar.setOnClickListener {
+            salvarTexto()
+        }
+        buttonExcluir.setOnClickListener {
+            excluirArquivo()
+        }
+    }
+    private fun salvarTexto() {
+        val conteudo = editTextTexto.text.toString()
+        try {
+            arquivo.salvarArquivo("meuArq.txt", conteudo)
+            Toast.makeText(this, "Texto salvo com sucesso", Toast.LENGTH_SHORT).show()
+            editTextTexto.setText("")
+            val intent = Intent(this, SegundaActivity::class.java)
+            startActivity(intent)
+        } catch (e: IOException) {
+            e.printStackTrace()
+            Toast.makeText(this, "Erro ao salvar o arquivo", Toast.LENGTH_SHORT).show()
+        }
+    }
+    private fun excluirArquivo() {
+        try {
+            arquivo.deletarArquivo("meuArq.txt")
+            editTextTexto.setText("")
+            Toast.makeText(this, "Arquivo excluído", Toast.LENGTH_SHORT).show()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Toast.makeText(this, "Erro ao excluir o arquivo", Toast.LENGTH_SHORT).show()
+        }
+    }
+}
+
+- SegundaActivity.kt
+[source,kotlin]
+import android.content.Intent
+import android.os.Bundle
+import android.widget.Button
+import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import java.io.IOException
+class SegundaActivity : AppCompatActivity() {
+    private lateinit var textViewTexto: TextView
+    private lateinit var buttonVoltar: Button
+    private lateinit var arquivo: ManipulaArquivo
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_segunda)
+        textViewTexto = findViewById(R.id.textViewTexto)
+        buttonVoltar = findViewById(R.id.buttonVoltar)
+        arquivo = ManipulaArquivo(this)
+        try {
+            val texto = arquivo.lerArquivo("meuArq.txt")
+            textViewTexto.text = texto
+        } catch (e: IOException) {
+            e.printStackTrace()
+            textViewTexto.text = "Erro ao carregar conteúdo"
+            Toast.makeText(this, "Erro ao ler o arquivo", Toast.LENGTH_SHORT).show()
+        }
+        buttonVoltar.setOnClickListener {
+            voltarTela()
+        }
+    }
+    private fun voltarTela() {
+        val intent = Intent(this, MainActivity::class.java).apply {
+            putExtra("texto", textViewTexto.text.toString())
+        }
+        startActivity(intent)
+        finish()
+    }
+}
+
 Exemplos práticos (Armazenamento externo no Diretório Downloads):
 
 - ManipulaArquivo.java
@@ -579,4 +832,143 @@ public class SegundaActivity extends AppCompatActivity {
     }
 }
 
+- ManipulaArquivo.kt
+[source,kotlin]
+import android.content.ContentUris
+import android.content.ContentValues
+import android.content.Context
+import android.net.Uri
+import android.os.Environment
+import android.provider.MediaStore
+import android.util.Log
+class ManipulaArquivo {
+    companion object {
+        private const val TAG = "FileManager"
+        private const val NOME_ARQUIVO = "meuArq.txt"
+        fun salvarDados(context: Context, data: String): Boolean {
+            try {
+                val valores = ContentValues().apply {
+                    put(MediaStore.MediaColumns.DISPLAY_NAME, NOME_ARQUIVO)
+                    put(MediaStore.MediaColumns.MIME_TYPE, "text/plain")
+                    put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS)
+                }
+                val uri = context.contentResolver.insert(
+                    MediaStore.Files.getContentUri("external"), 
+                    valores
+                )
+                uri?.let { validUri ->
+                    context.contentResolver.openOutputStream(validUri).use { outputStream ->
+                        outputStream?.write(data.toByteArray())
+                        return true
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Erro ao salvar o arquivo no diretório Downloads", e)
+            }
+            return false
+        }
+        fun lerDados(context: Context): String {
+            val dados = StringBuilder()
+            val uri = MediaStore.Files.getContentUri("external")
+            val selecao = "${MediaStore.MediaColumns.DISPLAY_NAME} = ?"
+            val argumentos = arrayOf(NOME_ARQUIVO)
+            try {
+                context.contentResolver.query(uri, null, selecao, argumentos, null).use { cursor ->
+                    if (cursor != null && cursor.moveToFirst()) {
+                        val idColuna = cursor.getColumnIndex(MediaStore.MediaColumns._ID)
+                        if (idColuna != -1) {
+                            val idArquivo = cursor.getLong(idColuna)
+                            val uriArquivo = ContentUris.withAppendedId(
+                                MediaStore.Files.getContentUri("external"), 
+                                idArquivo
+                            )
+                            context.contentResolver.openInputStream(uriArquivo).use { inputStream ->
+                                inputStream?.bufferedReader()?.use { reader ->
+                                    dados.append(reader.readText())
+                                }
+                            }
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Erro ao ler o arquivo", e)
+            }
+            return dados.toString()
+        }
+        fun deletarDados(context: Context): Boolean {
+            val uri = MediaStore.Files.getContentUri("external")
+            val selecao = "${MediaStore.MediaColumns.DISPLAY_NAME} = ?"
+            val argumentos = arrayOf(NOME_ARQUIVO)
+            try {
+                val linhasDeletadas = context.contentResolver.delete(uri, selecao, argumentos)
+                return linhasDeletadas > 0
+            } catch (e: Exception) {
+                Log.e(TAG, "Erro ao excluir o arquivo", e)
+            }
+            return false
+        }
+    }
+}
 
+- MainActivity.kt
+[source,koltin]
+import android.content.Intent
+import android.os.Bundle
+import android.view.View
+import android.widget.Button
+import android.widget.EditText
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+class MainActivity : AppCompatActivity() {
+    private lateinit var editTextNome: EditText
+    private lateinit var buttonS: Button
+    private lateinit var buttonE: Button
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+        editTextNome = findViewById(R.id.editTextNome)
+        buttonS = findViewById(R.id.buttonS)
+        buttonE = findViewById(R.id.buttonE)
+        intent?.getStringExtra("msg")?.let { msg ->
+            editTextNome.setText(msg)
+        }
+    }
+    fun clicar(view: View) {
+        when (view.id) {
+            R.id.buttonS -> {
+                val dado = editTextNome.text.toString()
+                if (ManipulaArquivo.salvarDados(applicationContext, dado)) {
+                    Toast.makeText(applicationContext, "Salvo com sucesso", Toast.LENGTH_SHORT).show()
+                    val intent = Intent(applicationContext, SegundaActivity::class.java)
+                    startActivity(intent)
+                } else {
+                    Toast.makeText(applicationContext, "Erro ao salvar", Toast.LENGTH_SHORT).show()
+                }
+            }
+            R.id.buttonE -> {
+                if (ManipulaArquivo.deletarDados(applicationContext)) {
+                    Toast.makeText(applicationContext, "Arquivo excluído", Toast.LENGTH_SHORT).show()
+                    editTextNome.setText("")
+                } else {
+                    Toast.makeText(applicationContext, "Erro ao excluir", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+}
+
+- SegundaActivity.kt
+[source,kotlin]
+import android.os.Bundle
+import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
+class SegundaActivity : AppCompatActivity() {
+    private lateinit var textView: TextView
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_segunda)
+        textView = findViewById(R.id.textView)
+        val data = ManipulaArquivo.lerDados(applicationContext)
+        textView.text = data
+    }
+}
