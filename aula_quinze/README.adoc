@@ -1373,8 +1373,686 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 }
 
+== App Planetas com Fragmentos, banco de dados e Toolbar
 
+- menu.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/sol"
+        android:icon="@drawable/sun"
+        android:title="@string/sol" />
+    <item android:id="@+id/lua"
+        android:icon="@drawable/lua"
+        android:title="@string/lua" />
+</menu>
 
+- toolbar.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/toolbar"
+    android:layout_height="wrap_content"
+    android:background="?attr/colorTertiary"
+    app:titleTextColor="?attr/colorOnPrimary"
+    android:elevation="10dp">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        />
+</androidx.appcompat.widget.Toolbar>
 
+- item_list.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="6dp"
+    app:contentPadding="0dp">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:gravity="center_vertical">
+        <ImageView
+            android:id="@+id/imagemView"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:src="@mipmap/ic_launcher"
+            android:contentDescription="Imagem do Planeta" />
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:text="@string/nomePlaneta"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@color/black" />
+    </LinearLayout>
+</androidx.cardview.widget.CardView>
 
+- fragment_detalhe.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp"
+        android:gravity="center_horizontal"
+        android:background="@android:color/white">
+        <ImageView
+            android:id="@+id/imgDetalhe"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:src="@mipmap/ic_launcher"
+            android:layout_marginBottom="20dp"/>
+        <TextView
+            android:id="@+id/txtNomeDetalhe"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="32sp"
+            android:textStyle="bold"
+            android:text="Nome"
+            android:layout_marginBottom="10dp"/>
+        <TextView
+            android:id="@+id/txtInfoAstro"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="18sp"
+            android:gravity="center"
+            android:text="Informações do Astro"
+            android:visibility="gone"/>
+        <LinearLayout
+            android:id="@+id/layoutCalculadora"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
+            android:visibility="gone"> <TextView
+            android:id="@+id/txtGravidade"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="18sp"
+            android:layout_marginBottom="20dp"
+            android:text="Gravidade: X m/s²" />
+            <EditText
+                android:id="@+id/editNomeUsuario"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Digite seu nome"
+                android:inputType="textPersonName"
+                android:gravity="center"
+                android:layout_marginBottom="10dp"/>
+            <EditText
+                android:id="@+id/editPeso"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Digite seu peso na Terra (kg)"
+                android:inputType="numberDecimal"
+                android:gravity="center"/>
+            <Button
+                android:id="@+id/btnCalcular"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Calcular Peso"
+                android:layout_marginTop="10dp"/>
+            <ProgressBar
+                android:id="@+id/progressBar"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:max="100"
+                android:visibility="invisible"/>
+            <TextView
+                android:id="@+id/resultadoPeso"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:layout_marginTop="20dp"
+                android:textColor="@android:color/holo_blue_dark"/>
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>
+
+- activity_main.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <include layout="@layout/toolbar" />
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerViewItens"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scrollbars="vertical" />
+    </LinearLayout>
+    <FrameLayout
+        android:id="@+id/fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+</FrameLayout>
+
+- activity_detalhe.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:gravity="center_horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <ImageView
+        android:id="@+id/imagemPlaneta"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_gravity="center"
+        android:layout_marginBottom="16dp"
+        android:scaleType="fitCenter" />
+    <TextView
+        android:id="@+id/nomePlaneta"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="8dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    <TextView
+        android:id="@+id/gravidadePlaneta"
+        android:textSize="18sp"
+        android:layout_marginBottom="16dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    <EditText
+        android:id="@+id/editPeso"
+        android:hint="@string/digite_seu_peso"
+        android:inputType="numberDecimal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <Button
+        android:id="@+id/btnCalcular"
+        android:text="@string/calcular_peso"
+        android:layout_marginTop="12dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:visibility="invisible" />
+    <TextView
+        android:id="@+id/resultadoPeso"
+        android:textSize="18sp"
+        android:layout_marginTop="16dp"
+        android:textColor="@android:color/holo_blue_dark"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+</LinearLayout>
+
+- activity_astro_detalhe.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:gravity="center_horizontal"
+    android:background="@color/black"
+    tools:context=".AstroDetalheActivity">
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbarAstro"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        app:titleTextColor="@android:color/white"
+        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"/>
+    <ImageView
+        android:id="@+id/imagemAstro"
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        android:layout_marginTop="20dp"
+        android:contentDescription="Imagem do astro"
+        tools:src="@drawable/ic_launcher_foreground" />
+    <TextView
+    android:id="@+id/nomeAstro"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="24dp"
+    android:textColor="@android:color/white"
+    android:textSize="32sp"
+    android:textStyle="bold"
+    tools:text="@string/nome_do_planeta" />
+    <TextView
+        android:id="@+id/temperaturaAstro"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:textColor="#E0E0E0"
+        android:textSize="18sp"
+        tools:text="@string/temperatura_do_planeta" />
+    <TextView
+        android:id="@+id/distanciaAstro"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:textColor="#E0E0E0"
+        android:textSize="18sp"
+        tools:text="@string/Distancia_da_terra" />
+</LinearLayout>
+
+- Historico.java
+[source,java]
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+@Entity(tableName = "tabela_historico")
+public class Historico {
+    @PrimaryKey(autoGenerate = true)
+    public int id;
+    public String nomeUsuario;
+    public double msnInserida; 
+    public double pesoCalculado;
+    public String nomePlaneta;
+    // Construtor padrão exigido pelo Room
+    public Historico() {}
+    public Historico(String nomeUsuario, double msnInserida, double pesoCalculado, String nomePlaneta) {
+        this.nomeUsuario = nomeUsuario;
+        this.msnInserida = msnInserida;
+        this.pesoCalculado = pesoCalculado;
+        this.nomePlaneta = nomePlaneta;
+    }
+}
+
+- ItemLista.java
+[source,java]
+import java.io.Serializable;
+public class ItemLista implements Serializable {
+    private String nome;
+    private int imagem;
+    private Double gravidade;
+    private String infoExtra;
+    public ItemLista(String nome, int imagem, Double gravidade) {
+        this.nome = nome;
+        this.imagem = imagem;
+        this.gravidade = gravidade;
+        this.infoExtra = null;
+    }
+    public ItemLista(String nome, int imagem, String infoExtra) {
+        this.nome = nome;
+        this.imagem = imagem;
+        this.infoExtra = infoExtra;
+        this.gravidade = null;
+    }
+    public String getNome() {
+        return nome;
+    }
+    public int getImagem() {
+        return imagem;
+    }
+    public Double getGravidade() {
+        return gravidade;
+    }
+    public String getInfoExtra() {
+        return infoExtra;
+    }
+}
+
+- CalculoGravidade.java
+[source,java]
+public class CalculoGravidade {
+    public static double calcularPeso(double msn, double gravidadeDoPlaneta) {
+        return msn * gravidadeDoPlaneta;
+    }
+}
+
+- RepositorioItem.java
+[source,java]
+import java.util.ArrayList;
+import java.util.List;
+public class RepositorioItem {
+    public static List<ItemLista> obterPlanetas() {
+        List<ItemLista> planetas = new ArrayList<>();
+        planetas.add(new ItemLista("Mercúrio", R.drawable.mercury, 3.7));
+        planetas.add(new ItemLista("Vênus", R.drawable.venus, 8.87));
+        planetas.add(new ItemLista("Terra", R.drawable.earth, 9.8));
+        planetas.add(new ItemLista("Marte", R.drawable.mars, 3.71));
+        planetas.add(new ItemLista("Júpiter", R.drawable.jupiter, 24.79));
+        planetas.add(new ItemLista("Saturno", R.drawable.planet, 10.44));
+        planetas.add(new ItemLista("Urano", R.drawable.uranus, 8.87));
+        planetas.add(new ItemLista("Netuno", R.drawable.neptune, 11.15));
+        return planetas;
+    }
+    public static List<ItemLista> obterEstrelas() {
+        List<ItemLista> estrelas = new ArrayList<>();
+        estrelas.add(new ItemLista("Sol", R.drawable.sun, "Temp: 5.500°C / Dist: 150 mi km"));
+        estrelas.add(new ItemLista("Lua", R.drawable.lua, "Temp: -130°C a 120°C / Dist: 384.400 km"));
+        return estrelas;
+    }
+}
+
+- HistoricoDao.java
+[source,java]
+import androidx.room.Dao;
+import androidx.room.Insert;
+import androidx.room.Query;
+import java.util.List;
+@Dao
+public interface HistoricoDao {
+    @Insert
+    void inserirCalculo(Historico historico);
+    @Query("SELECT * FROM tabela_historico ORDER BY id DESC")
+    List<Historico> obterTodos();
+}
+
+- AppDatabase.java
+[source,java]
+import android.content.Context;
+import androidx.room.Database;
+import androidx.room.Room;
+import androidx.room.RoomDatabase;
+@Database(entities = {Historico.class}, version = 1)
+public abstract class AppDatabase extends RoomDatabase {
+    public abstract HistoricoDao historicoDao();
+    private static volatile AppDatabase INSTANCE;
+    public static AppDatabase getInstance(Context context) {
+        if (INSTANCE == null) {
+            synchronized (AppDatabase.class) {
+                if (INSTANCE == null) {
+                    INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
+                                    AppDatabase.class, "banco_planetas")
+                            .build();
+                }
+            }
+        }
+        return INSTANCE;
+    }
+}
+
+- MeuAdapter.java
+[source,java]
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+import java.util.List;
+public class MeuAdapter extends RecyclerView.Adapter<MeuAdapter.MeuViewHolder> {
+    private List<ItemLista> itens;
+    private OnItemClickListener listener;
+    // Interface para escutar eventos 
+    public interface OnItemClickListener {
+        void onItemClick(ItemLista item);
+    }
+    public MeuAdapter(List<ItemLista> itens, OnItemClickListener listener) {
+        this.itens = itens;
+        this.listener = listener;
+    }
+    @NonNull
+    @Override
+    public MeuViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View itemLista = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.item_list, parent, false);
+        return new MeuViewHolder(itemLista);
+    }
+    @Override
+    public void onBindViewHolder(@NonNull MeuViewHolder holder, int position) {
+        final ItemLista item = itens.get(position);
+        holder.textView.setText(item.getNome());
+        holder.imageView.setImageResource(item.getImagem());
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (listener != null) {
+                    listener.onItemClick(item);
+                }
+            }
+        });
+    }
+    @Override
+    public int getItemCount() {
+        return itens.size();
+    }
+    public static class MeuViewHolder extends RecyclerView.ViewHolder {
+        ImageView imageView;
+        TextView textView;
+        public MeuViewHolder(@NonNull View itemView) {
+            super(itemView);
+            imageView = itemView.findViewById(R.id.imagemView);
+            textView = itemView.findViewById(R.id.textView);
+        }
+    }
+}
+
+- MainActivity.java
+[source,java]
+import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.graphics.Insets;
+import androidx.core.view.OnApplyWindowInsetsListener;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import java.util.List;
+public class MainActivity extends AppCompatActivity {
+    private RecyclerView recyclerView;
+    private MeuAdapter adapter;
+    private List<ItemLista> listaPlanetas;
+    private List<ItemLista> listaAstros;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        View mainView = findViewById(R.id.main);
+        ViewCompat.setOnApplyWindowInsetsListener(mainView, new OnApplyWindowInsetsListener() {
+            @Override
+            public boolean onApplyWindowInsets(View v, WindowInsetsCompat insets) {
+                Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+                v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+                return insets;
+            }
+        });
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setTitle("App Planetas");
+        }
+        recyclerView = findViewById(R.id.recyclerViewItens);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        listaPlanetas = RepositorioItem.obterPlanetas();
+        listaAstros = RepositorioItem.obterEstrelas();
+        // Passando Listener por classe anônima
+        adapter = new MeuAdapter(listaPlanetas, new MeuAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(ItemLista item) {
+                abrirDetalhes(item);
+            }
+        });
+        recyclerView.setAdapter(adapter);
+    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.sol) {
+            ItemLista sol = listaAstros.get(0);
+            abrirDetalhes(sol);
+            return true;
+        } else if (item.getItemId() == R.id.lua) {
+            ItemLista lua = listaAstros.get(1);
+            abrirDetalhes(lua);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+    private void abrirDetalhes(ItemLista itemSelecionado) {
+        DetalheFragment fragment = new DetalheFragment();
+        Bundle args = new Bundle();
+        args.putSerializable("objeto_selecionado", itemSelecionado);
+        fragment.setArguments(args);
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.fragment_container, fragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
+    }
+}
+
+- DetalheFragment.java
+[source,java]
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+import android.widget.Toast;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+public class DetalheFragment extends Fragment {
+    private ImageView img;
+    private TextView txtNome, txtInfoAstro, txtGravidade, resultadoPeso;
+    private EditText editPeso, editNomeUsuario;
+    private Button btnCalcular;
+    private ProgressBar progressBar;
+    private LinearLayout layoutCalculadora;
+    private int progress = 0;
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_detalhe, container, false);
+        img = view.findViewById(R.id.imgDetalhe);
+        txtNome = view.findViewById(R.id.txtNomeDetalhe);
+        txtInfoAstro = view.findViewById(R.id.txtInfoAstro);
+        layoutCalculadora = view.findViewById(R.id.layoutCalculadora);
+        txtGravidade = view.findViewById(R.id.txtGravidade);
+        editPeso = view.findViewById(R.id.editPeso);
+        editNomeUsuario = view.findViewById(R.id.editNomeUsuario);
+        btnCalcular = view.findViewById(R.id.btnCalcular);
+        progressBar = view.findViewById(R.id.progressBar);
+        resultadoPeso = view.findViewById(R.id.resultadoPeso);
+        Bundle args = getArguments();
+        if (args != null) {
+            final ItemLista item = (ItemLista) args.getSerializable("objeto_selecionado");
+            if (item != null) {
+                txtNome.setText(item.getNome());
+                img.setImageResource(item.getImagem());
+                if (item.getGravidade() != null) {
+                    configurarModoPlaneta(item);
+                } else {
+                    configurarModoAstro(item);
+                }
+            }
+        }
+        return view;
+    }
+    private void configurarModoAstro(ItemLista item) {
+        layoutCalculadora.setVisibility(View.GONE);
+        txtInfoAstro.setVisibility(View.VISIBLE);
+        txtInfoAstro.setText(item.getInfoExtra());
+    }
+    private void configurarModoPlaneta(final ItemLista item) {
+        txtInfoAstro.setVisibility(View.GONE);
+        layoutCalculadora.setVisibility(View.VISIBLE);
+        txtGravidade.setText("Gravidade: " + item.getGravidade() + " m/s²");
+        btnCalcular.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String pesoStr = editPeso.getText().toString();
+                String nomeUsuario = editNomeUsuario.getText().toString();
+                if (pesoStr.isEmpty() || nomeUsuario.isEmpty()) {
+                    resultadoPeso.setText("Preencha nome e massa!");
+                    return;
+                }
+                double msn = Double.parseDouble(pesoStr);
+                double pesoPlaneta = CalculoGravidade.calcularPeso(msn, item.getGravidade());
+                executarProgressBar(pesoPlaneta, nomeUsuario, msn, item.getNome());
+            }
+        });
+    }
+    private void executarProgressBar(final double pesoFinal, final String nomeUser, final double massaOriginal, final String nomePlaneta) {
+        this.progress = 0;
+        resultadoPeso.setText("");
+        progressBar.setProgress(progress);
+        progressBar.setVisibility(View.VISIBLE);
+        final Handler handler = new Handler(Looper.getMainLooper());
+        // Thread e post do Handler sem uso de Lambdas (Classes anônimas Runnable)
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (progress < 100) {
+                    progress += 10;
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            progressBar.setProgress(progress);
+                        }
+                    });
+                    try {
+                        Thread.sleep(200);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                // Salva o cálculo no Model de banco de dados
+                Historico novoRegistro = new Historico(nomeUser, massaOriginal, pesoFinal, nomePlaneta);
+                AppDatabase db = AppDatabase.getInstance(requireContext());
+                db.historicoDao().inserirCalculo(novoRegistro);
+                // Atualiza a View do usuário na Thread Principal
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        progressBar.setVisibility(View.INVISIBLE);
+                        resultadoPeso.setText(String.format("Olá %s! Seu peso em %s seria: %.2f N", nomeUser, nomePlaneta, pesoFinal));
+                        Toast.makeText(requireContext(), "Cálculo salvo no histórico!", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        }).start();
+    }
+}
 
