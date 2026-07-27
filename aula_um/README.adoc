@@ -149,6 +149,61 @@ Os componentes são os blocos de construção relevantes para o desenvolvimento 
 
 Referência: GOOGLE DEVELOPERS. Fundamentos  de aplicativos. Disponível em: https://developer.android.com/guide/components/fundamentals?hl=pt-br. Acesso em: 08 de jul. 2025.
 
+== Fundamentos da linguagem Kotlin
+
+Linguagem possui os 2 processos de compilação e execução assim como ocorre no Java.
+
+- Declarações de variáveis: VAL e VAR. VAL é imutável. VAR é mutável. O tipo é definido pelo compilador.
+[source,kotlin]
+val nome: String = "Ana"
+val idade = 30
+var cidade = "Palmas"
+idade = "42" //erro de compilação
+
+- Funções: usa a palavra FUN e o retorno vem logo após os dois pontos.
+[source,kotlin]
+fun somar(a: Int,b: Int): Int { return a+b }
+fun multiplicar(a: Int,b: Int): Int = a*b
+fun exibirMsg(mensagem:String){ println("mensagem: $mensagem")}
+
+Em Kotlin, as variáveis por padrão não podem receber NULL. Para permitir nulos, deve adicionar ? ao tipo
+[source,kotlin]
+var textoNormal: String = "hello" //não pode ser null
+var textoNulo: String? = "pode ser nulo"
+textoNulo = null
+
+SafeCall(?.) -> verifica se é nulo, se não for, a função/método será executado. Se for nulo, a função/método não será executado e a variável recebe o valor null.
+[source,kotlin]
+var textoNulo: String ?= null
+var tamanho: Int ?= textoNulo ?.length
+
+Operador Elvis(?:) -> é um operador binário utilizado para verificar valores nulos.
+val tamanhoSeguro: Int = textoNulo ?. length ?: 0
+
+Estruturas de controle
+
+Objetos e classes -> o construtor faz parte do cabeçalho da classe.
+
+[source,kotlin]
+class Usuario (var nome: String, var idade: Int) {
+   fun apresentar(){ println("hello, my name is $nome e tenho $idade anos")} 
+}
+val usuario = Usuario("Ana",30) //não usa o palavra NEW
+usuario.apresentar()
+
+Herança e classes abstratas(open) -> por padrão todas as classes são final (não podem ser herdadas). Para permitir herança, você deve usar a palavra OPEN.
+[source,kotlin]
+open class Animal(var nome:String){
+   open fun emitirSom(){ println("som")}
+}
+
+class cachorro(nome:String):Animal(nome){
+   override fun emitirSom(){ println("auaauau")}
+}
+
+
+
+
 == Activity
 
 A activity é um componente disponível no SDK do Android responsável em apresentar a parte visual (interface gráfica) do aplicativo. A activity possui métodos que são invocados automaticamente pelo sistema. O entendimento desses métodos é fundamental para o funcionamento adequado do aplicativo. A figura 2 mostra os métodos envolvidos no ciclo de vida.
