@@ -180,7 +180,19 @@ var tamanho: Int ?= textoNulo ?.length
 Operador Elvis(?:) -> é um operador binário utilizado para verificar valores nulos.
 val tamanhoSeguro: Int = textoNulo ?. length ?: 0
 
-Estruturas de controle
+Estruturas de controle (if e when)
+[source,kotlin]
+val idade = 20
+val status = if(idade>=18) "maior" else "menor"
+
+when(substituto do switch-case)
+[source,kotlin]
+val nota = 8
+when(nota){
+   10 -> println("excelente")
+   in 7..9 -> println("bom") //intervalos inclusivos
+   else -> println("precisa melhorar")
+}
 
 Objetos e classes -> o construtor faz parte do cabeçalho da classe.
 
@@ -201,7 +213,7 @@ class cachorro(nome:String):Animal(nome){
    override fun emitirSom(){ println("auaauau")}
 }
 
-
+Para mais detalhes sobre a linguagem kotlin, acesse o material Abordagem Kotlin do Android, disponível em: https://developer.android.com/kotlin/first?hl=pt-br. 
 
 
 == Activity
@@ -228,6 +240,16 @@ Métodos dos ciclos de vida:
         Toast.makeText(getApplicationContext(), "OnCreate", Toast.LENGTH_SHORT).show();
     }
 
+[source,kotlin]
+override fun onCreate(savedInstanceState: Bundle?) {
+    // único método cuja a implementação é obrigatória;
+    // executado apenas uma única vez durante todo o ciclo da atividade;
+    // usado para configurações iniciais da atividade como os componentes visuais e também para restaurar dados salvos (use o Bundle).
+    super.onCreate(savedInstanceState)
+    setContentView(R.layout.activity_main)
+    Toast.makeText(applicationContext, "OnCreate", Toast.LENGTH_SHORT).show()
+}
+
 - onStart
 [source,java]
 @Override
@@ -237,6 +259,14 @@ Métodos dos ciclos de vida:
         super.onStart();
         Toast.makeText(getApplicationContext(), "OnStart", Toast.LENGTH_SHORT).show();
     }
+
+[source,kotlin]
+override fun onStart() {
+    // a atividade está visível, porém não esta apta para atender as solicitações do usuário.
+    // estado de preparação da Activity
+    super.onStart()
+    Toast.makeText(applicationContext, "OnStart", Toast.LENGTH_SHORT).show()
+}
 
 - onResume
 [source,java]
@@ -248,6 +278,14 @@ Métodos dos ciclos de vida:
         Toast.makeText(getApplicationContext(), "OnResume", Toast.LENGTH_SHORT).show();
     }
 
+[source,kotlin]
+override fun onResume() {
+    // a atividade está apta para atender as solicitações do usuário.
+    // coloque aqui recursos que consomem processamento.
+    super.onResume()
+    Toast.makeText(applicationContext, "OnResume", Toast.LENGTH_SHORT).show()
+}
+
 - onPause
 [source,java]
  @Override
@@ -257,6 +295,14 @@ Métodos dos ciclos de vida:
         super.onPause();
         Toast.makeText(getApplicationContext(), "OnPause", Toast.LENGTH_SHORT).show();
     }
+
+[source,kotlin]
+override fun onPause() {
+    // método chamado quando activity não tem mais foco, mas ainda é visível.
+    // a atividade não está mais em primeiro plano, mas ainda existe uma referência dela.
+    super.onPause()
+    Toast.makeText(applicationContext, "OnPause", Toast.LENGTH_SHORT).show()
+}
 
 - onStop
 [source,java]
@@ -268,6 +314,14 @@ Métodos dos ciclos de vida:
         Toast.makeText(getApplicationContext(), "OnStop", Toast.LENGTH_SHORT).show();
     }
 
+[source,kotlin]
+override fun onStop() {
+    // a atividade não é mais visível ao usuário;
+    // nesta fase, na falta de recursos o sistema pode destruir o processo. Portanto, é um bom lugar para realizar a persistência de dados.
+    super.onStop()
+    Toast.makeText(applicationContext, "OnStop", Toast.LENGTH_SHORT).show()
+}
+
 - onDestroy
 [source,java]
  @Override
@@ -278,6 +332,13 @@ Métodos dos ciclos de vida:
         Toast.makeText(getApplicationContext(), "OnDestroy", Toast.LENGTH_SHORT).show();
     }
 
+[source,kotlin]
+override fun onDestroy() {
+    // depois da execução deste método, a atividade é destruída.
+    // libere todos os recursos usados!!
+    super.onDestroy()
+    Toast.makeText(applicationContext, "OnDestroy", Toast.LENGTH_SHORT).show()
+}
 
 === EXEMPLO PRATICO:
 
