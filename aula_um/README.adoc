@@ -215,6 +215,8 @@ class cachorro(nome:String):Animal(nome){
 
 Para mais detalhes sobre a linguagem kotlin, acesse o material Abordagem Kotlin do Android, disponível em: https://developer.android.com/kotlin/first?hl=pt-br. 
 
+Para mais informações sobre a sintaxe, acesse o material Visão geral da sintaxe básica, disponível em: https://kotlinlang.org/docs/basic-syntax.html
+
 
 == Activity
 
