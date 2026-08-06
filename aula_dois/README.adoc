@@ -13,7 +13,7 @@
 
 == Classe Context
 
-No desenvolvimento para Android, o Contexto (Context) é um conceito fundamental que representa o estado atual do aplicativo ou de um objeto dentro dele. Trata-se de uma classe abstrata que funciona como uma interface que permite que objetos acessem informações e recursos do sistema Android, como serviços, atividades, recursos do aplicativo (como strings, layouts e imagens) e outras funcionalidades específicas da plataforma. 
+No desenvolvimento para Android, o Contexto (Context) é um objeto que permite acessar dados globais do aplicativo ou do ambiente. Na documentação, o contexto é definico como uma classe abstrata que funciona como uma interface que permite que objetos acessem informações e recursos do sistema Android, como serviços, atividades, recursos do aplicativo (como strings, layouts e imagens) e outras funcionalidades específicas da plataforma. 
 
 Dois principais contextos usados no desenvolvimento inicial de apps:
 
