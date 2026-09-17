@@ -1,8 +1,228 @@
 = Atividades resolvidas
 
+== Exemplo de lista com itens
+
+- activity_main.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="24dp">
+    <ImageButton
+        android:id="@+id/botaoAndroid"
+        android:layout_width="180dp"
+        android:layout_height="180dp"
+        android:src="@drawable/logo_android_nova"
+        android:background="@android:color/transparent"
+        android:contentDescription="Abrir versões do Android"
+        android:scaleType="fitCenter" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="Conheça o Android"
+        android:textSize="28sp"
+        android:textStyle="bold" />
+</LinearLayout>
+
+- activity_lista.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:text="Versões do Android"
+        android:textSize="24sp"
+        android:textStyle="bold" />
+    <ListView
+        android:id="@+id/listViewVersoes"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+</LinearLayout>
+
+- item_versao.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="80dp"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:padding="10dp">
+    <ImageView
+        android:id="@+id/imagemVersao"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:scaleType="fitCenter" />
+    <TextView
+        android:id="@+id/nomeVersao"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginStart="16dp"
+        android:textSize="18sp" />
+</LinearLayout>
+
+- activity_detalhe.xml
+[source,xml]
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center_horizontal"
+    android:padding="24dp">
+    <ImageView
+        android:id="@+id/imagemDetalhe"
+        android:layout_width="180dp"
+        android:layout_height="180dp"
+        android:layout_marginTop="30dp"
+        android:scaleType="fitCenter" />
+    <TextView
+        android:id="@+id/nomeDetalhe"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:textSize="26sp"
+        android:textStyle="bold" />
+    <TextView
+        android:id="@+id/txt1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:textSize="18sp" />
+    <TextView
+        android:id="@+id/txt2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="14dp"
+        android:textSize="18sp" />
+    <TextView
+        android:id="@+id/txt3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="14dp"
+        android:textSize="18sp" />
+</LinearLayout>
+
+- VersaoAndroid.kt
+[source,kt]
+data class VersaoAndroid(
+    val nome: String,
+    val imagem: Int,
+    val txt1: String,
+    val txt2: String,
+    val txt3: String
+)
+
+- VersaoAdapter.kt
+[source.kt]
+import android.content.Context
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.BaseAdapter
+import android.widget.ImageView
+import android.widget.TextView
+class VersaoAdapter(
+    private val context: Context,
+    private val lista: ArrayList<VersaoAndroid>
+) : BaseAdapter() {
+    override fun getCount(): Int = lista.size
+    override fun getItem(position: Int): Any = lista[position]
+    override fun getItemId(position: Int): Long = position.toLong()
+    override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
+        val view = convertView ?: LayoutInflater.from(context).inflate(R.layout.item_versao, parent, false)
+        val imagem = view.findViewById<ImageView>(R.id.imagemVersao)
+        val nome = view.findViewById<TextView>(R.id.nomeVersao)
+        imagem.setImageResource(lista[position].imagem)
+        nome.text = lista[position].nome
+        return view
+    }
+}
+
+- ListaActivity.kt
+[source,kt]
+import android.content.Intent
+import android.os.Bundle
+import android.widget.ListView
+import androidx.appcompat.app.AppCompatActivity
+class ListaActivity : AppCompatActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_lista)
+        val lista = arrayListOf(
+            VersaoAndroid("Android 1.0", R.drawable.versao_img_01, "Android 1.0","Android 1.0","Android 1.0"),
+            VersaoAndroid("Android 1.1", R.drawable.versao_img_02, "Android 1.1", "Android 1.1", "Android 1.1"),
+            VersaoAndroid("Android 1.5", R.drawable.versao_img_03, "Android 1.5", "Android 1.5", "Android 1.5"),
+        )
+        val listView = findViewById<ListView>(R.id.listViewVersoes)
+        listView.adapter = VersaoAdapter(this, lista)
+        listView.setOnItemClickListener { _, _, position, _ ->
+            val item = lista[position]
+            val intent = Intent(this, DetalheActivity::class.java)
+            intent.putExtra("nome", item.nome)
+            intent.putExtra("imagem", item.imagem)
+            intent.putExtra("txt1", item.txt1)
+            intent.putExtra("txt2", item.txt2)
+            intent.putExtra("txt3", item.txt3)
+            startActivity(intent)
+        }
+    }
+}
+
+- DetalheActivity.kt
+[source,kt]
+import android.os.Bundle
+import android.widget.ImageView
+import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
+class DetalheActivity : AppCompatActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_detalhe)
+        val imagem = findViewById<ImageView>(R.id.imagemDetalhe)
+        val nome = findViewById<TextView>(R.id.nomeDetalhe)
+        val txt1 = findViewById<TextView>(R.id.txt1)
+        val txt2 = findViewById<TextView>(R.id.txt2)
+        val txt3 = findViewById<TextView>(R.id.txt3)
+        nome.text = intent.getStringExtra("nome")
+        imagem.setImageResource(intent.getIntExtra("imagem", R.drawable.logo_android_nova))
+        txt1.text = "• ${intent.getStringExtra("txt1")}"
+        txt2.text = "• ${intent.getStringExtra("txt2")}"
+        txt3.text = "• ${intent.getStringExtra("txt3")}"
+    }
+}
+
+- MainActivity.kt
+[source,kt]
+import android.content.Intent
+import android.os.Bundle
+import android.widget.ImageButton
+import androidx.appcompat.app.AppCompatActivity
+class MainActivity : AppCompatActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+        val botaoAndroid = findViewById<ImageButton>(R.id.botaoAndroid)
+        botaoAndroid.setOnClickListener {
+            startActivity(Intent(this, ListaActivity::class.java))
+        }
+    }
+}
+
 == Exemplo de Lista com AlertDialog e exclusão de itens
 
-- activity_mains.xml
+- activity_main.xml
 [source,xml]
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
